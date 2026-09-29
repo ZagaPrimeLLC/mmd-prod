@@ -8,8 +8,9 @@ New Jersey DDD approved statewide provider · South Plainfield, NJ
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
-[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-F38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com)
+[![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
 </div>
 
@@ -22,7 +23,7 @@ One Next.js application serving two audiences from a single codebase and a singl
 | Surface | Route | Audience |
 | :--- | :--- | :--- |
 | **Public website** | `/` | Families, guardians, support coordinators |
-| **Internal CRM** | `/dashboard` | The five-person MMD operations team |
+| **Internal CRM** | `/dashboard` | The MMD operations team |
 
 Keeping them together means one `job_posts` row renders the public Careers listing *and* generates the column on the applicant board. Splitting them would mean two deploys, two schemas, and a synchronisation problem.
 
@@ -30,18 +31,14 @@ Keeping them together means one `job_posts` row renders the public Careers listi
 
 ## Stack
 
-| Layer | Choice | Why |
-| :--- | :--- | :--- |
-| Framework | Next.js 14 (App Router) · TypeScript · Tailwind | Server rendering is what makes the SEO goals reachable |
-| Hosting | Cloudflare Pages | Free tier **permits commercial use**; accepts a custom domain by CNAME from external DNS |
-| Database | Supabase — shared host, schema `proj_mmd` | Standing rule: no new Supabase project |
-| Auth | Supabase Auth (magic link) | Scoped by `hub.is_member('mmd')` |
-| Files | Supabase Storage — private bucket `mmd-resumes` | Signed URLs only, never public |
-
-> [!NOTE]
-> **Vercel was evaluated and rejected.** The Hobby tier forbids commercial use and MMD is a trading business; Pro at $20/month defeats the point of replacing a $204/year Wix plan.
->
-> **Pages rather than Workers.** Workers custom domains require the zone to sit on Cloudflare DNS, which is blocked until the domain is recovered from GoDaddy. Pages accepts a CNAME from the existing Wix DNS panel today.
+| Layer | Choice |
+| :--- | :--- |
+| Framework | Next.js 14 (App Router) · TypeScript · Tailwind |
+| Hosting | Vercel |
+| Database | Supabase — shared host, schema `proj_mmd` |
+| Auth | Supabase Auth (magic link), scoped by `hub.is_member('mmd')` |
+| Files | Supabase Storage — private bucket `mmd-resumes`, signed URLs only |
+| DNS | Cloudflare (planned), Wix panel until the domain transfer completes |
 
 ---
 
@@ -57,8 +54,21 @@ npm run dev                   # http://localhost:3000
 | :--- | :--- |
 | `npm run dev` | Development server |
 | `npm run build` | Production build |
+| `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run pages:build` | Cloudflare Pages build |
+
+### Environment
+
+| Variable | Value |
+| :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://vcwvrtxbmgtwemsqdmch.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key from Supabase → API keys |
+| `NEXT_PUBLIC_SUPABASE_SCHEMA` | `proj_mmd` |
+
+Set all three in Vercel → Project → Settings → Environment Variables for Production, Preview and Development.
+
+> [!IMPORTANT]
+> Add the deployed URL to **Supabase → Authentication → URL Configuration → Redirect URLs**, including the Vercel preview pattern, or magic-link sign-in will bounce.
 
 ---
 
@@ -79,8 +89,8 @@ supabase db pull --schema proj_mmd
 
 ### Access model
 
-> [!IMPORTANT]
-> Team tables use **member read + member write** — deliberately *not* `hub.secure_table`, whose default is owner-writes-own-rows. A board where only the creator can move a card is unusable for a five-person team.
+> [!NOTE]
+> Team tables use **member read + member write** — deliberately *not* `hub.secure_table`, whose default is owner-writes-own-rows. A board where only the creator can move a card is unusable for a shared team.
 
 | Rule | Applies to |
 | :--- | :--- |
@@ -117,7 +127,7 @@ The real risk is free text. Watch `handoffs.case_info` and `screenings.notes` �
 
 ## Roles
 
-Held in `hub.memberships`. Roles drive routing and defaults, not access locks — at five people, a permission matrix adds friction and prevents nothing.
+Held in `hub.memberships`. Roles drive routing and defaults, not access locks.
 
 `admin` · `hr` · `supervisor` · `case_manager` · `coordinator`
 
@@ -127,8 +137,8 @@ Held in `hub.memberships`. Roles drive routing and defaults, not access locks �
 
 ```
 CareerPlug → New → Screening → Ready → With Coordinator → Appointment Set → Completed
-                        ↓
-                    Archived (not qualified / unresponsive)
+                       ↓
+                   Archived (not qualified / unresponsive)
 ```
 
 CareerPlug stays the system of record for applications. This dashboard is the working surface. Intake is a ladder, built so the source is swappable:
@@ -136,6 +146,26 @@ CareerPlug stays the system of record for applications. This dashboard is the wo
 1. **CSV export** — works on any plan, ships first
 2. **Notification emails parsed by n8n** — the steady state
 3. **Native API / webhooks** — Grow plan only, not currently available
+
+---
+
+## Project layout
+
+```
+src/
+├── app/
+│   ├── (dashboard)/dashboard/   internal CRM, auth-gated
+│   ├── auth/callback/           magic-link exchange
+│   ├── login/                   team sign-in
+│   ├── layout.tsx
+│   └── page.tsx                 public home
+├── components/
+├── lib/
+│   ├── supabase/                browser + server clients
+│   ├── pipeline.ts              stages, roles, staleness
+│   └── site.ts                  site content and service copy
+└── middleware.ts                gates /dashboard
+```
 
 ---
 
