@@ -20,7 +20,8 @@ export default function HeroSection() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy/88 via-navy/55 to-navy/15" />
+        <div className="absolute inset-0 bg-navy/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy/95 via-navy/80 to-navy/20" />
       </div>
 
       <div className="relative z-10 flex h-full items-center">

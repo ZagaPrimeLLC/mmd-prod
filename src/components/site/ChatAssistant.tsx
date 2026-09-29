@@ -76,14 +76,22 @@ export default function ChatAssistant() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label={open ? 'Close the assistant' : 'Open the assistant'}
-        className="fixed bottom-5 right-5 z-[60] grid h-14 w-14 place-items-center rounded-full bg-navy text-white shadow-xl transition hover:bg-navy-dark"
-      >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-      </button>
+      <div className="fixed bottom-5 right-5 z-[60] grid h-16 w-16 place-items-center">
+        {!open && (
+          <span
+            aria-hidden="true"
+            className="mmd-chat-halo pointer-events-none absolute inset-0 rounded-full bg-gold"
+          />
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? 'Close the assistant' : 'Open the assistant'}
+          className={`relative grid h-14 w-14 place-items-center rounded-full bg-gold text-navy transition hover:bg-gold-dark ${open ? 'shadow-xl' : 'mmd-chat-fab'}`}
+        >
+          {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-7 w-7" />}
+        </button>
+      </div>
 
       {open && (
         <div

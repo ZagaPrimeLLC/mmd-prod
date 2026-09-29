@@ -15,7 +15,7 @@ export default function PageHero({
         <Image src={image} alt={imageAlt} fill priority sizes="100vw" className="object-cover" />
         {/* faded so the photograph reads behind the type without fighting it */}
         <div className="absolute inset-0 bg-navy/25" />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy/90 via-navy/60 to-navy/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy/92 via-navy/70 to-navy/15" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
