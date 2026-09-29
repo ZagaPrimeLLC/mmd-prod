@@ -10,7 +10,7 @@ const badges = [
 
 export default function HeroSection() {
   return (
-    <section className="relative h-[600px] overflow-hidden md:h-[700px]">
+    <section className="relative h-[34rem] overflow-hidden sm:h-[38rem] md:h-[44rem] lg:h-[48vw] lg:max-h-[54rem] lg:min-h-[44rem]">
       <div className="absolute inset-0">
         <Image
           src="/images/home-hero.jpg"
@@ -18,10 +18,9 @@ export default function HeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-[60%_center]"
         />
-        <div className="absolute inset-0 bg-navy/15" />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy/95 via-navy/80 to-navy/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy/88 via-navy/55 to-navy/15" />
       </div>
 
       <div className="relative z-10 flex h-full items-center">
