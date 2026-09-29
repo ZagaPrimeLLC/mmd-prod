@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import PageHero from '@/components/site/PageHero';
 import ContactForm from '@/components/site/ContactForm';
+import BookingFlow from '@/components/site/BookingFlow';
 import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -18,14 +19,32 @@ export default function ContactPage() {
         eyebrow="Contact"
         title="Book a free consultation"
         lead="Tell us a little about the person you are looking for support for, and we will call you back."
-        image="/images/hero-care.png"
+        image="/images/office-phone.jpg"
         imageAlt="An MMD support worker talking with a client at home"
       />
 
       <section className="bg-white py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:px-12 lg:grid-cols-5">
-          <div className="lg:col-span-3">
-            <ContactForm sourcePage="/contact" />
+          <div className="space-y-14 lg:col-span-3">
+            <div id="book">
+              <h2 className="text-2xl font-bold text-navy">Book a consultation</h2>
+              <p className="mt-2 text-gray-600">
+                Pick a time and we will call you to confirm it.
+              </p>
+              <div className="mt-6 rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <BookingFlow />
+              </div>
+            </div>
+
+            <div id="message">
+              <h2 className="text-2xl font-bold text-navy">Or send a message</h2>
+              <p className="mt-2 text-gray-600">
+                Prefer to write instead? Tell us what you need and we will get back to you.
+              </p>
+              <div className="mt-6">
+                <ContactForm sourcePage="/contact" />
+              </div>
+            </div>
           </div>
 
           <aside className="lg:col-span-2">

@@ -19,7 +19,7 @@ export default function ServicesPage() {
         eyebrow="Services"
         title="Support that fits the person"
         lead="The State of New Jersey Division of Developmental Disabilities has approved our agency to provide community-based support, respite and individual support to adults with disabilities."
-        image="/images/community-walk.png"
+        image="/images/games.jpg"
         imageAlt="An MMD support worker accompanying a client in the community"
       />
 

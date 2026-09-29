@@ -18,7 +18,7 @@ export default function MissionPage() {
         eyebrow="Mission"
         title="Why we do what we do"
         lead="We believe in treating our clients with compassion and respect."
-        image="/images/hero-care.png"
+        image="/images/reading.jpg"
         imageAlt="An MMD support worker talking with a client at home"
       />
 

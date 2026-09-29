@@ -34,7 +34,7 @@ export default async function CareersPage() {
         eyebrow="Careers"
         title="Better care starts with you"
         lead="Join a team of dedicated professionals making a real difference in the lives of adults with special needs across New Jersey."
-        image="/images/team.png"
+        image="/images/training.jpg"
         imageAlt="MMD Direct Support Professionals outside the South Plainfield office"
       />
 
@@ -91,8 +91,8 @@ export default async function CareersPage() {
               </ul>
 
               <Image
-                src="/images/community-walk.png"
-                alt="An MMD Direct Support Professional supporting a client in the community"
+                src="/images/team-office.jpg"
+                alt="MMD Direct Support Professionals outside the South Plainfield office"
                 width={1200}
                 height={900}
                 sizes="(min-width: 1024px) 50vw, 100vw"

@@ -7,8 +7,8 @@ export default function CareersBand() {
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <Image
-            src="/images/team.png"
-            alt="MMD Direct Support Professionals outside the South Plainfield office"
+            src="/images/garden.jpg"
+            alt="An MMD support worker and a client having tea in the garden"
             width={800}
             height={600}
             sizes="(min-width: 768px) 50vw, 100vw"

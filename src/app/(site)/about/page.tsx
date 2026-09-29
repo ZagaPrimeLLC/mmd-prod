@@ -19,7 +19,7 @@ export default function AboutPage() {
         eyebrow="About MMD"
         title="Care built around the person, not the paperwork"
         lead="We are a New Jersey DDD approved statewide provider of community support, respite and individual support for adults with disabilities."
-        image="/images/kitchen-support.png"
+        image="/images/kitchen.jpg"
         imageAlt="An MMD support worker and a client preparing a meal together at home"
       />
 
@@ -45,7 +45,7 @@ export default function AboutPage() {
             </div>
           </div>
           <Image
-            src="/images/kitchen-support.png"
+            src="/images/kitchen.jpg"
             alt="An MMD support worker and a client preparing a meal together"
             width={1200}
             height={900}

@@ -8,6 +8,7 @@ export type ChatNode = {
   say: string[];
   options?: ChatOption[];
   capture?: 'lead';
+  link?: { href: string; label: string };
 };
 
 export const CHAT: Record<string, ChatNode> = {
@@ -15,14 +16,30 @@ export const CHAT: Record<string, ChatNode> = {
     id: 'start',
     say: [
       'Hello, and thanks for visiting MMD Community Care.',
-      'I can answer a few common questions, or take your details so someone calls you back. What brings you here?',
+      'I can answer questions about our services, book you a consultation, or take your details so someone calls you back.',
+      'Please keep any medical or personal health details out of this chat. We will go through anything clinical on the phone.',
+      'What brings you here?',
     ],
     options: [
+      { id: 'book', label: 'Book a free consultation', next: 'booking' },
       { id: 'family', label: 'I need care for a family member', next: 'family' },
       { id: 'job', label: 'I want to work as a caregiver', next: 'job' },
       { id: 'coordinator', label: "I'm a support coordinator", next: 'coordinator' },
       { id: 'other', label: 'Something else', next: 'human' },
     ],
+  },
+  booking: {
+    id: 'booking',
+    say: [
+      'Consultations run on Tuesdays and Thursdays between 11am and 4pm, and take about 45 minutes.',
+      'I will open the booking page so you can pick a time that suits you.',
+    ],
+    options: [{ id: 'go', label: 'Show me the times', next: 'book-link' }],
+  },
+  'book-link': {
+    id: 'book-link',
+    say: ['Choose a slot on the booking page and the office will call to confirm it.'],
+    link: { href: '/contact#book', label: 'Open the booking page' },
   },
   family: {
     id: 'family',
@@ -44,7 +61,8 @@ export const CHAT: Record<string, ChatNode> = {
       'Shall I take your details so someone can call you and talk it through?',
     ],
     options: [
-      { id: 'yes', label: 'Yes, please call me', next: 'lead' },
+      { id: 'book', label: 'Book a consultation', next: 'booking' },
+      { id: 'yes', label: 'Just have someone call me', next: 'lead' },
       { id: 'more', label: 'Tell me about the staff first', next: 'vetting' },
     ],
   },
@@ -55,7 +73,8 @@ export const CHAT: Record<string, ChatNode> = {
       'Would you like someone to call you about it?',
     ],
     options: [
-      { id: 'yes', label: 'Yes, please call me', next: 'lead' },
+      { id: 'book', label: 'Book a consultation', next: 'booking' },
+      { id: 'yes', label: 'Just have someone call me', next: 'lead' },
       { id: 'more', label: 'How are your staff vetted?', next: 'vetting' },
     ],
   },
@@ -66,7 +85,8 @@ export const CHAT: Record<string, ChatNode> = {
       'Would you like someone to call you?',
     ],
     options: [
-      { id: 'yes', label: 'Yes, please call me', next: 'lead' },
+      { id: 'book', label: 'Book a consultation', next: 'booking' },
+      { id: 'yes', label: 'Just have someone call me', next: 'lead' },
       { id: 'more', label: 'How are your staff vetted?', next: 'vetting' },
     ],
   },

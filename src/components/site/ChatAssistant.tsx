@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MessageCircle, X, Send, CheckCircle2 } from 'lucide-react';
+import { MessageCircle, X, Send, CheckCircle2, CalendarCheck } from 'lucide-react';
 import { CHAT } from '@/lib/chat-script';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
@@ -144,6 +144,15 @@ export default function ChatAssistant() {
             <div ref={endRef} />
           </div>
 
+          {!capturing && !sent && current?.link && (
+            <div className="shrink-0 border-t border-gray-100 px-4 py-3">
+              <a href={current.link.href}
+                className="flex items-center justify-center gap-2 rounded-lg bg-gold px-3.5 py-2.5 text-sm font-bold text-navy">
+                <CalendarCheck className="h-4 w-4" /> {current.link.label}
+              </a>
+            </div>
+          )}
+
           {!capturing && !sent && current?.options && (
             <div className="shrink-0 space-y-2 border-t border-gray-100 px-4 py-3">
               {current.options.map((o) => (
@@ -155,7 +164,7 @@ export default function ChatAssistant() {
             </div>
           )}
 
-          {!capturing && !sent && !current?.options && (
+          {!capturing && !sent && !current?.options && !current?.link && (
             <div className="shrink-0 border-t border-gray-100 px-4 py-3">
               <a href={site.phoneHref} className="block rounded-lg bg-gold px-3.5 py-2.5 text-center text-sm font-bold text-navy">
                 Call {site.phone}

@@ -19,7 +19,7 @@ export default function TestimonialsPage() {
         eyebrow="Testimonials"
         title="What families tell us"
         lead="The families we support, the coordinators who refer to us, and the people who work here."
-        image="/images/community-walk.png"
+        image="/images/sidewalk.jpg"
         imageAlt="An MMD support worker accompanying a client in the community"
       />
 
