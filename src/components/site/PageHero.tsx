@@ -10,7 +10,7 @@ export default function PageHero({
   imageAlt: string;
 }) {
   return (
-    <section className="relative flex items-center overflow-hidden py-20 md:py-28 lg:min-h-[30vw] lg:max-h-[34rem]">
+    <section className="relative flex items-center overflow-hidden py-16 sm:py-20 md:py-28 lg:min-h-[30vw] lg:max-h-[34rem]">
       <div className="absolute inset-0">
         <Image src={image} alt={imageAlt} fill priority sizes="100vw" className="object-cover object-[60%_center]" />
         {/* faded so the photograph reads behind the type without fighting it */}

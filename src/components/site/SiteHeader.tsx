@@ -20,8 +20,8 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-12">
-        <Link href="/" className="flex shrink-0 items-center gap-3">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-8 lg:px-12">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           {/* white plate keeps the shield's fine detail legible at small sizes */}
           <span className="grid shrink-0 place-items-center rounded-lg bg-white p-1 shadow-sm ring-1 ring-gray-100">
             <Image
@@ -31,14 +31,14 @@ export default function SiteHeader() {
               height={484}
               priority
               quality={100}
-              className="h-14 w-auto sm:h-16"
+              className="h-12 w-auto sm:h-16"
             />
           </span>
-          <span className="leading-tight">
-            <span className="block text-base font-extrabold tracking-tight text-navy sm:text-xl">
+          <span className="min-w-0 leading-tight">
+            <span className="block text-[15px] font-extrabold leading-snug tracking-tight text-navy sm:text-xl">
               MMD Community Care
             </span>
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-steel sm:text-xs">
+            <span className="block text-[10px] font-semibold uppercase tracking-wide text-steel [text-wrap:balance] sm:text-xs">
               {site.slogan}
             </span>
           </span>
