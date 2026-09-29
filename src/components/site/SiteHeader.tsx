@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
 import { site } from '@/lib/site';
@@ -21,11 +22,17 @@ export default function SiteHeader() {
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-navy text-sm font-bold text-gold">
-            MMD
-          </span>
-          <span className="text-lg font-bold leading-tight text-navy">
-            MMD Community Care
+          <Image
+            src={site.logo}
+            alt={`${site.legalName} logo`}
+            width={616}
+            height={484}
+            priority
+            className="h-12 w-auto"
+          />
+          <span className="hidden leading-tight sm:block">
+            <span className="block text-lg font-bold text-navy">MMD Community Care</span>
+            <span className="block text-[11px] font-medium tracking-wide text-steel">{site.slogan}</span>
           </span>
         </Link>
 

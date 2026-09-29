@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { site } from '@/lib/site';
 
@@ -7,7 +8,15 @@ export default function SiteFooter() {
     <footer className="bg-navy text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-3">
         <div>
+          <Image
+            src={site.logo}
+            alt={`${site.legalName} logo`}
+            width={616}
+            height={484}
+            className="mb-4 h-16 w-auto"
+          />
           <p className="text-lg font-bold">{site.legalName}</p>
+          <p className="text-sm font-medium text-gold">{site.slogan}</p>
           <p className="mt-3 text-sm leading-relaxed text-gray-200">
             A New Jersey DDD approved statewide provider of community support, respite and
             individual support for adults with disabilities.

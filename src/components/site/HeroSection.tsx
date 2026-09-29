@@ -13,8 +13,8 @@ export default function HeroSection() {
     <section className="relative h-[600px] overflow-hidden md:h-[700px]">
       <div className="absolute inset-0">
         <Image
-          src="/images/hero-care-ChqNW3E1.jpg"
-          alt="A caregiver supporting an adult with special needs"
+          src="/images/hero-care.png"
+          alt="An MMD support worker talking with a client in his own home"
           fill
           priority
           sizes="100vw"

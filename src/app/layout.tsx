@@ -7,7 +7,14 @@ export const metadata: Metadata = {
   title: { default: `${site.name} | ${site.tagline}`, template: `%s | ${site.name}` },
   description: site.description,
   robots: { index: true, follow: true },
-  openGraph: { siteName: site.name, type: 'website', locale: 'en_US' },
+  keywords: [
+    'NJ DDD approved provider', 'developmental disabilities New Jersey',
+    'respite care NJ', 'individual support NJ', 'community support NJ',
+    'Direct Support Professional jobs NJ', 'special needs care New Jersey',
+    'adult disability services South Plainfield',
+  ],
+  openGraph: { siteName: site.name, type: 'website', locale: 'en_US', images: [site.logo] },
+  icons: { icon: site.logo },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
