@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-white text-slate-800 antialiased; }
+/* 16px minimum on inputs stops iOS zoom-on-focus breaking form layouts */
+input, select, textarea { font-size: 16px; }
