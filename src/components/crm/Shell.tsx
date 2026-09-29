@@ -1,0 +1,152 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { Menu, X, LogOut, ShieldCheck, Eye } from 'lucide-react';
+import { navFor, canWrite, ROLE_LABELS, type Role } from '@/lib/crm/nav';
+import { site } from '@/lib/site';
+
+function initials(email: string) {
+  const name = email.split('@')[0] ?? '';
+  return name.slice(0, 2).toUpperCase() || 'MM';
+}
+
+export default function Shell({
+  who, role, children,
+}: { who: string; role: Role | null; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const sections = navFor(role);
+  const writes = canWrite(role);
+
+  const nav = (
+    <nav className="flex-1 space-y-7 overflow-y-auto px-3 py-6">
+      {sections.map((section) => (
+        <div key={section.title}>
+          <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-widest text-white/40">
+            {section.title}
+          </p>
+          <ul className="space-y-0.5">
+            {section.items.map((item) => {
+              const active =
+                item.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname.startsWith(item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
+                      active
+                        ? 'bg-white/15 font-semibold text-white'
+                        : 'font-medium text-white/70 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-gold' : 'text-white/50 group-hover:text-white/80'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  );
+
+  const brand = (
+    <div className="flex items-center gap-2.5 border-b border-white/10 px-5 py-4">
+      <span className="grid shrink-0 place-items-center rounded-lg bg-white p-1">
+        <Image src={site.logo} alt="" width={616} height={484} className="h-8 w-auto" />
+      </span>
+      <span className="min-w-0 leading-tight">
+        <span className="block text-[13px] font-bold leading-snug text-white">MMD Community Care</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-wider text-gold">
+          Operations
+        </span>
+      </span>
+    </div>
+  );
+
+  const footer = (
+    <div className="border-t border-white/10 px-4 py-4">
+      <div className="flex items-center gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold text-xs font-bold text-navy-deep">
+          {initials(who)}
+        </span>
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block truncate text-xs font-semibold text-white">{who}</span>
+          <span className="flex items-center gap-1 text-[11px] text-white/50">
+            {writes ? <ShieldCheck className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+            {role ? ROLE_LABELS[role] : 'No role'}
+          </span>
+        </span>
+      </div>
+      <form action="/auth/signout" method="post" className="mt-3">
+        <button
+          type="submit"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sign out
+        </button>
+      </form>
+    </div>
+  );
+
+  return (
+    <div className="min-h-dvh bg-slate-100">
+      {/* Desktop sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col bg-navy-deep lg:flex">
+        {brand}
+        {nav}
+        {footer}
+      </aside>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <button
+            aria-label="Close menu"
+            className="absolute inset-0 bg-navy-deep/60 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          />
+          <aside className="absolute inset-y-0 left-0 flex w-[270px] flex-col bg-navy-deep shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">{brand}</div>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                className="mr-3 rounded-md p-2 text-white/70 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {nav}
+            {footer}
+          </aside>
+        </div>
+      )}
+
+      <div className="lg:pl-[260px]">
+        {/* Mobile top bar */}
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+            className="rounded-md p-2 text-navy hover:bg-slate-100"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <Image src={site.logo} alt="" width={616} height={484} className="h-7 w-auto" />
+          <span className="text-sm font-bold text-navy">MMD Operations</span>
+        </div>
+
+        {children}
+      </div>
+    </div>
+  );
+}

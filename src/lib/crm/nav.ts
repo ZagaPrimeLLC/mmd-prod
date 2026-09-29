@@ -1,0 +1,75 @@
+import {
+  LayoutDashboard, KanbanSquare, UserCheck, Inbox, Users,
+  GraduationCap, Route, History, CircleUser,
+} from 'lucide-react';
+
+/**
+ * Roles come from hub.memberships.role. Everything here is deliberately blunt:
+ * ops and admin run the business, leadership watches it.
+ */
+export type Role = 'admin' | 'ops' | 'leadership' | 'viewer';
+
+export const WRITERS: Role[] = ['admin', 'ops'];
+export function canWrite(role: Role | null): boolean {
+  return role !== null && WRITERS.includes(role);
+}
+
+export type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  roles: Role[];
+  hint?: string;
+};
+
+export type NavSection = { title: string; items: NavItem[] };
+
+const ALL: Role[] = ['admin', 'ops', 'leadership', 'viewer'];
+const OPS: Role[] = ['admin', 'ops'];
+
+export const NAV: NavSection[] = [
+  {
+    title: 'Work',
+    items: [
+      { href: '/dashboard',          label: 'Overview',   icon: LayoutDashboard, roles: ALL },
+      { href: '/dashboard/board',    label: 'Work board', icon: KanbanSquare,    roles: ALL },
+      { href: '/dashboard/my-work',  label: 'My work',    icon: CircleUser,      roles: OPS },
+    ],
+  },
+  {
+    title: 'Recruitment',
+    items: [
+      { href: '/dashboard/recruitment', label: 'Applicants', icon: UserCheck, roles: ALL },
+      { href: '/dashboard/inbox',       label: 'Inbox',      icon: Inbox,     roles: ALL,
+        hint: 'from the website' },
+    ],
+  },
+  {
+    title: 'People',
+    items: [
+      { href: '/dashboard/people',     label: 'Employees',  icon: Users,          roles: ALL },
+      { href: '/dashboard/onboarding', label: 'Onboarding', icon: Route,          roles: OPS },
+      { href: '/dashboard/training',   label: 'Training',   icon: GraduationCap,  roles: ALL },
+    ],
+  },
+  {
+    title: 'Record',
+    items: [
+      { href: '/dashboard/activity', label: 'Activity', icon: History, roles: ALL },
+    ],
+  },
+];
+
+export function navFor(role: Role | null): NavSection[] {
+  const r = role ?? 'viewer';
+  return NAV
+    .map((s) => ({ ...s, items: s.items.filter((i) => i.roles.includes(r)) }))
+    .filter((s) => s.items.length > 0);
+}
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: 'Administrator',
+  ops: 'Operations',
+  leadership: 'Leadership',
+  viewer: 'Viewer',
+};
