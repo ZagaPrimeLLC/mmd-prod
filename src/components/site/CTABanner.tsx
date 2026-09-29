@@ -5,7 +5,7 @@ import { site } from '@/lib/site';
 export default function CTABanner() {
   return (
     <section className="bg-cream py-20">
-      <div className="mx-auto max-w-5xl px-4 text-center">
+      <div className="mx-auto w-full max-w-5xl px-5 sm:px-8 lg:px-12 text-center">
         <h2 className="mb-6 text-3xl font-bold text-gray-900 md:text-4xl">Ready to Get Started?</h2>
         <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
           Book a free consultation to discuss how we can support your loved one.

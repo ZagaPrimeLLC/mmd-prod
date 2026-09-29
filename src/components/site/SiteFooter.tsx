@@ -6,7 +6,7 @@ import { site } from '@/lib/site';
 export default function SiteFooter() {
   return (
     <footer className="bg-navy text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:px-12 py-14 md:grid-cols-3">
         <div>
           <Image
             src={site.logo}
@@ -56,7 +56,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="border-t border-white/15">
-        <p className="mx-auto max-w-7xl px-4 py-5 text-sm text-gray-300">
+        <p className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12 py-5 text-sm text-gray-300">
           &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
         </p>
       </div>

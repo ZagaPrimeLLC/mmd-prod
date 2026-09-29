@@ -34,10 +34,12 @@ export default async function CareersPage() {
         eyebrow="Careers"
         title="Better care starts with you"
         lead="Join a team of dedicated professionals making a real difference in the lives of adults with special needs across New Jersey."
+        image="/images/team.png"
+        imageAlt="MMD Direct Support Professionals outside the South Plainfield office"
       />
 
       <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="grid items-start gap-12 lg:grid-cols-2">
             <div>
               <h2 className="text-2xl font-bold text-navy md:text-3xl">Open positions</h2>

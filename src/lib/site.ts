@@ -15,7 +15,7 @@ export const site = {
   logo: '/brand/mmd-logo.png',
 } as const;
 
-// Onboarding checks every DSP clears before working a case — stated on the
+// Onboarding checks every DSP clears before working a case. Stated on the
 // current site and compliance-relevant, so kept verbatim in substance.
 export const serviceDetail = [
   {
@@ -43,7 +43,7 @@ export const serviceDetail = [
     name: 'Community Support',
     lead: 'Support to take part in the community, not just be present in it.',
     body: [
-      'Community support is about participation — getting to appointments, activities and the places that matter, with the right level of help alongside.',
+      'Community support is about participation: getting to appointments, activities and the places that matter, with the right level of help alongside.',
       'Our team is available around the clock so the support fits the life, rather than the other way round.',
     ],
     includes: ['Transportation to essential services', 'Social and recreational activities', 'Appointment coordination', 'Around-the-clock availability'],

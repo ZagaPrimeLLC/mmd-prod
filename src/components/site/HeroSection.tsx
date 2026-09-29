@@ -24,7 +24,7 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 flex h-full items-center">
-        <div className="mx-auto max-w-7xl px-4 py-20">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12 py-20">
           <div className="max-w-3xl">
             <p className="mb-6 inline-block rounded-full border border-gold/30 bg-gold/20 px-4 py-2 font-semibold text-gold backdrop-blur-sm">
               NJ DDD Approved Provider

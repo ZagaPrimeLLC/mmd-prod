@@ -41,7 +41,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
     return (
       <div className="rounded-xl border border-green-200 bg-green-50 p-6">
         <CheckCircle2 className="mb-3 h-7 w-7 text-green-700" />
-        <h3 className="text-lg font-bold text-green-900">Thank you — we have your enquiry.</h3>
+        <h3 className="text-lg font-bold text-green-900">Thank you. We have your enquiry.</h3>
         <p className="mt-2 text-sm leading-relaxed text-green-900">
           Someone from our team will get back to you within one business day. If it is urgent,
           please call <a href={site.phoneHref} className="font-semibold underline">{site.phone}</a>.
@@ -69,7 +69,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
         <label htmlFor="email" className="block text-sm font-semibold text-gray-800">Email</label>
         <input id="email" name="email" type="email" autoComplete="email"
           className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-3 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy" />
-        <p className="mt-1.5 text-xs text-gray-500">Give us a phone number or an email — whichever you prefer we use.</p>
+        <p className="mt-1.5 text-xs text-gray-500">Give us a phone number or an email, whichever you prefer we use.</p>
       </div>
 
       <div>

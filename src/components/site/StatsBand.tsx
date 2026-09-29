@@ -8,7 +8,7 @@ const stats = [
 export default function StatsBand() {
   return (
     <section className="bg-gray-50 py-20">
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
         <dl className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label}>

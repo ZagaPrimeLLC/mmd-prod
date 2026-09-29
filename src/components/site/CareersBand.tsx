@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function CareersBand() {
   return (
     <section className="bg-gradient-to-br from-navy to-navy-dark py-20 text-white">
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <Image
             src="/images/team.png"

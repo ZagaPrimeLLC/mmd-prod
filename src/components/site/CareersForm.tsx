@@ -35,7 +35,7 @@ export default function CareersForm() {
       const path = `applications/${Date.now()}-${safe}`;
       const { error: upErr } = await supabase.storage.from('mmd-resumes').upload(path, resume);
       // An upload failure must not lose the application itself.
-      resumeNote = upErr ? '\n\n[resume upload failed — ask the applicant to email it]' : `\n\n[resume: ${path}]`;
+      resumeNote = upErr ? '\n\n[resume upload failed, ask the applicant to email it]' : `\n\n[resume: ${path}]`;
     }
 
     const payload = {
@@ -44,7 +44,7 @@ export default function CareersForm() {
       phone: String(fd.get('phone') ?? '').trim() || null,
       service_interested: 'dsp-application',
       message:
-        `DSP application — ${String(fd.get('area') ?? 'area not given')}\n` +
+        `DSP application. Area: ${String(fd.get('area') ?? 'not given')}\n` +
         `Availability: ${String(fd.get('availability') ?? 'not given')}\n` +
         `CPR/First Aid certified: ${fd.get('cpr') ? 'yes' : 'not stated'}\n` +
         `Driver with own vehicle: ${fd.get('driver') ? 'yes' : 'not stated'}\n` +

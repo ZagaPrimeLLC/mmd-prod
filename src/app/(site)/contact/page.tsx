@@ -18,10 +18,12 @@ export default function ContactPage() {
         eyebrow="Contact"
         title="Book a free consultation"
         lead="Tell us a little about the person you are looking for support for, and we will call you back."
+        image="/images/hero-care.png"
+        imageAlt="An MMD support worker talking with a client at home"
       />
 
       <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 lg:grid-cols-5">
+        <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:px-12 lg:grid-cols-5">
           <div className="lg:col-span-3">
             <ContactForm sourcePage="/contact" />
           </div>

@@ -19,10 +19,12 @@ export default function ServicesPage() {
         eyebrow="Services"
         title="Support that fits the person"
         lead="The State of New Jersey Division of Developmental Disabilities has approved our agency to provide community-based support, respite and individual support to adults with disabilities."
+        image="/images/community-walk.png"
+        imageAlt="An MMD support worker accompanying a client in the community"
       />
 
       <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl space-y-16 px-4">
+        <div className="mx-auto max-w-7xl space-y-16 px-5 sm:px-8 lg:px-12">
           {serviceDetail.map((s, i) => (
             <article key={s.slug} id={s.slug} className="grid gap-8 md:grid-cols-3">
               <div>
@@ -49,11 +51,11 @@ export default function ServicesPage() {
       </section>
 
       <section className="bg-cream py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <h2 className="text-2xl font-bold text-navy md:text-3xl">What to expect from MMD</h2>
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
-              ['Personal care', 'Help with daily living — bathing, dressing, grooming and toileting.'],
+              ['Personal care', 'Help with daily living: bathing, dressing, grooming and toileting.'],
               ['Companionship', 'Activities that support social and emotional wellbeing.'],
               ['Respite care', 'Temporary relief for primary caregivers.'],
               ['Medical coordination', 'Appointments coordinated and medication reminders given.'],
@@ -69,7 +71,7 @@ export default function ServicesPage() {
       </section>
 
       <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <h2 className="text-2xl font-bold text-navy md:text-3xl">How our staff are vetted</h2>
           <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">
             Every Direct Support Professional completes our full onboarding process before they
