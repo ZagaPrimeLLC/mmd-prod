@@ -96,7 +96,7 @@ export default async function PeoplePage() {
                         </td>
                         <td className="px-5 py-3 text-xs text-slate-500">{dateLabel(p.start_date)}</td>
                         <td className="px-5 py-3 text-xs tabular-nums text-slate-600">
-                          {trainings.length === 0 ? '—' : `${complete} of ${trainings.length}`}
+                          {trainings.length === 0 ? 'none yet' : `${complete} of ${trainings.length}`}
                         </td>
                         <td className="px-5 py-3">
                           <Pill tone={EMPLOYMENT[p.employment] ?? ''}>{p.employment}</Pill>

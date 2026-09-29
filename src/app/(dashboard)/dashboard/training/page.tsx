@@ -76,10 +76,10 @@ export default async function TrainingPage() {
                           {r.employees?.full_name ?? 'Unassigned'}
                         </td>
                         <td className="px-5 py-3 text-slate-700">{r.name}</td>
-                        <td className="px-5 py-3 text-xs text-slate-500">{r.provider ?? '—'}</td>
-                        <td className="px-5 py-3 text-xs text-slate-500">{dateLabel(r.completed_on) || '—'}</td>
+                        <td className="px-5 py-3 text-xs text-slate-500">{r.provider ?? 'not recorded'}</td>
+                        <td className="px-5 py-3 text-xs text-slate-500">{dateLabel(r.completed_on) || 'not yet'}</td>
                         <td className={`px-5 py-3 text-xs ${gone ? 'font-bold text-red-600' : soon ? 'font-semibold text-amber-700' : 'text-slate-500'}`}>
-                          {dateLabel(r.expires_on) || '—'}
+                          {dateLabel(r.expires_on) || 'no expiry'}
                         </td>
                         <td className="px-5 py-3">
                           <Pill tone={STATUS[r.status] ?? ''}>{r.status.replace('_', ' ')}</Pill>
