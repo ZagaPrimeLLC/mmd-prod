@@ -5,11 +5,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy:  { DEFAULT: '#264D80', deep: '#1E3F6B', mid: '#2F5A94', light: '#3565A4' },
-        gold:  { DEFAULT: '#D8B752', bright: '#F5C544' },
-        tint:  '#E8EEF6',
+        // palette carried over from the community-navigator build
+        navy:  { DEFAULT: '#1e3a8a', dark: '#1e40af', deep: '#172554' },
+        gold:  { DEFAULT: '#fbbf24', dark: '#f59e0b' },
+        steel: '#336699',
+        cream: '#F8F8F6',
       },
-      fontFamily: { sans: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] },
     },
   },
   plugins: [],
