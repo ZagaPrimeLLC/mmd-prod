@@ -33,9 +33,14 @@ export default function CareersForm() {
         setError('That file is larger than 10MB. Please attach a smaller file.');
         return;
       }
-      const safe = resume.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const path = `applications/${Date.now()}-${safe}`;
-      const { error: upErr } = await supabase.storage.from('mmd-resumes').upload(path, resume);
+      const safe = resume.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80);
+      // A random segment in the name means a stored resume cannot be guessed at
+      // from the outside, on top of the bucket already being private.
+      const token = crypto.randomUUID().slice(0, 12);
+      const path = `applications/${Date.now()}-${token}-${safe}`;
+      const { error: upErr } = await supabase.storage
+        .from('mmd-resumes')
+        .upload(path, resume, { upsert: false, contentType: resume.type || undefined });
       // An upload failure must not lose the application itself, but the applicant
       // has to be told plainly rather than shown a success screen that is not true.
       setResumeFailed(Boolean(upErr));
