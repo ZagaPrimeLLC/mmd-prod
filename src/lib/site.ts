@@ -92,7 +92,7 @@ export const values = [
   ['Continuous Improvement', 'We continuously improve our services to meet the changing needs of our clients.'],
 ] as const;
 
-// PLACEHOLDER TESTIMONIALS — written to show the page working.
+// PLACEHOLDER TESTIMONIALS, written to show the page working.
 // Replace each quote, name and role with real, permissioned client words
 // before this goes in front of families. Nothing here is a real client.
 export const testimonials = [
@@ -139,3 +139,42 @@ export const testimonials = [
     service: 'Working at MMD',
   },
 ] as const;
+
+/**
+ * Dates and contacts used by the legal and compliance pages.
+ * Anything marked "confirm" is shown highlighted on the page until MMD fills it in.
+ */
+export const legal = {
+  effective: 'September 29, 2026',
+  privacyOfficer: {
+    name: '[MMD to confirm the Privacy Officer name]',
+    title: 'Privacy Officer',
+  },
+  civilRightsCoordinator: {
+    name: '[MMD to confirm the Civil Rights Coordinator name]',
+    title: 'Civil Rights Coordinator',
+  },
+  /**
+   * Section 1557 requires the notice of availability in English plus the 15
+   * languages most commonly spoken by people with limited English proficiency
+   * in New Jersey. Confirm this list and paste the official translated taglines
+   * from the HHS Office for Civil Rights before relying on it.
+   */
+  languages: [
+    'Español (Spanish)',
+    'Português (Portuguese)',
+    '한국어 (Korean)',
+    '中文 (Chinese)',
+    'ગુજરાતી (Gujarati)',
+    'हिन्दी (Hindi)',
+    'Polski (Polish)',
+    'العربية (Arabic)',
+    'Italiano (Italian)',
+    'Tagalog',
+    'Русский (Russian)',
+    'Kreyòl Ayisyen (Haitian Creole)',
+    'اردو (Urdu)',
+    'Tiếng Việt (Vietnamese)',
+    'বাংলা (Bengali)',
+  ],
+} as const;

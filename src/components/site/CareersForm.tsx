@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CheckCircle2, AlertCircle, Upload } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { site } from '@/lib/site';
+import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
@@ -12,6 +13,7 @@ export default function CareersForm() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [resumeFailed, setResumeFailed] = useState(false);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,8 +36,12 @@ export default function CareersForm() {
       const safe = resume.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const path = `applications/${Date.now()}-${safe}`;
       const { error: upErr } = await supabase.storage.from('mmd-resumes').upload(path, resume);
-      // An upload failure must not lose the application itself.
-      resumeNote = upErr ? '\n\n[resume upload failed, ask the applicant to email it]' : `\n\n[resume: ${path}]`;
+      // An upload failure must not lose the application itself, but the applicant
+      // has to be told plainly rather than shown a success screen that is not true.
+      setResumeFailed(Boolean(upErr));
+      resumeNote = upErr
+        ? `\n\n[resume "${safe}" did NOT upload, the applicant was asked to email it to ${site.email}]`
+        : `\n\n[resume: ${path}]`;
     }
 
     const payload = {
@@ -74,6 +80,16 @@ export default function CareersForm() {
           come to the office during walk-in hours: <strong>{site.walkIn}</strong>, at {site.address.street},{' '}
           {site.address.city}, {site.address.state}.
         </p>
+        {resumeFailed && (
+          <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-sm leading-relaxed text-gray-800 ring-1 ring-amber-300">
+            <strong>Your resume did not attach.</strong> Everything else came through. Please email
+            the file to{' '}
+            <a href={`mailto:${site.email}`} className="font-semibold text-navy underline">
+              {site.email}
+            </a>{' '}
+            so we have it with your application.
+          </p>
+        )}
       </div>
     );
   }
@@ -154,8 +170,10 @@ export default function CareersForm() {
         certification. We will walk you through each step.
       </p>
 
+      <FormPrivacyNote />
+
       {error && (
-        <p className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}
         </p>
       )}

@@ -36,3 +36,38 @@ input, select, textarea { font-size: 16px; }
   .mmd-chat-halo { animation: none; }
   .mmd-chat-halo { opacity: 0; }
 }
+
+/* A visible focus ring on everything a keyboard reaches. Without this the
+   browser default is easy to lose against the navy and gold. */
+/* !important because utility classes set focus:outline-none on the inputs, and a
+   keyboard user losing the focus ring is not a tradeoff worth making. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #0c1a3a !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+/* On dark panels the navy ring disappears, so invert it there. */
+:where(.bg-navy, footer) :where(a, button, [tabindex]):focus-visible {
+  outline-color: #fbbf24 !important;
+}
+/* The skip link sits off screen until it is focused. */
+.mmd-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+.mmd-skip:focus {
+  left: 0.75rem;
+  top: 0.75rem;
+  width: auto;
+  height: auto;
+  padding: 0.75rem 1.25rem;
+  background: #0c1a3a;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 0.5rem;
+}
+/* main takes focus programmatically after a skip, but should not show a ring
+   just from being targeted. */
+main:focus { outline: none; }

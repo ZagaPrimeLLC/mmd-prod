@@ -3,7 +3,7 @@ export const STAGES = [
   { key: 'screening',        label: 'Screening',        hint: 'qualification call' },
   { key: 'ready',            label: 'Ready',            hint: 'qualified and available' },
   { key: 'with_coordinator', label: 'With Coordinator', hint: 'handed off' },
-  { key: 'appointment_set',  label: 'Appointment Set',  hint: 'Tue / Thu, 11–4' },
+  { key: 'appointment_set',  label: 'Appointment Set',  hint: 'Tue and Thu, 11 to 4' },
   { key: 'completed',        label: 'Completed',        hint: 'applied in person' },
   { key: 'archived',         label: 'Archived',         hint: 'not qualified / unresponsive' },
 ] as const;

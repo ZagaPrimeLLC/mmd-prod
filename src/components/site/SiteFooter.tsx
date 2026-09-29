@@ -58,9 +58,29 @@ export default function SiteFooter() {
       </div>
 
       <div className="border-t border-white/15">
-        <p className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12 py-5 text-sm text-gray-300">
-          &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
-        </p>
+        <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-12">
+          {/* Section 1557 requires this to sit somewhere conspicuous on the site. */}
+          <p className="text-sm font-semibold text-gold">
+            Language assistance services and aids for effective communication are available free of
+            charge.{' '}
+            <a href={site.phoneHref} className="underline hover:text-white">
+              Call {site.phone}
+            </a>
+            .
+          </p>
+
+          <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-300">
+            <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+            <li><Link href="/notice-of-privacy-practices" className="hover:text-white">Notice of Privacy Practices</Link></li>
+            <li><Link href="/nondiscrimination" className="hover:text-white">Nondiscrimination and Language Assistance</Link></li>
+            <li><Link href="/accessibility" className="hover:text-white">Accessibility</Link></li>
+            <li><Link href="/terms" className="hover:text-white">Terms of Use</Link></li>
+          </ul>
+
+          <p className="mt-5 text-sm text-gray-400">
+            &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );

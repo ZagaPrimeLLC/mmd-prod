@@ -10,7 +10,7 @@ export const metadata = { title: 'CRM design preview', robots: { index: false } 
 export default function DesignPreviewPage() {
   if (process.env.NODE_ENV === 'production') notFound();
   return (
-    <DashboardShell who="design preview — sample data" notice="Sample data for design review. Not connected to the database.">
+    <DashboardShell who="design preview, sample data" notice="Sample data for design review. Not connected to the database.">
       <Board cards={sampleBoard} />
     </DashboardShell>
   );

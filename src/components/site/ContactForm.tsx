@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { site, services } from '@/lib/site';
+import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: string }) {
   const [busy, setBusy] = useState(false);
@@ -92,8 +93,10 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
         </p>
       </div>
 
+      <FormPrivacyNote />
+
       {error && (
-        <p className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}
         </p>
       )}

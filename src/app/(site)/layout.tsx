@@ -6,9 +6,14 @@ import ChatAssistant from '@/components/site/ChatAssistant';
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <a href="#main" className="mmd-skip">
+        Skip to main content
+      </a>
       <TopBar />
       <SiteHeader />
-      <main>{children}</main>
+      <main id="main" tabIndex={-1}>
+        {children}
+      </main>
       <SiteFooter />
       <ChatAssistant />
     </>

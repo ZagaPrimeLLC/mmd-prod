@@ -5,6 +5,7 @@ import { CalendarCheck, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-reac
 import { createClient } from '@/lib/supabase/client';
 import { availableSlots, groupByDay, type Slot } from '@/lib/booking';
 import { site } from '@/lib/site';
+import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 export default function BookingFlow() {
   const days = useMemo(() => groupByDay(availableSlots()), []);
@@ -137,8 +138,10 @@ export default function BookingFlow() {
         </p>
       </div>
 
+      <FormPrivacyNote />
+
       {error && (
-        <p className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}
         </p>
       )}
