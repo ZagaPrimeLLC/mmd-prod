@@ -57,21 +57,6 @@ export default function AboutPage() {
 
       <TrustBadges />
 
-      <section className="bg-cream py-16 md:py-20">
-        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
-          <h2 className="text-2xl font-bold text-navy md:text-3xl">Mission</h2>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-            To improve the quality of life for our special needs clients, every day.
-          </p>
-
-          <h2 className="mt-12 text-2xl font-bold text-navy md:text-3xl">Vision</h2>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-            To deliver the highest standards of care by ensuring our clients live a fulfilled life.
-            Fulfilment is instilled in our values of compassionate caring and teamwork.
-          </p>
-        </div>
-      </section>
-
       <section className="bg-white py-16 md:py-20">
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <h2 className="text-2xl font-bold text-navy md:text-3xl">Our values</h2>

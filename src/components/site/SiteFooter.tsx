@@ -45,6 +45,8 @@ export default function SiteFooter() {
           <p className="font-semibold text-gold">Quick links</p>
           <ul className="mt-4 space-y-2 text-sm text-gray-200">
             <li><Link href="/services" className="hover:text-white">Our services</Link></li>
+            <li><Link href="/mission" className="hover:text-white">Mission and vision</Link></li>
+            <li><Link href="/contact/testimonials" className="hover:text-white">Testimonials</Link></li>
             <li><Link href="/about" className="hover:text-white">About us</Link></li>
             <li><Link href="/careers" className="hover:text-white">Caregiver jobs</Link></li>
             <li><Link href="/contact" className="hover:text-white">Book a consultation</Link></li>

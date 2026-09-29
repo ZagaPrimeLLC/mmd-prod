@@ -43,10 +43,10 @@ export const serviceDetail = [
     name: 'Community Support',
     lead: 'Support to take part in the community, not just be present in it.',
     body: [
-      'Community support is about participation: getting to appointments, activities and the places that matter, with the right level of help alongside.',
+      'Community support is about participation: getting to activities, appointments and the places that matter, with the right level of help alongside.',
       'Our team is available around the clock so the support fits the life, rather than the other way round.',
     ],
-    includes: ['Transportation to essential services', 'Social and recreational activities', 'Appointment coordination', 'Around-the-clock availability'],
+    includes: ['Social and recreational activities', 'Appointment coordination', 'Support to access community services', 'Around-the-clock availability'],
   },
 ] as const;
 
@@ -90,4 +90,52 @@ export const values = [
   ['Professionalism', 'We hold to the highest standards of professionalism, ethics and integrity.'],
   ['Respect', 'We treat our clients with respect and dignity, and honour their choices.'],
   ['Continuous Improvement', 'We continuously improve our services to meet the changing needs of our clients.'],
+] as const;
+
+// PLACEHOLDER TESTIMONIALS — written to show the page working.
+// Replace each quote, name and role with real, permissioned client words
+// before this goes in front of families. Nothing here is a real client.
+export const testimonials = [
+  {
+    quote:
+      'My brother had been through three agencies before MMD. What changed was consistency. The same support professional comes, she knows his routine, and she knows when something is off before I do. That is the whole thing for us.',
+    name: 'Placeholder name',
+    role: 'Sister and guardian, Middlesex County',
+    service: 'Individual Support',
+  },
+  {
+    quote:
+      'I had not had a full weekend off in four years. The respite team met us twice before they started so my son was not meeting a stranger on day one. That mattered more than I expected.',
+    name: 'Placeholder name',
+    role: 'Parent, Union County',
+    service: 'Respite Care',
+  },
+  {
+    quote:
+      'As a support coordinator I refer to a lot of providers. MMD answer the phone, they tell me honestly when they cannot staff a case, and the paperwork comes back complete. That is rarer than it should be.',
+    name: 'Placeholder name',
+    role: 'DDD Support Coordinator',
+    service: 'Community Support',
+  },
+  {
+    quote:
+      'They did not try to change how our daughter does things. They asked what she already manages on her own and built around protecting that. She is doing more for herself now than a year ago.',
+    name: 'Placeholder name',
+    role: 'Parent, Warren County',
+    service: 'Individual Support',
+  },
+  {
+    quote:
+      'The office rang me before I had to ring them. When our regular DSP was out sick they had cover arranged the same morning and told me who was coming and when.',
+    name: 'Placeholder name',
+    role: 'Family caregiver, Somerset County',
+    service: 'Community Support',
+  },
+  {
+    quote:
+      'I started as a DSP with no experience in this field. The training was real training, not a video, and there was always someone to call. Three years on I am still here.',
+    name: 'Placeholder name',
+    role: 'Direct Support Professional, MMD',
+    service: 'Working at MMD',
+  },
 ] as const;

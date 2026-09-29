@@ -59,7 +59,6 @@ export default function ServicesPage() {
               ['Companionship', 'Activities that support social and emotional wellbeing.'],
               ['Respite care', 'Temporary relief for primary caregivers.'],
               ['Medical coordination', 'Appointments coordinated and medication reminders given.'],
-              ['Transportation', 'Access to essential services and community activities.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl bg-white p-6 shadow-sm">
                 <h3 className="font-bold text-navy">{title}</h3>
