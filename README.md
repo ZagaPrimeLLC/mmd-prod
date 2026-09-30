@@ -35,7 +35,7 @@ Keeping them together means one `job_posts` row renders the public Careers listi
 | :--- | :--- |
 | Framework | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind |
 | Hosting | Vercel |
-| Database | Supabase — shared host, schema `proj_mmd` |
+| Database | Supabase — dedicated project `zwkpeksrsiaanewuzizc` (Zagaprime org), schema `proj_mmd` |
 | Auth | Supabase Auth (magic link, no self-signup), scoped by `hub.is_member('mmd')` |
 | Files | Supabase Storage — private bucket `mmd-resumes`, signed URLs only |
 | DNS | Cloudflare (planned), Wix panel until the domain transfer completes |
@@ -61,7 +61,7 @@ npm run dev                   # http://localhost:3000
 
 | Variable | Value |
 | :--- | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://vcwvrtxbmgtwemsqdmch.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://zwkpeksrsiaanewuzizc.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key from Supabase → API keys |
 | `NEXT_PUBLIC_SUPABASE_SCHEMA` | `proj_mmd` |
 
@@ -76,10 +76,10 @@ Set all three in Vercel → Project → Settings → Environment Variables for P
 
 ## Database
 
-Schema lives in Supabase project `vcwvrtxbmgtwemsqdmch`, schema `proj_mmd`.
+Schema lives in Supabase project `zwkpeksrsiaanewuzizc`, schema `proj_mmd` (moved off the shared beta.zagram.store host on 2026-09-30). `proj_mmd` must be listed under **Project Settings → Data API → Exposed schemas**. The small `hub` schema holds team membership and is kept so the access rules did not change in the move.
 
 ```bash
-supabase link --project-ref vcwvrtxbmgtwemsqdmch
+supabase link --project-ref zwkpeksrsiaanewuzizc
 supabase db pull --schema proj_mmd
 ```
 
@@ -148,6 +148,24 @@ CareerPlug stays the system of record for applications. This dashboard is the wo
 1. **CSV export** — works on any plan, ships first
 2. **Notification emails parsed by n8n** — the steady state
 3. **Native API / webhooks** — Grow plan only, not currently available
+
+### Jobs
+
+Jobs are created and published in **Dashboard → Jobs**. Publishing sets `status = 'open'` and `published = true`, which is exactly what the anon RLS policy on `job_posts` exposes, so a job appears on `/careers` and at `/careers/<slug>` the moment it is published (the pages are revalidated on every change) and disappears when it is paused or closed. The slug is fixed at creation so shared links survive title edits. Job pages carry `JobPosting` structured data for Google for Jobs.
+
+### Applicant intake
+
+Every way in goes through one database routine, `proj_mmd._ingest_applicant`, which recognises an existing person by CareerPlug ID, then email, then the last ten phone digits, and matches the job by id, CareerPlug job ID, then title.
+
+| Door | Where | Who |
+| :--- | :--- | :--- |
+| CSV import | Dashboard → Import applicants (`import_applicants`) | admin, ops |
+| Automatic feed | `POST /api/intake` with `Authorization: Bearer <key>` (`intake_applicant`) | n8n / Zapier, per key |
+| Job page apply form | `/careers/<slug>` (`apply_to_job`) | the public, open jobs only |
+
+Feed keys are created and revoked by an administrator in **Settings → Automatic applicant feed**. Only a SHA-256 of each key is stored; the key is shown once. The route holds no secrets; the database checks the key.
+
+Schema changes live in [supabase/migrations/](supabase/migrations/).
 
 ---
 

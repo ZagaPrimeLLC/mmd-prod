@@ -123,3 +123,34 @@ export async function setTeamRole(userId: string, role: string): Promise<Result>
   revalidatePath('/dashboard/settings');
   return { ok: true, note: 'Role updated.' };
 }
+
+export type KeyResult = { ok: true; key: string } | { ok: false; error: string };
+
+/** The key is returned once and never stored in readable form. */
+export async function createIntakeKey(form: FormData): Promise<KeyResult> {
+  const { supabase, isAdmin } = await ctx();
+  if (!isAdmin) return { ok: false, error: 'Only an administrator can create a feed key.' };
+
+  const label = String(form.get('label') ?? '').trim();
+  if (!label) return { ok: false, error: 'Name the key after what will use it, e.g. "n8n CareerPlug emails".' };
+
+  const { data, error } = await supabase.rpc('create_intake_key', {
+    p_label: label.slice(0, 80),
+    p_source: String(form.get('source') ?? 'CareerPlug').slice(0, 60),
+  });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/dashboard/settings');
+  return { ok: true, key: data as string };
+}
+
+export async function revokeIntakeKey(id: string): Promise<Result> {
+  const { supabase, isAdmin } = await ctx();
+  if (!isAdmin) return { ok: false, error: 'Only an administrator can revoke a feed key.' };
+
+  const { error } = await supabase.rpc('revoke_intake_key', { p_id: id });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/dashboard/settings');
+  return { ok: true, note: 'Key revoked. Anything still using it is now refused.' };
+}

@@ -1,4 +1,7 @@
+import Link from 'next/link';
+import { FileUp } from 'lucide-react';
 import PageHeader from '@/components/crm/PageHeader';
+import { canWrite } from '@/lib/crm/nav';
 import Board from '@/components/crm/Board';
 import { Notice } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
@@ -15,7 +18,7 @@ type Row = {
 };
 
 export default async function RecruitmentPage() {
-  const { supabase } = await getSession();
+  const { supabase, role } = await getSession();
 
   const { data, error } = await supabase
     .from('applications')
@@ -41,7 +44,13 @@ export default async function RecruitmentPage() {
     <>
       <PageHeader
         title="Applicants"
-        lead="The Direct Support Professional pipeline, from a CareerPlug application through to the in person appointment."
+        lead="The Direct Support Professional pipeline, from a CareerPlug, job board or website application through to the in person appointment."
+        actions={canWrite(role) ? (
+          <Link href="/dashboard/recruitment/import"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-navy ring-1 ring-slate-300 hover:bg-slate-50">
+            <FileUp className="h-4 w-4" /> Import applicants
+          </Link>
+        ) : undefined}
       />
       {error && (
         <div className="px-5 pt-5 sm:px-8">

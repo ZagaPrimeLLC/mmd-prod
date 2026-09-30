@@ -38,7 +38,7 @@ export default function SiteHeader() {
             <span className="block text-[15px] font-extrabold leading-snug tracking-tight text-navy sm:text-xl">
               MMD Community Care
             </span>
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-steel [text-wrap:balance] sm:text-xs">
+            <span className="block text-[10px] font-semibold uppercase tracking-wide text-gold-dark [text-wrap:balance] sm:text-xs">
               {site.slogan}
             </span>
           </span>
