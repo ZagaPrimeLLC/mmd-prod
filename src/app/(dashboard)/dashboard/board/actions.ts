@@ -10,7 +10,7 @@ import { STAGE_KEYS } from '@/lib/crm/board';
  * checks exist to give a clear message, not to be the lock.
  */
 async function ctx() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: role } = await supabase.rpc('mmd_role');
   return { supabase, user, canWrite: role === 'admin' || role === 'ops' };

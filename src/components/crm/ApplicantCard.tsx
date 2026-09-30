@@ -3,6 +3,8 @@ import type { BoardCard } from '@/lib/crm-types';
 import { isStale, STALE_HOURS } from '@/lib/pipeline';
 
 const digits = (s: string) => s.replace(/\D/g, '');
+// wa.me needs the country code; only add it to bare 10-digit US numbers, not ones stored as +1…
+const waNumber = (s: string) => (digits(s).length === 10 ? `1${digits(s)}` : digits(s));
 
 function sinceLabel(iso: string | null) {
   if (!iso) return 'never contacted';
@@ -50,7 +52,7 @@ export default function ApplicantCard({ card }: { card: BoardCard }) {
               <MessageSquare className="h-3 w-3" /> Text
             </a>
             <a
-              href={`https://wa.me/1${digits(a.phone)}`}
+              href={`https://wa.me/${waNumber(a.phone)}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700"

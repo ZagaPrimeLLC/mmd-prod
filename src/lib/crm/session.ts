@@ -14,7 +14,7 @@ const KNOWN: Role[] = ['admin', 'ops', 'leadership', 'viewer'];
  * answer was nobody.
  */
 export async function getSession() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: raw, error } = await supabase.rpc('mmd_role');

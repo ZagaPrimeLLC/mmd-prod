@@ -23,7 +23,8 @@ type Pack = {
   steps: Step[];
 };
 
-export default async function WelcomePage({ params }: { params: { token: string } }) {
+export default async function WelcomePage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
   // A plain anonymous client. The token is the only credential, and the
   // function it calls is the only thing it can reach.
   const supabase = createClient(
@@ -32,7 +33,7 @@ export default async function WelcomePage({ params }: { params: { token: string 
     { db: { schema: 'proj_mmd' }, auth: { persistSession: false } }
   );
 
-  const { data } = await supabase.rpc('onboarding_pack', { p_token: params.token });
+  const { data } = await supabase.rpc('onboarding_pack', { p_token: token });
   const pack = data as Pack | null;
 
   // Expired, revoked, not sent yet, or simply wrong. All the same answer.
@@ -140,7 +141,7 @@ export default async function WelcomePage({ params }: { params: { token: string 
                       {step.documents.map((d) => (
                         <li key={d.path}>
                           <DocumentLink
-                            token={params.token}
+                            token={token}
                             path={d.path}
                             title={d.title}
                             description={d.description}

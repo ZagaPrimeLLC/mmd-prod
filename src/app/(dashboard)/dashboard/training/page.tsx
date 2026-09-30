@@ -24,13 +24,16 @@ export default async function TrainingPage() {
     .order('expires_on', { nullsFirst: false });
 
   const rows = data ?? [];
+  // Server component, rendered per request: one clock reading keeps every comparison on the page consistent.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
   const complete = rows.filter((r) => r.status === 'complete');
   const outstanding = rows.filter((r) => r.status === 'assigned' || r.status === 'in_progress');
   const expiring = complete.filter(
-    (r) => r.expires_on && new Date(r.expires_on).getTime() < Date.now() + 60 * DAY
+    (r) => r.expires_on && new Date(r.expires_on).getTime() < now + 60 * DAY
   );
   const expired = rows.filter(
-    (r) => r.status === 'expired' || (r.expires_on && new Date(r.expires_on).getTime() < Date.now())
+    (r) => r.status === 'expired' || (r.expires_on && new Date(r.expires_on).getTime() < now)
   );
 
   return (
@@ -67,8 +70,8 @@ export default async function TrainingPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {rows.map((r) => {
-                    const soon = r.expires_on && new Date(r.expires_on).getTime() < Date.now() + 60 * DAY;
-                    const gone = r.expires_on && new Date(r.expires_on).getTime() < Date.now();
+                    const soon = r.expires_on && new Date(r.expires_on).getTime() < now + 60 * DAY;
+                    const gone = r.expires_on && new Date(r.expires_on).getTime() < now;
                     return (
                       <tr key={r.id} className="hover:bg-slate-50">
                         <td className="px-5 py-3 font-semibold text-navy-deep">

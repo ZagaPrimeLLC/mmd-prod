@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { site, services } from '@/lib/site';
@@ -10,19 +10,14 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Which button on the site sent them here. Read from the link, nothing
-  // tracked about the person and no cookie set.
-  const [cta, setCta] = useState<string | null>(null);
-
-  useEffect(() => {
-    const v = new URLSearchParams(window.location.search).get('cta');
-    if (v) setCta(v.replace(/[^a-z0-9-]/gi, '').slice(0, 40));
-  }, []);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    // Which button on the site sent them here. Read from the link, nothing
+    // tracked about the person and no cookie set.
+    const cta = new URLSearchParams(window.location.search).get('cta')?.replace(/[^a-z0-9-]/gi, '').slice(0, 40) || null;
 
     const fd = new FormData(e.currentTarget);
     const payload = {

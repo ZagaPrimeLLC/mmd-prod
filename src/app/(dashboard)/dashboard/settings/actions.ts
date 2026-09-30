@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 const ROLES = ['admin', 'ops', 'leadership', 'viewer'];
 
 async function ctx() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: role } = await supabase.rpc('mmd_role');
   return { supabase, user, role, canWrite: role === 'admin' || role === 'ops', isAdmin: role === 'admin' };

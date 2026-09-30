@@ -12,7 +12,8 @@ export const metadata = { title: 'Work board' };
 
 export default async function BoardPage({
   searchParams,
-}: { searchParams: { b?: string } }) {
+}: { searchParams: Promise<{ b?: string }> }) {
+  const { b: wanted } = await searchParams;
   const { supabase, user, role } = await getSession();
   const writes = canWrite(role);
 
@@ -39,7 +40,6 @@ export default async function BoardPage({
     );
   }
 
-  const wanted = searchParams.b;
   const board = boards.find((b) => b.key === wanted) ?? boards[0];
   if (wanted && !boards.some((b) => b.key === wanted)) redirect(`/dashboard/board?b=${board.key}`);
 

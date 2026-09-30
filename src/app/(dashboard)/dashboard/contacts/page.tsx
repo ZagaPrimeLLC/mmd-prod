@@ -1,5 +1,5 @@
 import PageHeader from '@/components/crm/PageHeader';
-import { Card, CardHead, Empty, Pill, Stat, ago, dateLabel } from '@/components/crm/ui';
+import { Card, CardHead, Empty, Pill, Stat, ago } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
 import { Contact2, Mail, Phone, MousePointerClick, Repeat } from 'lucide-react';
 

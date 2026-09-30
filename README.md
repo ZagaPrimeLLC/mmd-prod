@@ -6,7 +6,7 @@
 
 New Jersey DDD approved statewide provider · South Plainfield, NJ
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Tailwind](https://img.shields.io/badge/Tailwind-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
@@ -33,10 +33,10 @@ Keeping them together means one `job_posts` row renders the public Careers listi
 
 | Layer | Choice |
 | :--- | :--- |
-| Framework | Next.js 14 (App Router) · TypeScript · Tailwind |
+| Framework | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind |
 | Hosting | Vercel |
 | Database | Supabase — shared host, schema `proj_mmd` |
-| Auth | Supabase Auth (magic link), scoped by `hub.is_member('mmd')` |
+| Auth | Supabase Auth (magic link, no self-signup), scoped by `hub.is_member('mmd')` |
 | Files | Supabase Storage — private bucket `mmd-resumes`, signed URLs only |
 | DNS | Cloudflare (planned), Wix panel until the domain transfer completes |
 
@@ -54,7 +54,7 @@ npm run dev                   # http://localhost:3000
 | :--- | :--- |
 | `npm run dev` | Development server |
 | `npm run build` | Production build |
-| `npm run lint` | ESLint |
+| `npm run lint` | ESLint 9 (flat config, `eslint-config-next`) |
 | `npm run typecheck` | `tsc --noEmit` |
 
 ### Environment
@@ -69,6 +69,8 @@ Set all three in Vercel → Project → Settings → Environment Variables for P
 
 > [!IMPORTANT]
 > Add the deployed URL to **Supabase → Authentication → URL Configuration → Redirect URLs**, including the Vercel preview pattern, or magic-link sign-in will bounce.
+>
+> The login page does **not** create accounts. Add a new team member in **Supabase → Authentication → Users** first, then give them a row in `hub.memberships` with `project_slug = 'mmd'`.
 
 ---
 
@@ -164,7 +166,7 @@ src/
 │   ├── supabase/                browser + server clients
 │   ├── pipeline.ts              stages, roles, staleness
 │   └── site.ts                  site content and service copy
-└── middleware.ts                gates /dashboard
+└── proxy.ts                     gates /dashboard (Next 16's name for middleware)
 ```
 
 ---
