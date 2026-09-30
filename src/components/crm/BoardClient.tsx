@@ -1,149 +1,38 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { Plus, X, User, CalendarClock, ChevronLeft, ChevronRight, Loader2, Share2, Check } from 'lucide-react';
+import { useState, useTransition, useEffect, useMemo } from 'react';
 import {
-  STAGES, WORK_TYPES, PRIORITIES, typeMeta, priorityMeta, isOverdue,
-  type WorkItem, type Board,
+  DndContext, DragOverlay, PointerSensor, TouchSensor, KeyboardSensor,
+  useSensor, useSensors, closestCorners, useDroppable,
+  type DragStartEvent, type DragOverEvent, type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove,
+} from '@dnd-kit/sortable';
+import { Plus, X, Loader2 } from 'lucide-react';
+import {
+  STAGES, WORK_TYPES, PRIORITIES, type WorkItem, type Board,
 } from '@/lib/crm/board';
-import { dateLabel } from '@/components/crm/ui';
-import { createItem, moveItem, claimItem, setBoardLink } from '@/app/(dashboard)/dashboard/board/actions';
+import BoardCard, { CardBody } from '@/components/crm/BoardCard';
+import {
+  createItem, moveItem, claimItem, setBoardLink, applyColumnOrder,
+} from '@/app/(dashboard)/dashboard/board/actions';
 
 const stageIndex = (k: string) => STAGES.findIndex((s) => s.key === k);
 
-function Card({
-  item, canWrite, mine, busy, boards, currentBoardId, onMove, onClaim, onShare,
-}: {
-  item: WorkItem; canWrite: boolean; mine: boolean; busy: boolean;
-  boards: Board[]; currentBoardId: string;
-  onMove: (dir: -1 | 1) => void; onClaim: () => void;
-  onShare: (boardId: string, on: boolean) => void;
-}) {
-  const [sharing, setSharing] = useState(false);
-  const on = item.boardIds ?? [];
-  const elsewhere = boards.filter((b) => b.id !== currentBoardId && on.includes(b.id));
-  const t = typeMeta(item.work_type);
-  const p = priorityMeta(item.priority);
-  const i = stageIndex(item.stage);
-  const late = isOverdue(item);
-
+function Column({
+  stage, children,
+}: { stage: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `col:${stage}`, data: { stage } });
   return (
-    <article
-      className={`group rounded-lg border bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition ${
-        busy ? 'opacity-50' : 'hover:border-slate-300 hover:shadow-md'
-      } ${late ? 'border-red-200' : 'border-slate-200'}`}
+    <div
+      ref={setNodeRef}
+      className={`min-h-[8rem] space-y-2.5 rounded-lg p-1 transition ${
+        isOver ? 'bg-navy/5 ring-2 ring-dashed ring-navy/25' : ''
+      }`}
     >
-      <div className="flex items-start gap-2">
-        <span className={`mt-px grid h-5 w-5 shrink-0 place-items-center rounded ring-1 ring-inset ${t.tone}`}>
-          <t.icon className="h-3 w-3" />
-        </span>
-        <p className="min-w-0 flex-1 text-sm font-medium leading-snug text-navy-deep">{item.title}</p>
-        {item.priority !== 'normal' && (
-          <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${p.tone}`}>
-            {p.label}
-          </span>
-        )}
-      </div>
-
-      {item.notes && (
-        <p className="mt-2 line-clamp-2 pl-7 text-xs leading-relaxed text-slate-500">{item.notes}</p>
-      )}
-
-      <div className="mt-2.5 flex flex-wrap items-center gap-2 pl-7 text-[11px] text-slate-500">
-        {item.due_at && (
-          <span className={`inline-flex items-center gap-1 ${late ? 'font-semibold text-red-600' : ''}`}>
-            <CalendarClock className="h-3 w-3" />
-            {dateLabel(item.due_at)}
-          </span>
-        )}
-        {mine && (
-          <span className="inline-flex items-center gap-1 rounded bg-gold/20 px-1.5 py-0.5 font-semibold text-navy">
-            <User className="h-3 w-3" /> Mine
-          </span>
-        )}
-        {elsewhere.map((b) => (
-          <span
-            key={b.id}
-            title={`Also on the ${b.name} board`}
-            className="inline-flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 font-semibold text-violet-800"
-          >
-            <Share2 className="h-3 w-3" />{b.name}
-          </span>
-        ))}
-        {item.labels?.map((l) => (
-          <span key={l} className="rounded bg-slate-100 px-1.5 py-0.5 font-medium text-slate-600">{l}</span>
-        ))}
-      </div>
-
-      {canWrite && (
-        <div className="mt-3 flex items-center gap-1 border-t border-slate-100 pt-2.5 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
-          <button
-            onClick={() => onMove(-1)}
-            disabled={i <= 0 || busy}
-            aria-label={`Move "${item.title}" left`}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-navy disabled:opacity-30"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onMove(1)}
-            disabled={i >= STAGES.length - 1 || busy}
-            aria-label={`Move "${item.title}" right`}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-navy disabled:opacity-30"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-          {boards.length > 1 && (
-            <button
-              onClick={() => setSharing((v) => !v)}
-              disabled={busy}
-              aria-expanded={sharing}
-              aria-label={`Show this card on other boards`}
-              className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-navy"
-            >
-              <Share2 className="h-4 w-4" />
-            </button>
-          )}
-          <button
-            onClick={onClaim}
-            disabled={busy}
-            className="ml-auto rounded px-2 py-1 text-[11px] font-semibold text-steel hover:bg-slate-100"
-          >
-            {mine ? 'Release' : 'Take it'}
-          </button>
-        </div>
-      )}
-
-      {canWrite && sharing && (
-        <div className="mt-2 rounded-lg bg-slate-50 p-2.5 ring-1 ring-slate-200">
-          <p className="mb-2 text-[11px] font-bold text-navy-deep">Show this card on</p>
-          <ul className="space-y-1">
-            {boards.map((b) => {
-              const isOn = on.includes(b.id);
-              return (
-                <li key={b.id}>
-                  <button
-                    onClick={() => onShare(b.id, !isOn)}
-                    disabled={busy}
-                    className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-[11px] hover:bg-white"
-                  >
-                    <span className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${
-                      isOn ? 'border-navy bg-navy text-white' : 'border-slate-300 bg-white'
-                    }`}>
-                      {isOn && <Check className="h-3 w-3" />}
-                    </span>
-                    <span className={isOn ? 'font-semibold text-navy-deep' : 'text-slate-600'}>{b.name}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
-            It stays one card. A change on either board shows on both.
-          </p>
-        </div>
-      )}
-    </article>
+      {children}
+    </div>
   );
 }
 
@@ -157,6 +46,113 @@ export default function BoardClient({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [adding, setAdding] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Local copy so a drag lands instantly. The server refreshes it afterwards.
+  const [cards, setCards] = useState<WorkItem[]>(items);
+  useEffect(() => { setCards(items); }, [items]);
+
+  const sensors = useSensors(
+    // A small drag threshold so clicking a button on the card still works.
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // On a phone, a short hold starts the drag so the board can still scroll.
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const byStage = useMemo(() => {
+    const m: Record<string, WorkItem[]> = {};
+    for (const s of STAGES) m[s.key] = [];
+    for (const c of [...cards].sort((a, b) => a.position - b.position)) {
+      (m[c.stage] ??= []).push(c);
+    }
+    return m;
+  }, [cards]);
+
+  const active = activeId ? cards.find((c) => c.id === activeId) ?? null : null;
+
+  /**
+   * What a screen reader says during a keyboard drag. Without these, dnd-kit
+   * announces the raw row id ("item sample-9 was moved over sample-9"), which
+   * tells a blind user nothing about where their card went.
+   */
+  const titleOf = (id: string) => cards.find((c) => c.id === id)?.title ?? 'card';
+  const columnOfId = (id: string) => {
+    const key = id.startsWith('col:') ? id.slice(4) : cards.find((c) => c.id === id)?.stage;
+    return STAGES.find((s) => s.key === key)?.label ?? 'the board';
+  };
+
+  const announcements = {
+    onDragStart: ({ active: a }: { active: { id: string | number } }) =>
+      `Picked up ${titleOf(String(a.id))}. Use the arrow keys to move it, space to drop it, escape to cancel.`,
+    onDragOver: ({ active: a, over }: { active: { id: string | number }; over: { id: string | number } | null }) =>
+      over ? `${titleOf(String(a.id))} is over ${columnOfId(String(over.id))}.` : '',
+    onDragEnd: ({ active: a, over }: { active: { id: string | number }; over: { id: string | number } | null }) =>
+      over
+        ? `Dropped ${titleOf(String(a.id))} into ${columnOfId(String(over.id))}.`
+        : `${titleOf(String(a.id))} was returned to where it started.`,
+    onDragCancel: ({ active: a }: { active: { id: string | number } }) =>
+      `Cancelled. ${titleOf(String(a.id))} is back where it started.`,
+  };
+
+  function columnOf(id: string): string | null {
+    if (id.startsWith('col:')) return id.slice(4);
+    return cards.find((c) => c.id === id)?.stage ?? null;
+  }
+
+  function onDragStart(e: DragStartEvent) {
+    setActiveId(String(e.active.id));
+    setError(null);
+  }
+
+  /** Moves the card between columns while the pointer is still down. */
+  function onDragOver(e: DragOverEvent) {
+    const { active: a, over } = e;
+    if (!over) return;
+    const from = columnOf(String(a.id));
+    const to = columnOf(String(over.id));
+    if (!from || !to || from === to) return;
+
+    setCards((prev) =>
+      prev.map((c) => (c.id === String(a.id) ? { ...c, stage: to } : c))
+    );
+  }
+
+  function onDragEnd(e: DragEndEvent) {
+    const { active: a, over } = e;
+    setActiveId(null);
+    if (!over) return;
+
+    const movedId = String(a.id);
+    const target = columnOf(String(over.id));
+    if (!target) return;
+
+    // Settle the order inside the destination column.
+    const col = [...(byStage[target] ?? [])];
+    const oldIndex = col.findIndex((c) => c.id === movedId);
+    const overIndex = col.findIndex((c) => c.id === String(over.id));
+    const ordered =
+      oldIndex >= 0 && overIndex >= 0 && oldIndex !== overIndex
+        ? arrayMove(col, oldIndex, overIndex)
+        : col;
+
+    setCards((prev) => {
+      const others = prev.filter((c) => c.stage !== target);
+      return [
+        ...others,
+        ...ordered.map((c, i) => ({ ...c, stage: target, position: (i + 1) * 1000 })),
+      ];
+    });
+
+    const ids = ordered.map((c) => c.id);
+    start(async () => {
+      const r = await applyColumnOrder(board.id, target, ids);
+      if (!r.ok) {
+        setError(r.error);
+        setCards(items); // put it back where it was
+      }
+    });
+  }
 
   function move(item: WorkItem, dir: -1 | 1) {
     const next = STAGES[stageIndex(item.stage) + dir];
@@ -165,16 +161,6 @@ export default function BoardClient({
     setError(null);
     start(async () => {
       const r = await moveItem(item.id, next.key);
-      if (!r.ok) setError(r.error);
-      setBusyId(null);
-    });
-  }
-
-  function share(item: WorkItem, boardId: string, on: boolean) {
-    setBusyId(item.id);
-    setError(null);
-    start(async () => {
-      const r = await setBoardLink(item.id, boardId, on);
       if (!r.ok) setError(r.error);
       setBusyId(null);
     });
@@ -190,6 +176,16 @@ export default function BoardClient({
     });
   }
 
+  function share(item: WorkItem, boardId: string, on: boolean) {
+    setBusyId(item.id);
+    setError(null);
+    start(async () => {
+      const r = await setBoardLink(item.id, boardId, on);
+      if (!r.ok) setError(r.error);
+      setBusyId(null);
+    });
+  }
+
   return (
     <div className="p-5 sm:p-8">
       {error && (
@@ -197,125 +193,137 @@ export default function BoardClient({
           {error}
         </p>
       )}
+      {canWrite && (
+        <p className="mb-4 text-xs text-slate-500">
+          Drag a card by its handle to move it, or use the arrows on the card. On a phone, hold a
+          card for a moment first so the board can still scroll.
+        </p>
+      )}
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {STAGES.map((stage) => {
-          const col = items
-            .filter((i) => i.stage === stage.key)
-            .sort((a, b) => a.position - b.position);
-          return (
-            <section key={stage.key} className="flex w-[86vw] shrink-0 flex-col sm:w-[300px]">
-              <div className="mb-3 flex items-center gap-2">
-                <stage.icon className="h-4 w-4 text-steel" />
-                <h2 className="text-sm font-bold text-navy-deep">{stage.label}</h2>
-                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-bold tabular-nums text-slate-600">
-                  {col.length}
-                </span>
-                {canWrite && (
-                  <button
-                    onClick={() => { setAdding(adding === stage.key ? null : stage.key); setError(null); }}
-                    aria-label={`Add an item to ${stage.label}`}
-                    className="ml-auto rounded-md p-1 text-slate-400 hover:bg-white hover:text-navy"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-              <p className="mb-3 text-[11px] text-slate-400">{stage.hint}</p>
-
-              {adding === stage.key && (
-                <form
-                  action={(fd) => {
-                    setError(null);
-                    start(async () => {
-                      const r = await createItem(fd);
-                      if (r.ok) setAdding(null);
-                      else setError(r.error);
-                    });
-                  }}
-                  className="mb-3 rounded-lg border border-navy/20 bg-white p-3 shadow-sm"
-                >
-                  <input type="hidden" name="stage" value={stage.key} />
-                  <input type="hidden" name="board_id" value={board.id} />
-                  <div className="flex items-center justify-between">
-                    <label htmlFor={`t-${stage.key}`} className="text-xs font-bold text-navy-deep">
-                      New item
-                    </label>
+      <DndContext
+        // A fixed id keeps the accessibility description ids identical on the
+        // server and the client. Without it React warns about a hydration
+        // mismatch on every board render.
+        id="mmd-board"
+        accessibility={{ announcements }}
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+        onDragCancel={() => { setActiveId(null); setCards(items); }}
+      >
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {STAGES.map((stage) => {
+            const col = byStage[stage.key] ?? [];
+            return (
+              <section key={stage.key} className="flex w-[86vw] shrink-0 flex-col sm:w-[300px]">
+                <div className="mb-3 flex items-center gap-2">
+                  <stage.icon className="h-4 w-4 text-steel" />
+                  <h2 className="text-sm font-bold text-navy-deep">{stage.label}</h2>
+                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-bold tabular-nums text-slate-600">
+                    {col.length}
+                  </span>
+                  {canWrite && (
                     <button
-                      type="button"
-                      onClick={() => setAdding(null)}
-                      aria-label="Cancel"
-                      className="rounded p-1 text-slate-400 hover:bg-slate-100"
+                      onClick={() => { setAdding(adding === stage.key ? null : stage.key); setError(null); }}
+                      aria-label={`Add an item to ${stage.label}`}
+                      className="ml-auto rounded-md p-1 text-slate-400 hover:bg-white hover:text-navy"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <Plus className="h-4 w-4" />
                     </button>
-                  </div>
-                  <input
-                    id={`t-${stage.key}`}
-                    name="title"
-                    required
-                    autoFocus
-                    placeholder="What needs doing?"
-                    className="mt-2 w-full rounded-md border border-slate-300 px-2.5 py-2 text-sm"
-                  />
-                  <textarea
-                    name="notes"
-                    rows={2}
-                    placeholder="Any detail (optional)"
-                    className="mt-2 w-full rounded-md border border-slate-300 px-2.5 py-2 text-xs"
-                  />
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    <select name="work_type" defaultValue="task" aria-label="Type"
-                      className="rounded-md border border-slate-300 px-2 py-1.5 text-xs">
-                      {WORK_TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
-                    </select>
-                    <select name="priority" defaultValue="normal" aria-label="Priority"
-                      className="rounded-md border border-slate-300 px-2 py-1.5 text-xs">
-                      {PRIORITIES.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
-                    </select>
-                  </div>
-                  <input type="date" name="due_at" aria-label="Due date"
-                    className="mt-2 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs" />
-                  <label className="mt-2 flex items-center gap-2 text-xs text-slate-600">
-                    <input type="checkbox" name="mine" className="rounded border-slate-300" />
-                    Assign it to me
-                  </label>
-                  <button
-                    type="submit"
-                    disabled={pending}
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-navy px-3 py-2 text-xs font-bold text-white hover:bg-navy-dark disabled:opacity-60"
-                  >
-                    {pending && <Loader2 className="h-3 w-3 animate-spin" />}
-                    Add to {stage.label}
-                  </button>
-                </form>
-              )}
+                  )}
+                </div>
+                <p className="mb-3 text-[11px] text-slate-400">{stage.hint}</p>
 
-              <div className="space-y-2.5">
-                {col.map((item) => (
-                  <Card
-                    key={item.id}
-                    item={item}
-                    canWrite={canWrite}
-                    mine={!!userId && item.owner_id === userId}
-                    busy={busyId === item.id}
-                    boards={boards}
-                    currentBoardId={board.id}
-                    onMove={(d) => move(item, d)}
-                    onClaim={() => claim(item)}
-                    onShare={(bid, on) => share(item, bid, on)}
-                  />
-                ))}
-                {col.length === 0 && adding !== stage.key && (
-                  <p className="rounded-lg border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">
-                    Nothing here
-                  </p>
+                {adding === stage.key && (
+                  <form
+                    action={(fd) => {
+                      setError(null);
+                      start(async () => {
+                        const r = await createItem(fd);
+                        if (r.ok) setAdding(null);
+                        else setError(r.error);
+                      });
+                    }}
+                    className="mb-3 rounded-lg border border-navy/20 bg-white p-3 shadow-sm"
+                  >
+                    <input type="hidden" name="stage" value={stage.key} />
+                    <input type="hidden" name="board_id" value={board.id} />
+                    <div className="flex items-center justify-between">
+                      <label htmlFor={`t-${stage.key}`} className="text-xs font-bold text-navy-deep">
+                        New item
+                      </label>
+                      <button type="button" onClick={() => setAdding(null)} aria-label="Cancel"
+                        className="rounded p-1 text-slate-400 hover:bg-slate-100">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <input id={`t-${stage.key}`} name="title" required autoFocus
+                      placeholder="What needs doing?"
+                      className="mt-2 w-full rounded-md border border-slate-300 px-2.5 py-2 text-sm" />
+                    <textarea name="notes" rows={2} placeholder="Any detail (optional)"
+                      className="mt-2 w-full rounded-md border border-slate-300 px-2.5 py-2 text-xs" />
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <select name="work_type" defaultValue="task" aria-label="Type"
+                        className="rounded-md border border-slate-300 px-2 py-1.5 text-xs">
+                        {WORK_TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+                      </select>
+                      <select name="priority" defaultValue="normal" aria-label="Priority"
+                        className="rounded-md border border-slate-300 px-2 py-1.5 text-xs">
+                        {PRIORITIES.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
+                      </select>
+                    </div>
+                    <input type="date" name="due_at" aria-label="Due date"
+                      className="mt-2 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs" />
+                    <label className="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                      <input type="checkbox" name="mine" className="rounded border-slate-300" />
+                      Assign it to me
+                    </label>
+                    <button type="submit" disabled={pending}
+                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-navy px-3 py-2 text-xs font-bold text-white hover:bg-navy-dark disabled:opacity-60">
+                      {pending && <Loader2 className="h-3 w-3 animate-spin" />}
+                      Add to {stage.label}
+                    </button>
+                  </form>
                 )}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+
+                <SortableContext items={col.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                  <Column stage={stage.key}>
+                    {col.map((item) => (
+                      <BoardCard
+                        key={item.id}
+                        item={item}
+                        canWrite={canWrite}
+                        mine={!!userId && item.owner_id === userId}
+                        busy={busyId === item.id}
+                        boards={boards}
+                        currentBoardId={board.id}
+                        onMove={(d) => move(item, d)}
+                        onClaim={() => claim(item)}
+                        onShare={(bid, on) => share(item, bid, on)}
+                      />
+                    ))}
+                    {col.length === 0 && adding !== stage.key && (
+                      <p className="rounded-lg border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">
+                        {canWrite ? 'Drop a card here' : 'Nothing here'}
+                      </p>
+                    )}
+                  </Column>
+                </SortableContext>
+              </section>
+            );
+          })}
+        </div>
+
+        <DragOverlay>
+          {active && (
+            <article className="w-[280px] rotate-2 rounded-lg border border-navy/30 bg-white p-3 shadow-2xl">
+              <CardBody item={active} boards={boards} currentBoardId={board.id} dragging />
+            </article>
+          )}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }

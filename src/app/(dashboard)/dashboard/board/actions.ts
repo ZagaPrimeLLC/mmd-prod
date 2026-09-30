@@ -142,3 +142,60 @@ export async function setBoardLink(
   touched();
   return { ok: true };
 }
+
+/**
+ * Persists a drag. The client sends the whole target column in its new order,
+ * which avoids fractional index drift and means one call covers both a move
+ * between columns and a reorder within one.
+ *
+ * Stage lives on the task and position lives on the board link, so dragging a
+ * shared card to Done moves it on every board it appears on, while reordering
+ * it only affects the board you are looking at. That is deliberate.
+ */
+export async function applyColumnOrder(
+  boardId: string, stage: string, orderedTaskIds: string[]
+): Promise<ActionResult> {
+  const { supabase, canWrite } = await ctx();
+  if (!canWrite) return { ok: false, error: NO_WRITE };
+  if (!STAGE_KEYS.includes(stage as never)) return { ok: false, error: 'Unknown column.' };
+  if (orderedTaskIds.length > 500) return { ok: false, error: 'Too many cards in one move.' };
+
+  const ids = orderedTaskIds.filter((id) => typeof id === 'string' && id.length > 0);
+  if (ids.length === 0) return { ok: true };
+
+  // Only the cards whose column actually changed need a stage write.
+  const { data: current } = await supabase
+    .from('tasks')
+    .select('id, stage')
+    .in('id', ids);
+
+  const needsStage = (current ?? []).filter((t) => t.stage !== stage).map((t) => t.id);
+
+  if (needsStage.length > 0) {
+    const { error } = await supabase
+      .from('tasks')
+      .update({
+        stage,
+        completed_at: stage === 'done' ? new Date().toISOString() : null,
+        status: stage === 'done' ? 'done' : 'open',
+        updated_at: new Date().toISOString(),
+      })
+      .in('id', needsStage);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  const rows = ids.map((taskId, i) => ({
+    board_id: boardId,
+    task_id: taskId,
+    position: (i + 1) * 1000,
+  }));
+
+  const { error: posErr } = await supabase
+    .from('board_items')
+    .upsert(rows, { onConflict: 'board_id,task_id' });
+
+  if (posErr) return { ok: false, error: posErr.message };
+
+  touched();
+  return { ok: true };
+}
