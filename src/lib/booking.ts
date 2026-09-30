@@ -1,49 +1,98 @@
 // Consultations are held during the office walk-in window: Tuesdays and
-// Thursdays, 11am to 4pm. Slots are generated from that rule so the form can
-// never offer a time the office does not actually staff.
+// Thursdays, 11am to 4pm, New York time. Slots are generated from that rule
+// every time the page opens, always covering the next few weeks from today, so
+// nothing needs updating when the month changes.
 export const SLOT_MINUTES = 45;
 export const CONSULT_DAYS = [2, 4]; // Tue, Thu
-export const CONSULT_START_HOUR = 11;
-export const CONSULT_END_HOUR = 16;
+export const CONSULT_START = 11 * 60; // minutes after midnight
+export const CONSULT_END = 16 * 60;   // the last consultation finishes by 4pm
 export const WEEKS_AHEAD = 3;
 export const MIN_NOTICE_HOURS = 24;
+export const OFFICE_TZ = 'America/New_York';
 
-export type Slot = { iso: string; dayLabel: string; timeLabel: string };
+/**
+ * One-off closures, as YYYY-MM-DD (e.g. a staff training day). Public holidays
+ * are worked out automatically below and do not need listing here.
+ */
+export const CLOSED_DATES: string[] = [];
 
-export function availableSlots(from: Date = new Date()): Slot[] {
-  const out: Slot[] = [];
-  const earliest = new Date(from.getTime() + MIN_NOTICE_HOURS * 3600_000);
-  const cursor = new Date(from);
-  cursor.setHours(0, 0, 0, 0);
+export type Slot = { iso: string; time: string };
+export type Day = { key: string; label: string; slots: Slot[] };
 
-  for (let d = 0; d < WEEKS_AHEAD * 7; d++) {
-    const day = new Date(cursor);
-    day.setDate(cursor.getDate() + d);
-    if (!CONSULT_DAYS.includes(day.getDay())) continue;
+type Ymd = { y: number; m: number; d: number };
 
-    for (let h = CONSULT_START_HOUR; h < CONSULT_END_HOUR; h++) {
-      for (const m of [0, SLOT_MINUTES % 60 === 0 ? 30 : 45]) {
-        if (m >= 60) continue;
-        const slot = new Date(day);
-        slot.setHours(h, m, 0, 0);
-        if (slot < earliest) continue;
-        out.push({
-          iso: slot.toISOString(),
-          dayLabel: slot.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
-          timeLabel: slot.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        });
-      }
-    }
+/** Holidays the office is closed that can land on a Tuesday or Thursday. */
+function isHoliday({ y, m, d }: Ymd): boolean {
+  if ((m === 1 && d === 1) || (m === 7 && d === 4) || (m === 12 && (d === 24 || d === 25 || d === 31))) return true;
+  // Thanksgiving: fourth Thursday of November
+  if (m === 11) {
+    const firstDow = new Date(Date.UTC(y, 10, 1)).getUTCDay();
+    const firstThu = 1 + ((4 - firstDow + 7) % 7);
+    if (d === firstThu + 21) return true;
   }
-  return out;
+  return false;
 }
 
-export function groupByDay(slots: Slot[]): { day: string; slots: Slot[] }[] {
-  const map = new Map<string, Slot[]>();
-  for (const s of slots) {
-    const list = map.get(s.dayLabel) ?? [];
-    list.push(s);
-    map.set(s.dayLabel, list);
+/** Today's calendar date in New York, whatever timezone the visitor is in. */
+function officeToday(now: Date): Ymd {
+  const p = new Intl.DateTimeFormat('en-US', { timeZone: OFFICE_TZ, year: 'numeric', month: 'numeric', day: 'numeric' })
+    .formatToParts(now);
+  const n = (t: string) => Number(p.find((x) => x.type === t)?.value);
+  return { y: n('year'), m: n('month'), d: n('day') };
+}
+
+/** The real instant of a New York wall-clock time (handles daylight saving). */
+function officeInstant({ y, m, d }: Ymd, minutes: number): Date {
+  const guess = Date.UTC(y, m - 1, d, Math.floor(minutes / 60), minutes % 60);
+  const p = new Intl.DateTimeFormat('en-US', {
+    timeZone: OFFICE_TZ, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric',
+  }).formatToParts(new Date(guess));
+  const n = (t: string) => Number(p.find((x) => x.type === t)?.value);
+  const asIfUtc = Date.UTC(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'));
+  return new Date(guess - (asIfUtc - guess));
+}
+
+function ordinal(d: number): string {
+  const s = d % 100 >= 11 && d % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10] ?? 'th';
+  return `${d}${s}`;
+}
+
+const WEEKDAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/** "Tuesday 6th", with "This" / "Next" so nobody has to work out which week. */
+export function dayLabel(date: Ymd, today: Ymd): string {
+  const dow = new Date(Date.UTC(date.y, date.m - 1, date.d)).getUTCDay();
+  const diff = Math.round((Date.UTC(date.y, date.m - 1, date.d) - Date.UTC(today.y, today.m - 1, today.d)) / 864e5);
+  const todayDow = new Date(Date.UTC(today.y, today.m - 1, today.d)).getUTCDay();
+  const base = `${WEEKDAY[dow]} ${ordinal(date.d)}`;
+  if (diff === 1) return `Tomorrow, ${base}`;
+  if (diff < 7 - todayDow) return `This ${base}`;
+  if (diff < 14 - todayDow) return `Next ${base}`;
+  return base;
+}
+
+export function timeLabel(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-US', { timeZone: OFFICE_TZ, hour: 'numeric', minute: '2-digit' });
+}
+
+export function availableDays(now: Date = new Date()): Day[] {
+  const today = officeToday(now);
+  const earliest = now.getTime() + MIN_NOTICE_HOURS * 3600_000;
+  const days: Day[] = [];
+
+  for (let i = 0; i < WEEKS_AHEAD * 7; i++) {
+    const cal = new Date(Date.UTC(today.y, today.m - 1, today.d + i));
+    const ymd = { y: cal.getUTCFullYear(), m: cal.getUTCMonth() + 1, d: cal.getUTCDate() };
+    const key = cal.toISOString().slice(0, 10);
+    if (!CONSULT_DAYS.includes(cal.getUTCDay()) || isHoliday(ymd) || CLOSED_DATES.includes(key)) continue;
+
+    const slots: Slot[] = [];
+    for (let t = CONSULT_START; t + SLOT_MINUTES <= CONSULT_END; t += SLOT_MINUTES) {
+      const at = officeInstant(ymd, t);
+      if (at.getTime() < earliest) continue;
+      slots.push({ iso: at.toISOString(), time: timeLabel(at.toISOString()) });
+    }
+    if (slots.length) days.push({ key, label: dayLabel(ymd, today), slots });
   }
-  return [...map.entries()].map(([day, slots]) => ({ day, slots }));
+  return days;
 }

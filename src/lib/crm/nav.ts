@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, KanbanSquare, UserCheck, Inbox, Users,
-  GraduationCap, Route, History, CircleUser, Settings, Contact2,
+  GraduationCap, Route, History, CircleUser, Settings, Contact2, Briefcase, FileUp,
 } from 'lucide-react';
 
 /**
@@ -39,7 +39,10 @@ export const NAV: NavSection[] = [
   {
     title: 'Recruitment',
     items: [
+      { href: '/dashboard/jobs',        label: 'Jobs',       icon: Briefcase, roles: ALL },
       { href: '/dashboard/recruitment', label: 'Applicants', icon: UserCheck, roles: ALL },
+      { href: '/dashboard/recruitment/import', label: 'Import applicants', icon: FileUp, roles: OPS,
+        hint: 'CareerPlug, Indeed, CSV' },
       { href: '/dashboard/inbox',       label: 'Inbox',      icon: Inbox,     roles: ALL,
         hint: 'from the website' },
       { href: '/dashboard/contacts',    label: 'Contacts',   icon: Contact2,  roles: ALL },

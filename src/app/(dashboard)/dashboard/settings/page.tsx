@@ -1,5 +1,6 @@
 import PageHeader from '@/components/crm/PageHeader';
 import SettingsClient from '@/components/crm/SettingsClient';
+import IntakeKeys, { type IntakeKey } from '@/components/crm/IntakeKeys';
 import { Card, CardHead } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
 import { canWrite } from '@/lib/crm/nav';
@@ -33,9 +34,13 @@ export default async function SettingsPage() {
     );
   }
 
-  const [boardsRes, teamRes] = await Promise.all([
+  const isAdmin = role === 'admin';
+  const [boardsRes, teamRes, keysRes] = await Promise.all([
     supabase.from('boards').select('*').eq('archived', false).order('position'),
     supabase.rpc('team_list'),
+    isAdmin
+      ? supabase.from('intake_keys').select('id, label, source, key_prefix, created_at, last_used_at, revoked_at').order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as IntakeKey[] }),
   ]);
 
   const boards = (boardsRes.data ?? []) as Board[];
@@ -54,9 +59,15 @@ export default async function SettingsPage() {
       <SettingsClient
         boards={boards}
         team={team}
-        isAdmin={role === 'admin'}
+        isAdmin={isAdmin}
         meId={user?.id ?? null}
       />
+
+      {isAdmin && (
+        <div id="intake" className="scroll-mt-6 px-5 pb-6 sm:px-8">
+          <IntakeKeys keys={(keysRes.data ?? []) as IntakeKey[]} endpoint={`${site.url}/api/intake`} />
+        </div>
+      )}
 
       <div className="grid gap-6 px-5 pb-8 sm:px-8 xl:grid-cols-2">
         <Card>

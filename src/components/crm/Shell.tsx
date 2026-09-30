@@ -20,6 +20,12 @@ export default function Shell({
   const pathname = usePathname();
   const sections = navFor(role);
   const writes = canWrite(role);
+  // The most specific match wins, so /dashboard/recruitment/import lights up
+  // "Import applicants" rather than "Applicants" as well.
+  const activeHref = sections
+    .flatMap((s) => s.items.map((i) => i.href))
+    .filter((h) => (h === '/dashboard' ? pathname === h : pathname === h || pathname.startsWith(`${h}/`)))
+    .sort((a, b) => b.length - a.length)[0];
 
   const nav = (
     <nav className="flex-1 space-y-7 overflow-y-auto px-3 py-6">
@@ -30,10 +36,7 @@ export default function Shell({
           </p>
           <ul className="space-y-0.5">
             {section.items.map((item) => {
-              const active =
-                item.href === '/dashboard'
-                  ? pathname === '/dashboard'
-                  : pathname.startsWith(item.href);
+              const active = item.href === activeHref;
               return (
                 <li key={item.href}>
                   <Link
