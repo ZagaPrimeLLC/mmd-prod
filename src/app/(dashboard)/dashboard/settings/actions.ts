@@ -124,6 +124,63 @@ export async function setTeamRole(userId: string, role: string): Promise<Result>
   return { ok: true, note: 'Role updated.' };
 }
 
+export type AddMemberResult =
+  | { ok: true; status: 'added' | 'invited'; email: string; note: string }
+  | { ok: false; error: string };
+
+/**
+ * Adds someone by email. The database decides: an existing account joins the
+ * team now; anyone else gets an invite that applies the moment they first sign in.
+ */
+export async function addTeamMember(form: FormData): Promise<AddMemberResult> {
+  const { supabase, isAdmin } = await ctx();
+  if (!isAdmin) return { ok: false, error: 'Only an administrator can add people to the team.' };
+
+  const email = String(form.get('email') ?? '').trim().toLowerCase();
+  const role = String(form.get('role') ?? '');
+  const jobTitle = String(form.get('job_title') ?? '').trim().slice(0, 80);
+  if (!email) return { ok: false, error: 'Enter their work email.' };
+  if (!ROLES.includes(role)) return { ok: false, error: 'Choose a role.' };
+
+  const { data, error } = await supabase.rpc('add_team_member', {
+    p_email: email, p_role: role, p_job_title: jobTitle || null,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  const status = (data as { status: 'added' | 'invited' }).status;
+  revalidatePath('/dashboard/settings');
+  return {
+    ok: true,
+    status,
+    email,
+    note: status === 'added'
+      ? `${email} already had an account and is now on the team.`
+      : `${email} is invited. They get access the first time they sign in with that email.`,
+  };
+}
+
+export async function revokeTeamInvite(id: string): Promise<Result> {
+  const { supabase, isAdmin } = await ctx();
+  if (!isAdmin) return { ok: false, error: 'Only an administrator can withdraw an invite.' };
+
+  const { error } = await supabase.rpc('revoke_team_invite', { p_id: id });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/dashboard/settings');
+  return { ok: true, note: 'Invite withdrawn.' };
+}
+
+export async function removeTeamMember(userId: string): Promise<Result> {
+  const { supabase, isAdmin } = await ctx();
+  if (!isAdmin) return { ok: false, error: 'Only an administrator can remove someone.' };
+
+  const { error } = await supabase.rpc('remove_team_member', { p_user: userId });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/dashboard/settings');
+  return { ok: true, note: 'Removed from the team. Their login stays but opens nothing here.' };
+}
+
 export type KeyResult = { ok: true; key: string } | { ok: false; error: string };
 
 /** The key is returned once and never stored in readable form. */

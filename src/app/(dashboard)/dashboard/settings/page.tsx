@@ -1,5 +1,6 @@
 import PageHeader from '@/components/crm/PageHeader';
-import SettingsClient from '@/components/crm/SettingsClient';
+import SettingsClient, { type Invite } from '@/components/crm/SettingsClient';
+import type { Member } from '@/components/crm/TeamAccess';
 import IntakeKeys, { type IntakeKey } from '@/components/crm/IntakeKeys';
 import { Card, CardHead } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
@@ -35,30 +36,32 @@ export default async function SettingsPage() {
   }
 
   const isAdmin = role === 'admin';
-  const [boardsRes, teamRes, keysRes] = await Promise.all([
+  const [boardsRes, teamRes, keysRes, invitesRes] = await Promise.all([
     supabase.from('boards').select('*').eq('archived', false).order('position'),
     supabase.rpc('team_list'),
     isAdmin
       ? supabase.from('intake_keys').select('id, label, source, key_prefix, created_at, last_used_at, revoked_at').order('created_at', { ascending: false })
       : Promise.resolve({ data: [] as IntakeKey[] }),
+    isAdmin
+      ? supabase.from('team_invites').select('id, email, role, job_title, created_at')
+          .is('accepted_at', null).is('revoked_at', null).order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as Invite[] }),
   ]);
 
   const boards = (boardsRes.data ?? []) as Board[];
-  const team = (teamRes.data ?? []) as {
-    user_id: string; email: string; role: string;
-    job_title: string | null; last_sign_in_at: string | null;
-  }[];
+  const team = (teamRes.data ?? []) as Member[];
 
   return (
     <>
       <PageHeader
         title="Settings"
-        lead="Boards, who can open them, and who is on the team."
+        lead="Who is on the team and what they can do, boards and who can open them, and the applicant feed."
       />
 
       <SettingsClient
         boards={boards}
         team={team}
+        invites={(invitesRes.data ?? []) as Invite[]}
         isAdmin={isAdmin}
         meId={user?.id ?? null}
       />

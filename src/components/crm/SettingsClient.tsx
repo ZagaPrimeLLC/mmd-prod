@@ -5,20 +5,13 @@ import { Plus, Loader2, Archive, Lock, Users2, Check } from 'lucide-react';
 import { Card, CardHead } from '@/components/crm/ui';
 import type { Board } from '@/lib/crm/board';
 import {
-  createBoard, updateBoardVisibility, archiveBoard, setTeamRole,
+  createBoard, updateBoardVisibility, archiveBoard,
 } from '@/app/(dashboard)/dashboard/settings/actions';
+import TeamAccess, { type Member, type Invite } from '@/components/crm/TeamAccess';
 
-const ROLES = [
-  { key: 'admin',      label: 'Administrator', hint: 'everything, including roles' },
-  { key: 'ops',        label: 'Operations',    hint: 'runs the boards and onboarding' },
-  { key: 'leadership', label: 'Leadership',    hint: 'sees, does not change' },
-  { key: 'viewer',     label: 'Viewer',        hint: 'limited read only' },
-] as const;
+export type { Invite };
 
-type Member = {
-  user_id: string; email: string; role: string;
-  job_title: string | null; last_sign_in_at: string | null;
-};
+import { ROLE_OPTIONS as ROLES } from '@/components/crm/TeamAccess';
 
 function Banner({ msg, tone }: { msg: string; tone: 'ok' | 'bad' }) {
   return (
@@ -36,8 +29,8 @@ function Banner({ msg, tone }: { msg: string; tone: 'ok' | 'bad' }) {
 }
 
 export default function SettingsClient({
-  boards, team, isAdmin, meId,
-}: { boards: Board[]; team: Member[]; isAdmin: boolean; meId: string | null }) {
+  boards, team, invites, isAdmin, meId,
+}: { boards: Board[]; team: Member[]; invites: Invite[]; isAdmin: boolean; meId: string | null }) {
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<{ text: string; tone: 'ok' | 'bad' } | null>(null);
   const [adding, setAdding] = useState(false);
@@ -56,6 +49,8 @@ export default function SettingsClient({
 
   return (
     <div className="space-y-6 p-5 sm:p-8">
+      <TeamAccess team={team} invites={invites} isAdmin={isAdmin} meId={meId} />
+
       {msg && <Banner msg={msg.text} tone={msg.tone} />}
 
       <Card>
@@ -176,52 +171,6 @@ export default function SettingsClient({
         </ul>
       </Card>
 
-      <Card>
-        <CardHead
-          title="Team and access"
-          sub={isAdmin
-            ? 'Change what someone can do here. They must sign in once before they appear.'
-            : 'Only an administrator can change a role.'}
-          icon={Users2}
-        />
-        {team.length === 0 ? (
-          <p className="p-5 text-sm text-slate-500">Nobody else has signed in yet.</p>
-        ) : (
-          <ul className="divide-y divide-slate-100">
-            {team.map((m) => (
-              <li key={m.user_id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-navy-deep">{m.email}</p>
-                  <p className="text-xs text-slate-500">
-                    {m.job_title ?? 'no title set'}
-                    {m.last_sign_in_at
-                      ? ` · last signed in ${new Date(m.last_sign_in_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                      : ' · never signed in'}
-                  </p>
-                </div>
-                {isAdmin ? (
-                  <select
-                    defaultValue={m.role}
-                    disabled={pending}
-                    onChange={(e) => run(() => setTeamRole(m.user_id, e.target.value))}
-                    aria-label={`Role for ${m.email}`}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  >
-                    {ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
-                  </select>
-                ) : (
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {ROLES.find((r) => r.key === m.role)?.label ?? m.role}
-                  </span>
-                )}
-                {m.user_id === meId && (
-                  <span className="rounded bg-gold/20 px-2 py-0.5 text-[11px] font-bold text-navy">you</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
     </div>
   );
 }
