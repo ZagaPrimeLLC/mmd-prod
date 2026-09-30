@@ -84,7 +84,7 @@ export default function ServicesPage() {
               </li>
             ))}
           </ul>
-          <Link href="/contact" className="mt-10 inline-block rounded-lg bg-navy px-8 py-4 font-bold text-white hover:bg-navy-dark">
+          <Link href="/contact?cta=services-page" className="mt-10 inline-block rounded-lg bg-navy px-8 py-4 font-bold text-white hover:bg-navy-dark">
             Book a free consultation
           </Link>
         </div>

@@ -50,7 +50,7 @@ export default function TestimonialsPage() {
               would be glad to hear from you. Nothing goes on this page without written permission.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/contact" className="rounded-lg bg-navy px-6 py-3 font-bold text-white hover:bg-navy-dark">
+              <Link href="/contact?cta=testimonials" className="rounded-lg bg-navy px-6 py-3 font-bold text-white hover:bg-navy-dark">
                 Get in touch
               </Link>
               <a href={site.phoneHref} className="rounded-lg border-2 border-navy px-6 py-3 font-semibold text-navy hover:bg-navy hover:text-white">

@@ -40,7 +40,7 @@ export default function HeroSection() {
 
           <div className="mb-8 flex flex-col gap-3 sm:mb-12 sm:flex-row sm:gap-4">
             <Link
-              href="/contact#book"
+              href="/contact?cta=home-hero#book"
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-6 py-3.5 text-base font-bold text-navy shadow-xl hover:bg-gold-dark sm:px-8 sm:py-4 sm:text-lg"
             >
               Book a Consultation

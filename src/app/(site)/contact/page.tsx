@@ -36,7 +36,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div id="message">
+            <div id="send-a-message">
               <h2 className="text-2xl font-bold text-navy">Or send a message</h2>
               <p className="mt-2 text-gray-600">
                 Prefer to write instead? Tell us what you need and we will get back to you.

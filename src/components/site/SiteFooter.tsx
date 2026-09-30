@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { site } from '@/lib/site';
+import NewsletterSignup from '@/components/site/NewsletterSignup';
 
 export default function SiteFooter() {
   return (
@@ -49,11 +50,15 @@ export default function SiteFooter() {
             <li><Link href="/contact/testimonials" className="hover:text-white">Testimonials</Link></li>
             <li><Link href="/about" className="hover:text-white">About us</Link></li>
             <li><Link href="/careers" className="hover:text-white">Caregiver jobs</Link></li>
-            <li><Link href="/contact" className="hover:text-white">Book a consultation</Link></li>
+            <li><Link href="/contact?cta=footer" className="hover:text-white">Book a consultation</Link></li>
           </ul>
           <p className="mt-6 text-sm text-gray-300">
             Walk-in paperwork: {site.walkIn}
           </p>
+
+          <div className="mt-6 border-t border-white/15 pt-5">
+            <NewsletterSignup />
+          </div>
         </div>
       </div>
 

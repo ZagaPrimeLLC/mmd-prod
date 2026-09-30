@@ -19,7 +19,7 @@ export default function CTABanner() {
             Call {site.phone}
           </a>
           <Link
-            href="/contact#book"
+            href="/contact?cta=cta-banner#book"
             className="inline-flex items-center justify-center rounded-lg bg-gold px-8 py-4 text-lg font-bold text-navy shadow-lg hover:bg-gold-dark"
           >
             Book Consultation
