@@ -26,8 +26,18 @@ export const sampleWork: WorkItem[] = [
   position: 1000 + i,
   labels: labels as string[],
   owner_id: i === 4 || i === 1 ? 'me' : null,
+  boardIds: [3, 5, 6, 10].includes(i) ? ['b-ops', 'b-lead'] : ['b-ops'],
   due_at: (due as number) !== 0 ? iso(due as number) : null,
   completed_at: stage === 'done' ? iso(-2) : null,
   created_at: iso(-20),
   updated_at: iso(-1),
 }));
+
+export const sampleBoards = [
+  { id: 'b-ops', key: 'operations', name: 'Operations',
+    description: 'The day to day board. Recruitment, coordination, compliance and everything the office is carrying.',
+    visible_to: ['admin', 'ops'], position: 10, archived: false },
+  { id: 'b-lead', key: 'leadership', name: 'Leadership',
+    description: 'What the CEO needs to see. Decisions waiting, items at risk, and anything the office has escalated.',
+    visible_to: ['admin', 'ops', 'leadership'], position: 20, archived: false },
+];

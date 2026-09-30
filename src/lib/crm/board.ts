@@ -47,6 +47,16 @@ export function stageMeta(key: string) {
   return STAGES.find((s) => s.key === key) ?? STAGES[0];
 }
 
+export type Board = {
+  id: string;
+  key: string;
+  name: string;
+  description: string | null;
+  visible_to: string[];
+  position: number;
+  archived: boolean;
+};
+
 export type WorkItem = {
   id: string;
   title: string;
@@ -61,6 +71,8 @@ export type WorkItem = {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  /** Every board this card sits on. One task row, several places it shows. */
+  boardIds?: string[];
 };
 
 /** Overdue, and not already finished. */

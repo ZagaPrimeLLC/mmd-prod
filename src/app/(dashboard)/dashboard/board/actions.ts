@@ -5,9 +5,9 @@ import { createClient } from '@/lib/supabase/server';
 import { STAGE_KEYS } from '@/lib/crm/board';
 
 /**
- * Every action here is also gated by row level security, so a leadership
- * account that posted one of these by hand would still be refused by the
- * database. These checks exist to give a clear message, not to be the lock.
+ * Every action is also gated by row level security, so a leadership account
+ * posting one of these by hand would still be refused by the database. These
+ * checks exist to give a clear message, not to be the lock.
  */
 async function ctx() {
   const supabase = createClient();
@@ -18,9 +18,17 @@ async function ctx() {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
+const NO_WRITE = 'Your role can see this board but cannot change it.';
+
+function touched() {
+  revalidatePath('/dashboard/board');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/my-work');
+}
+
 export async function createItem(form: FormData): Promise<ActionResult> {
   const { supabase, user, canWrite } = await ctx();
-  if (!canWrite) return { ok: false, error: 'Your role cannot change the board.' };
+  if (!canWrite) return { ok: false, error: NO_WRITE };
 
   const title = String(form.get('title') ?? '').trim();
   if (!title) return { ok: false, error: 'Give the item a title.' };
@@ -28,29 +36,44 @@ export async function createItem(form: FormData): Promise<ActionResult> {
   const stage = String(form.get('stage') ?? 'backlog');
   if (!STAGE_KEYS.includes(stage as never)) return { ok: false, error: 'Unknown column.' };
 
+  const boardId = String(form.get('board_id') ?? '');
+  if (!boardId) return { ok: false, error: 'No board chosen.' };
+
   const dueRaw = String(form.get('due_at') ?? '').trim();
 
-  const { error } = await supabase.from('tasks').insert({
-    title: title.slice(0, 200),
-    notes: String(form.get('notes') ?? '').trim().slice(0, 4000) || null,
-    work_type: String(form.get('work_type') ?? 'task'),
-    priority: String(form.get('priority') ?? 'normal'),
-    stage,
-    due_at: dueRaw ? new Date(dueRaw).toISOString() : null,
-    created_by: user?.id ?? null,
-    owner_id: form.get('mine') ? user?.id ?? null : null,
-    position: Date.now(),
-  });
+  const { data: task, error } = await supabase
+    .from('tasks')
+    .insert({
+      title: title.slice(0, 200),
+      notes: String(form.get('notes') ?? '').trim().slice(0, 4000) || null,
+      work_type: String(form.get('work_type') ?? 'task'),
+      priority: String(form.get('priority') ?? 'normal'),
+      stage,
+      due_at: dueRaw ? new Date(dueRaw).toISOString() : null,
+      created_by: user?.id ?? null,
+      owner_id: form.get('mine') ? user?.id ?? null : null,
+      position: Date.now(),
+    })
+    .select('id')
+    .single();
 
-  if (error) return { ok: false, error: error.message };
-  revalidatePath('/dashboard/board');
-  revalidatePath('/dashboard');
+  if (error || !task) return { ok: false, error: error?.message ?? 'Could not create that.' };
+
+  // A card with no board is invisible to everyone but admin and ops, so it is
+  // placed on the board it was created from in the same breath.
+  const { error: linkErr } = await supabase
+    .from('board_items')
+    .insert({ board_id: boardId, task_id: task.id, position: Date.now(), added_by: user?.id ?? null });
+
+  if (linkErr) return { ok: false, error: linkErr.message };
+
+  touched();
   return { ok: true };
 }
 
 export async function moveItem(id: string, stage: string): Promise<ActionResult> {
   const { supabase, canWrite } = await ctx();
-  if (!canWrite) return { ok: false, error: 'Your role cannot change the board.' };
+  if (!canWrite) return { ok: false, error: NO_WRITE };
   if (!STAGE_KEYS.includes(stage as never)) return { ok: false, error: 'Unknown column.' };
 
   const { error } = await supabase
@@ -64,14 +87,13 @@ export async function moveItem(id: string, stage: string): Promise<ActionResult>
     .eq('id', id);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/dashboard/board');
-  revalidatePath('/dashboard');
+  touched();
   return { ok: true };
 }
 
 export async function claimItem(id: string, take: boolean): Promise<ActionResult> {
   const { supabase, user, canWrite } = await ctx();
-  if (!canWrite) return { ok: false, error: 'Your role cannot change the board.' };
+  if (!canWrite) return { ok: false, error: NO_WRITE };
 
   const { error } = await supabase
     .from('tasks')
@@ -79,7 +101,44 @@ export async function claimItem(id: string, take: boolean): Promise<ActionResult
     .eq('id', id);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/dashboard/board');
-  revalidatePath('/dashboard/my-work');
+  touched();
+  return { ok: true };
+}
+
+/**
+ * Put an existing card on another board, or take it off one. There is still
+ * only one task row behind it, so a change made on either board shows on both.
+ */
+export async function setBoardLink(
+  taskId: string, boardId: string, on: boolean
+): Promise<ActionResult> {
+  const { supabase, user, canWrite } = await ctx();
+  if (!canWrite) return { ok: false, error: NO_WRITE };
+
+  if (on) {
+    const { error } = await supabase
+      .from('board_items')
+      .insert({ board_id: boardId, task_id: taskId, position: Date.now(), added_by: user?.id ?? null });
+    if (error && !error.message.includes('duplicate')) return { ok: false, error: error.message };
+  } else {
+    // Refuse to strand a card where nobody but admin and ops can find it.
+    const { count } = await supabase
+      .from('board_items')
+      .select('board_id', { count: 'exact', head: true })
+      .eq('task_id', taskId);
+
+    if ((count ?? 0) <= 1) {
+      return { ok: false, error: 'This is the only board it is on. Put it on another board first, otherwise it disappears from every board.' };
+    }
+
+    const { error } = await supabase
+      .from('board_items')
+      .delete()
+      .eq('task_id', taskId)
+      .eq('board_id', boardId);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  touched();
   return { ok: true };
 }

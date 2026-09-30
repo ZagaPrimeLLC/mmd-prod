@@ -1,21 +1,27 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Plus, X, User, CalendarClock, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Plus, X, User, CalendarClock, ChevronLeft, ChevronRight, Loader2, Share2, Check } from 'lucide-react';
 import {
-  STAGES, WORK_TYPES, PRIORITIES, typeMeta, priorityMeta, isOverdue, type WorkItem,
+  STAGES, WORK_TYPES, PRIORITIES, typeMeta, priorityMeta, isOverdue,
+  type WorkItem, type Board,
 } from '@/lib/crm/board';
 import { dateLabel } from '@/components/crm/ui';
-import { createItem, moveItem, claimItem } from '@/app/(dashboard)/dashboard/board/actions';
+import { createItem, moveItem, claimItem, setBoardLink } from '@/app/(dashboard)/dashboard/board/actions';
 
 const stageIndex = (k: string) => STAGES.findIndex((s) => s.key === k);
 
 function Card({
-  item, canWrite, mine, busy, onMove, onClaim,
+  item, canWrite, mine, busy, boards, currentBoardId, onMove, onClaim, onShare,
 }: {
   item: WorkItem; canWrite: boolean; mine: boolean; busy: boolean;
+  boards: Board[]; currentBoardId: string;
   onMove: (dir: -1 | 1) => void; onClaim: () => void;
+  onShare: (boardId: string, on: boolean) => void;
 }) {
+  const [sharing, setSharing] = useState(false);
+  const on = item.boardIds ?? [];
+  const elsewhere = boards.filter((b) => b.id !== currentBoardId && on.includes(b.id));
   const t = typeMeta(item.work_type);
   const p = priorityMeta(item.priority);
   const i = stageIndex(item.stage);
@@ -55,6 +61,15 @@ function Card({
             <User className="h-3 w-3" /> Mine
           </span>
         )}
+        {elsewhere.map((b) => (
+          <span
+            key={b.id}
+            title={`Also on the ${b.name} board`}
+            className="inline-flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 font-semibold text-violet-800"
+          >
+            <Share2 className="h-3 w-3" />{b.name}
+          </span>
+        ))}
         {item.labels?.map((l) => (
           <span key={l} className="rounded bg-slate-100 px-1.5 py-0.5 font-medium text-slate-600">{l}</span>
         ))}
@@ -78,6 +93,17 @@ function Card({
           >
             <ChevronRight className="h-4 w-4" />
           </button>
+          {boards.length > 1 && (
+            <button
+              onClick={() => setSharing((v) => !v)}
+              disabled={busy}
+              aria-expanded={sharing}
+              aria-label={`Show this card on other boards`}
+              className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-navy"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+          )}
           <button
             onClick={onClaim}
             disabled={busy}
@@ -87,13 +113,46 @@ function Card({
           </button>
         </div>
       )}
+
+      {canWrite && sharing && (
+        <div className="mt-2 rounded-lg bg-slate-50 p-2.5 ring-1 ring-slate-200">
+          <p className="mb-2 text-[11px] font-bold text-navy-deep">Show this card on</p>
+          <ul className="space-y-1">
+            {boards.map((b) => {
+              const isOn = on.includes(b.id);
+              return (
+                <li key={b.id}>
+                  <button
+                    onClick={() => onShare(b.id, !isOn)}
+                    disabled={busy}
+                    className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-[11px] hover:bg-white"
+                  >
+                    <span className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${
+                      isOn ? 'border-navy bg-navy text-white' : 'border-slate-300 bg-white'
+                    }`}>
+                      {isOn && <Check className="h-3 w-3" />}
+                    </span>
+                    <span className={isOn ? 'font-semibold text-navy-deep' : 'text-slate-600'}>{b.name}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+            It stays one card. A change on either board shows on both.
+          </p>
+        </div>
+      )}
     </article>
   );
 }
 
 export default function BoardClient({
-  items, canWrite, userId,
-}: { items: WorkItem[]; canWrite: boolean; userId: string | null }) {
+  items, canWrite, userId, boards, board,
+}: {
+  items: WorkItem[]; canWrite: boolean; userId: string | null;
+  boards: Board[]; board: Board;
+}) {
   const [pending, start] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [adding, setAdding] = useState<string | null>(null);
@@ -106,6 +165,16 @@ export default function BoardClient({
     setError(null);
     start(async () => {
       const r = await moveItem(item.id, next.key);
+      if (!r.ok) setError(r.error);
+      setBusyId(null);
+    });
+  }
+
+  function share(item: WorkItem, boardId: string, on: boolean) {
+    setBusyId(item.id);
+    setError(null);
+    start(async () => {
+      const r = await setBoardLink(item.id, boardId, on);
       if (!r.ok) setError(r.error);
       setBusyId(null);
     });
@@ -167,6 +236,7 @@ export default function BoardClient({
                   className="mb-3 rounded-lg border border-navy/20 bg-white p-3 shadow-sm"
                 >
                   <input type="hidden" name="stage" value={stage.key} />
+                  <input type="hidden" name="board_id" value={board.id} />
                   <div className="flex items-center justify-between">
                     <label htmlFor={`t-${stage.key}`} className="text-xs font-bold text-navy-deep">
                       New item
@@ -229,8 +299,11 @@ export default function BoardClient({
                     canWrite={canWrite}
                     mine={!!userId && item.owner_id === userId}
                     busy={busyId === item.id}
+                    boards={boards}
+                    currentBoardId={board.id}
                     onMove={(d) => move(item, d)}
                     onClaim={() => claim(item)}
+                    onShare={(bid, on) => share(item, bid, on)}
                   />
                 ))}
                 {col.length === 0 && adding !== stage.key && (

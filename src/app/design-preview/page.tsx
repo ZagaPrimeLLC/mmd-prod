@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation';
 import Shell from '@/components/crm/Shell';
 import PageHeader from '@/components/crm/PageHeader';
 import BoardClient from '@/components/crm/BoardClient';
+import BoardSwitcher, { BoardNote } from '@/components/crm/BoardSwitcher';
 import { Notice } from '@/components/crm/ui';
-import { sampleWork } from '@/lib/sample-crm';
+import { sampleWork, sampleBoards } from '@/lib/sample-crm';
 
 export const metadata = { title: 'CRM design preview', robots: { index: false } };
 
@@ -14,13 +15,15 @@ export default function DesignPreviewPage() {
   return (
     <Shell who="design.preview@mmd" role="ops">
       <PageHeader
-        title="Work board"
-        lead="Everything the team is carrying. Add an item to any column, and move a card with the arrows on it."
+        title="Operations"
+        lead="The day to day board. Recruitment, coordination, compliance and everything the office is carrying."
+        actions={<BoardNote board={sampleBoards[0]} />}
       />
+      <BoardSwitcher boards={sampleBoards} current="operations" />
       <div className="px-5 pt-5 sm:px-8">
         <Notice>Design preview. Static sample data, not connected to the database.</Notice>
       </div>
-      <BoardClient items={sampleWork} canWrite userId="me" />
+      <BoardClient items={sampleWork} canWrite userId="me" boards={sampleBoards} board={sampleBoards[0]} />
     </Shell>
   );
 }
