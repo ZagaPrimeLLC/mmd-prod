@@ -3,27 +3,39 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { safeNext } from '@/lib/safe-next';
 
 export default function LoginForm() {
   const params = useSearchParams();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    params.get('error') === 'link_expired' ? 'That sign-in link has expired or was already used. Request a new one.' : null
+  );
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     const supabase = createClient();
-    const next = params.get('next') ?? '/dashboard';
+    const next = safeNext(params.get('next'));
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      options: {
+        // Team accounts are provisioned by an admin; the login page must not create users on the shared host.
+        shouldCreateUser: false,
+        emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
     });
     setBusy(false);
-    if (error) setError(error.message);
-    else setSent(true);
+    if (error) {
+      setError(
+        /signups? not allowed/i.test(error.message)
+          ? 'This email is not set up for team access. Ask an admin to add you.'
+          : error.message
+      );
+    } else setSent(true);
   }
 
   if (sent) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useEffect, useMemo } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import {
   DndContext, DragOverlay, PointerSensor, TouchSensor, KeyboardSensor,
   useSensor, useSensors, closestCorners, useDroppable,
@@ -50,7 +50,12 @@ export default function BoardClient({
 
   // Local copy so a drag lands instantly. The server refreshes it afterwards.
   const [cards, setCards] = useState<WorkItem[]>(items);
-  useEffect(() => { setCards(items); }, [items]);
+  // When the server sends fresh items, reset the local copy during render (no effect, no extra paint).
+  const [prevItems, setPrevItems] = useState(items);
+  if (items !== prevItems) {
+    setPrevItems(items);
+    setCards(items);
+  }
 
   const sensors = useSensors(
     // A small drag threshold so clicking a button on the card still works.

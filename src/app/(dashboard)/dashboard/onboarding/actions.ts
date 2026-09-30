@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 async function ctx() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: role } = await supabase.rpc('mmd_role');
   return { supabase, user, canWrite: role === 'admin' || role === 'ops' };

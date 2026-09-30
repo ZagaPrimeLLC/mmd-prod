@@ -18,14 +18,15 @@ const STATUS: Record<string, string> = {
   revoked:     'bg-red-100 text-red-800 ring-red-200',
 };
 
-export default async function AssignmentPage({ params }: { params: { id: string } }) {
+export default async function AssignmentPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { supabase, role } = await getSession();
   const writes = canWrite(role);
 
   const { data: a } = await supabase
     .from('assignments')
     .select('*, employees(full_name, email, phone, job_title, start_date), workflows(id, name, summary, kind)')
-    .eq('id', params.id)
+    .eq('id', id)
     .maybeSingle();
 
   if (!a) notFound();

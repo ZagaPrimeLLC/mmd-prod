@@ -64,20 +64,23 @@ export default async function OverviewPage() {
   const review = tasks.filter((t) => t.stage === 'review');
   const issues = open.filter((t) => t.work_type === 'issue' || t.work_type === 'bug');
   const overdue = open.filter(isOverdue);
+  // Server component, rendered per request: one clock reading keeps every comparison on the page consistent.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
   const doneWeek = tasks.filter(
-    (t) => t.completed_at && Date.now() - new Date(t.completed_at).getTime() < 7 * 864e5
+    (t) => t.completed_at && now - new Date(t.completed_at).getTime() < 7 * 864e5
   );
 
   const apps = appsRes.data ?? [];
   const livePipeline = apps.filter((a) => a.stage !== 'completed' && a.stage !== 'archived');
 
   const bookings = (bookRes.data ?? []).filter(
-    (b) => b.requested_slot && new Date(b.requested_slot).getTime() > Date.now()
+    (b) => b.requested_slot && new Date(b.requested_slot).getTime() > now
   );
 
   const trainings = trainRes.data ?? [];
   const expiringSoon = trainings.filter(
-    (t) => t.expires_on && new Date(t.expires_on).getTime() < Date.now() + 60 * 864e5
+    (t) => t.expires_on && new Date(t.expires_on).getTime() < now + 60 * 864e5
   );
 
   const attention = [...overdue, ...issues]

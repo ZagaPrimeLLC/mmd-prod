@@ -18,7 +18,7 @@ export const revalidate = 300;
 type Post = { id: string; title: string; location: string | null; posted_at: string | null };
 
 export default async function CareersPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from('job_posts')
     .select('id, title, location, posted_at')
