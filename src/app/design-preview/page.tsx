@@ -13,7 +13,7 @@ export const metadata = { title: 'CRM design preview', robots: { index: false } 
 export default function DesignPreviewPage() {
   if (process.env.NODE_ENV === 'production') notFound();
   return (
-    <Shell who="design.preview@mmd" role="ops">
+    <Shell who="design.preview@mmd" profile={{ display_name: 'Design Preview', avatar_url: null, job_title: 'Operations' }} role="ops">
       <PageHeader
         title="Operations"
         lead="The day to day board. Recruitment, coordination, compliance and everything the office is carrying."

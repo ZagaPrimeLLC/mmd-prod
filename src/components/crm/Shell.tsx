@@ -7,15 +7,12 @@ import { usePathname } from 'next/navigation';
 import { Menu, X, LogOut, ShieldCheck, Eye } from 'lucide-react';
 import { navFor, canWrite, ROLE_LABELS, type Role } from '@/lib/crm/nav';
 import { site } from '@/lib/site';
-
-function initials(email: string) {
-  const name = email.split('@')[0] ?? '';
-  return name.slice(0, 2).toUpperCase() || 'MM';
-}
+import Avatar from '@/components/crm/Avatar';
+import type { Profile } from '@/lib/crm/session';
 
 export default function Shell({
-  who, role, children,
-}: { who: string; role: Role | null; children: React.ReactNode }) {
+  who, profile, role, children,
+}: { who: string; profile: Profile | null; role: Role | null; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const sections = navFor(role);
@@ -77,18 +74,22 @@ export default function Shell({
 
   const footer = (
     <div className="border-t border-white/10 px-4 py-4">
-      <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold text-xs font-bold text-navy-deep">
-          {initials(who)}
-        </span>
+      <Link
+        href="/dashboard/profile"
+        onClick={() => setOpen(false)}
+        title="Edit my profile"
+        className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-white/10"
+      >
+        <Avatar name={profile?.display_name} email={who} url={profile?.avatar_url} size={36} />
         <span className="min-w-0 flex-1 leading-tight">
-          <span className="block truncate text-xs font-semibold text-white">{who}</span>
-          <span className="flex items-center gap-1 text-[11px] text-white/50">
-            {writes ? <ShieldCheck className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-            {role ? ROLE_LABELS[role] : 'No role'}
+          <span className="block truncate text-xs font-semibold text-white">{profile?.display_name || who}</span>
+          <span className="flex items-center gap-1 truncate text-[11px] text-white/50">
+            {writes ? <ShieldCheck className="h-3 w-3 shrink-0" /> : <Eye className="h-3 w-3 shrink-0" />}
+            {profile?.job_title || (role ? ROLE_LABELS[role] : 'No role')}
           </span>
         </span>
-      </div>
+        <span className="text-[11px] font-semibold text-gold/80">Edit</span>
+      </Link>
       <form action="/auth/signout" method="post" className="mt-3">
         <button
           type="submit"

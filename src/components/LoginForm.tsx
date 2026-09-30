@@ -23,15 +23,17 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        // Team accounts are provisioned by an admin; the login page must not create users on the shared host.
-        shouldCreateUser: false,
+        // An administrator invites people from Settings; their first sign-in here
+        // creates the account and the invite applies their role. Strangers are
+        // refused by the before-user-created hook, or land on "not on the team".
+        shouldCreateUser: true,
         emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
     setBusy(false);
     if (error) {
       setError(
-        /signups? not allowed/i.test(error.message)
+        /signups? not allowed|not been invited/i.test(error.message)
           ? 'This email is not set up for team access. Ask an admin to add you.'
           : error.message
       );

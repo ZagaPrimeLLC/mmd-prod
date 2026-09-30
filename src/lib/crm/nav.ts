@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, KanbanSquare, UserCheck, Inbox, Users,
-  GraduationCap, Route, History, CircleUser, Settings, Contact2, Briefcase, FileUp,
+  GraduationCap, Route, History, CircleUser, Settings, Contact2, Briefcase, FileUp, UserCog,
 } from 'lucide-react';
 
 /**
@@ -59,6 +59,7 @@ export const NAV: NavSection[] = [
   {
     title: 'Record',
     items: [
+      { href: '/dashboard/profile',  label: 'My profile', icon: UserCog,  roles: ALL },
       { href: '/dashboard/activity', label: 'Activity', icon: History,  roles: ALL },
       { href: '/dashboard/settings', label: 'Settings', icon: Settings, roles: OPS },
     ],

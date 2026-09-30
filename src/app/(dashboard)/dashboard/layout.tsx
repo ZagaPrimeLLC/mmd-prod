@@ -7,7 +7,7 @@ export const metadata = { title: 'Operations', robots: { index: false } };
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { email, role, failed } = await getSession();
+  const { email, role, failed, profile } = await getSession();
 
   // We could not ask the database at all. That is our fault, not the user's,
   // and telling them they lack access would send them chasing the wrong thing.
@@ -53,5 +53,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
     );
   }
 
-  return <Shell who={email} role={role}>{children}</Shell>;
+  return <Shell who={email} profile={profile} role={role}>{children}</Shell>;
 }

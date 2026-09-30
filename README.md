@@ -36,7 +36,7 @@ Keeping them together means one `job_posts` row renders the public Careers listi
 | Framework | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind |
 | Hosting | Vercel |
 | Database | Supabase — dedicated project `zwkpeksrsiaanewuzizc` (Zagaprime org), schema `proj_mmd` |
-| Auth | Supabase Auth (magic link, no self-signup), scoped by `hub.is_member('mmd')` |
+| Auth | Supabase Auth (magic link, invite-only via Settings), scoped by `hub.is_member('mmd')` |
 | Files | Supabase Storage — private bucket `mmd-resumes`, signed URLs only |
 | DNS | Cloudflare (planned), Wix panel until the domain transfer completes |
 
@@ -70,7 +70,7 @@ Set all three in Vercel → Project → Settings → Environment Variables for P
 > [!IMPORTANT]
 > Add the deployed URL to **Supabase → Authentication → URL Configuration → Redirect URLs**, including the Vercel preview pattern, or magic-link sign-in will bounce.
 >
-> The login page does **not** create accounts. Add a new team member in **Supabase → Authentication → Users** first, then give them a row in `hub.memberships` with `project_slug = 'mmd'`.
+> Team members are added by an administrator in **Settings → Team and access** (email + role). An existing account joins immediately; anyone else gets an invite that applies their role the first time they sign in at `/login`. To stop uninvited emails creating a login at all, enable **Authentication → Hooks → Before User Created → `proj_mmd.hook_before_user_created`**. Each person sets their name, title and photo on **My profile**.
 
 ---
 

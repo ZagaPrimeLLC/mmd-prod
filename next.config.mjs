@@ -21,7 +21,8 @@ const csp = [
   // a form on this site can only post back to this site, so an injected form
   // cannot quietly ship what someone typed to another server
   "form-action 'self'",
-  "img-src 'self' data: blob:",
+  // profile photos are served from the project's public avatars bucket
+  ["img-src", "'self'", 'data:', 'blob:', supabaseOrigin].filter(Boolean).join(' '),
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   // Next.js ships a small inline bootstrap script on every page, so inline

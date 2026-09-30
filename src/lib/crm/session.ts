@@ -17,7 +17,12 @@ export async function getSession() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: raw, error } = await supabase.rpc('mmd_role');
+  const [{ data: raw, error }, { data: profile }] = await Promise.all([
+    supabase.rpc('mmd_role'),
+    user
+      ? supabase.from('profiles').select('display_name, avatar_url, job_title').eq('id', user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
   const role = (KNOWN as string[]).includes(raw as string)
     ? (raw as Role)
@@ -29,7 +34,10 @@ export async function getSession() {
     supabase,
     user,
     email: user?.email ?? '',
+    profile: (profile ?? null) as Profile | null,
     role: error ? null : role,
     failed: error ? error.message : null,
   };
 }
+
+export type Profile = { display_name: string | null; avatar_url: string | null; job_title: string | null };
