@@ -5,7 +5,7 @@ export default function JobNotFound() {
   return (
     <section className="bg-white py-24">
       <div className="mx-auto max-w-xl px-5 text-center">
-        <p className="text-sm font-bold uppercase tracking-widest text-gold-dark">Careers</p>
+        <p className="text-sm font-bold uppercase tracking-widest text-gold-deep">Careers</p>
         <h1 className="mt-2 text-3xl font-bold text-navy">This position is no longer open</h1>
         <p className="mt-4 leading-relaxed text-gray-600">
           It may have been filled or closed. We hire across New Jersey all the time, so have a look at what is open now.

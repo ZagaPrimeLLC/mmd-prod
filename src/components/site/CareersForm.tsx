@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { CheckCircle2, AlertCircle, Upload } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
@@ -61,6 +63,7 @@ export default function CareersForm() {
         `Driver with own vehicle: ${fd.get('driver') ? 'yes' : 'not stated'}\n` +
         `Experience: ${String(fd.get('experience') ?? '').trim()}` + resumeNote,
       source_page: '/careers',
+      attribution: getAttribution(),
     };
 
     if (!payload.email && !payload.phone) {
@@ -72,7 +75,7 @@ export default function CareersForm() {
     const { error: insErr } = await supabase.from('inquiries').insert(payload);
     setBusy(false);
     if (insErr) setError(`We could not send that. Please call us on ${site.phone}.`);
-    else setDone(true);
+    else { setDone(true); track('lead_submitted', { form: 'careers_interest' }); }
   }
 
   if (done) {

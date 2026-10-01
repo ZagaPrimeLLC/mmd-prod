@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 
 export default function NewsletterSignup() {
   const [busy, setBusy] = useState(false);
@@ -21,7 +23,7 @@ export default function NewsletterSignup() {
 
     const { error: err } = await createClient()
       .from('newsletter_subscribers')
-      .insert({ email });
+      .insert({ email, attribution: getAttribution() });
 
     setBusy(false);
     if (err) {
@@ -30,6 +32,7 @@ export default function NewsletterSignup() {
       else setError('That did not go through. Please try again later.');
     } else {
       setDone(true);
+      track('newsletter_signup');
     }
   }
 
