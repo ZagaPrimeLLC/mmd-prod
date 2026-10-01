@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {
-  ListTodo, Timer, AlertTriangle, Eye, CheckCircle2, UserCheck,
+  ListTodo, Timer, AlertTriangle, Eye, CheckCircle2, UserCheck, Ban,
   Inbox, CalendarCheck, GraduationCap, ArrowRight, Route,
 } from 'lucide-react';
 import PageHeader from '@/components/crm/PageHeader';
@@ -62,6 +62,7 @@ export default async function OverviewPage() {
   const open = tasks.filter((t) => t.stage !== 'done');
   const wip = tasks.filter((t) => t.stage === 'in_progress');
   const review = tasks.filter((t) => t.stage === 'review');
+  const blocked = tasks.filter((t) => t.stage === 'blocked');
   const issues = open.filter((t) => t.work_type === 'issue' || t.work_type === 'bug');
   const overdue = open.filter(isOverdue);
   // Server component, rendered per request: one clock reading keeps every comparison on the page consistent.
@@ -99,10 +100,11 @@ export default async function OverviewPage() {
       />
 
       <div className="space-y-6 p-5 sm:p-8">
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <Stat icon={ListTodo}      label="Open items"      value={open.length}     sub="everything not done" href="/dashboard/board" />
           <Stat icon={Timer}         label="In progress"     value={wip.length}      sub="someone is on it"    href="/dashboard/board" />
           <Stat icon={Eye}           label="Waiting on review" value={review.length} sub="needs a decision"    href="/dashboard/board" />
+          <Stat icon={Ban}           label="Blocked"         value={blocked.length}  sub="stuck, needs unblocking" tone="alert" href="/dashboard/board" />
           <Stat icon={AlertTriangle} label="Overdue"         value={overdue.length}  sub="past the due date" tone="alert" href="/dashboard/board" />
         </section>
 

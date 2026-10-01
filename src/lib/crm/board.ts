@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  Layers, CircleDot, Timer, Eye, CheckCircle2,
+  Layers, CircleDot, Timer, Ban, Eye, CheckCircle2,
   Bug, Flag, ListTodo, BookOpen, Wrench, AlertTriangle,
 } from 'lucide-react';
 
@@ -9,6 +9,7 @@ export const STAGES = [
   { key: 'backlog',     label: 'Backlog',     icon: Layers,       hint: 'raised, not started' },
   { key: 'todo',        label: 'To Do',       icon: CircleDot,    hint: 'agreed and queued' },
   { key: 'in_progress', label: 'In Progress', icon: Timer,        hint: 'someone is on it' },
+  { key: 'blocked',     label: 'Blocked',     icon: Ban,          hint: 'stuck, waiting on someone or something' },
   { key: 'review',      label: 'Review',      icon: Eye,          hint: 'waiting on a check' },
   { key: 'done',        label: 'Done',        icon: CheckCircle2, hint: 'finished' },
 ] as const;

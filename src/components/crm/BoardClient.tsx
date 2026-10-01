@@ -224,9 +224,11 @@ export default function BoardClient({
             return (
               <section key={stage.key} className="flex w-[86vw] shrink-0 flex-col sm:w-[300px]">
                 <div className="mb-3 flex items-center gap-2">
-                  <stage.icon className="h-4 w-4 text-steel" />
-                  <h2 className="text-sm font-bold text-navy-deep">{stage.label}</h2>
-                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-bold tabular-nums text-slate-600">
+                  <stage.icon className={`h-4 w-4 ${stage.key === 'blocked' ? 'text-red-600' : 'text-steel'}`} />
+                  <h2 className={`text-sm font-bold ${stage.key === 'blocked' ? 'text-red-700' : 'text-navy-deep'}`}>{stage.label}</h2>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
+                    stage.key === 'blocked' && col.length > 0 ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'
+                  }`}>
                     {col.length}
                   </span>
                   {canWrite && (
