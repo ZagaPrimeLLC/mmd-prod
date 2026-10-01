@@ -56,6 +56,69 @@ export async function saveItemDetails(
   return { ok: true };
 }
 
+const PRIORITY_KEYS = ['urgent', 'high', 'normal', 'low'];
+const WORK_TYPE_KEYS = ['epic', 'story', 'task', 'todo', 'issue', 'bug', 'milestone'];
+
+/** Status, priority, type, owner and due date from the item information panel. */
+export async function saveItemInfo(id: string, form: FormData): Promise<ActionResult> {
+  const { supabase, user, canWrite } = await ctx();
+  if (!user || !canWrite) return { ok: false, error: NO_WRITE };
+  if (!TASK_ID.test(id)) return { ok: false, error: 'That item could not be found.' };
+
+  const stage = String(form.get('stage') ?? '');
+  const priority = String(form.get('priority') ?? '');
+  const workType = String(form.get('work_type') ?? '');
+  const owner = String(form.get('owner_id') ?? '');
+  const due = String(form.get('due_on') ?? '').trim();
+
+  if (!STAGE_KEYS.includes(stage as never)) return { ok: false, error: 'Choose a status.' };
+  if (!PRIORITY_KEYS.includes(priority)) return { ok: false, error: 'Choose a priority.' };
+  if (!WORK_TYPE_KEYS.includes(workType)) return { ok: false, error: 'Choose a type.' };
+  if (due && !/^\d{4}-\d{2}-\d{2}$/.test(due)) return { ok: false, error: 'Enter the due date as a date.' };
+
+  // Only people on the team can own work.
+  if (owner) {
+    if (!TASK_ID.test(owner)) return { ok: false, error: 'Choose someone from the team.' };
+    const { data: member } = await supabase.from('team_roles').select('user_id').eq('user_id', owner).maybeSingle();
+    if (!member) return { ok: false, error: 'That person is not on the team any more.' };
+  }
+
+  const { data: current } = await supabase.from('tasks').select('stage, completed_at').eq('id', id).maybeSingle();
+  if (!current) return { ok: false, error: 'That item could not be found.' };
+
+  const stageChanged = current.stage !== stage;
+  const { error } = await supabase
+    .from('tasks')
+    .update({
+      stage,
+      priority,
+      work_type: workType,
+      owner_id: owner || null,
+      due_at: due ? officeDeadline(due) : null,
+      ...(stageChanged
+        ? { completed_at: stage === 'done' ? new Date().toISOString() : null, status: stage === 'done' ? 'done' : 'open' }
+        : {}),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+  if (error) return { ok: false, error: error.message };
+
+  touched(id);
+  return { ok: true };
+}
+
+/** A due date means close of business in the office: 5:00 PM New York time that day. */
+function officeDeadline(ymd: string): string {
+  const [y, m, d] = ymd.split('-').map(Number);
+  const guess = Date.UTC(y, m - 1, d, 17, 0);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric',
+  }).formatToParts(new Date(guess));
+  const n = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const asIfUtc = Date.UTC(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'));
+  return new Date(guess - (asIfUtc - guess)).toISOString();
+}
+
 export async function addItemComment(id: string, form: FormData): Promise<ActionResult> {
   const { supabase, user, canWrite } = await ctx();
   if (!user || !canWrite) return { ok: false, error: NO_WRITE };
