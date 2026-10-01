@@ -18,6 +18,13 @@ directly from the migration being tested.
 The work-item database suite verifies comment visibility against task RLS,
 writer permissions, author identity, text constraints, and deletion behavior.
 
+Board search tests cover phrases, matching across summary/notes/comments,
+literal punctuation, authenticated access, board scope, RLS, and results beyond
+the default API row limit. The database suite runs the actual search route
+against disposable PostgreSQL and PostgREST containers. Search needs no new
+migration; if comments are unavailable, the UI reports that coverage and keeps
+summary, notes, and label search available.
+
 Deploy `20261001050307_rate_limit_fixes.sql` after the existing hardening
 migration to activate the database fixes. The route change and migration are
 compatible with either deployment order.

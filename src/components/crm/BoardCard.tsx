@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { STAGES, typeMeta, priorityMeta, isOverdue, type WorkItem, type Board } from '@/lib/crm/board';
 import { dateLabel } from '@/components/crm/ui';
+import type { SearchMatch } from '@/lib/crm/board-search';
 
 const stageIndex = (k: string) => STAGES.findIndex((s) => s.key === k);
 
@@ -60,9 +61,10 @@ export function CardBody({
 }
 
 export default function BoardCard({
-  item, canWrite, mine, busy, boards, currentBoardId, onMove, onClaim, onShare,
+  item, canWrite, canDrag = canWrite, searchMatch, mine, busy, boards, currentBoardId, onMove, onClaim, onShare,
 }: {
   item: WorkItem; canWrite: boolean; mine: boolean; busy: boolean;
+  canDrag?: boolean; searchMatch?: SearchMatch;
   boards: Board[]; currentBoardId: string;
   onMove: (dir: -1 | 1) => void; onClaim: () => void;
   onShare: (boardId: string, on: boolean) => void;
@@ -74,7 +76,7 @@ export default function BoardCard({
 
   const {
     attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging,
-  } = useSortable({ id: item.id, disabled: !canWrite, data: { stage: item.stage } });
+  } = useSortable({ id: item.id, disabled: !canWrite || !canDrag, data: { stage: item.stage } });
 
   return (
     <article
@@ -85,7 +87,7 @@ export default function BoardCard({
       } ${late ? 'border-red-200' : 'border-slate-200'}`}
     >
       <div className="flex items-start gap-1">
-        {canWrite && (
+        {canWrite && canDrag && (
           <button
             ref={setActivatorNodeRef}
             {...attributes}
@@ -102,6 +104,10 @@ export default function BoardCard({
           className="min-w-0 flex-1 rounded text-left outline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-navy"
         >
           <CardBody item={item} boards={boards} currentBoardId={currentBoardId} />
+          {searchMatch && <div className="mt-3 rounded-md bg-gold/10 p-2 text-xs">
+            <p className="font-semibold text-navy">Matched in {searchMatch.sources.join(', ').toLowerCase()}</p>
+            <p className="mt-1 break-words leading-relaxed text-slate-600">{searchMatch.excerpt}</p>
+          </div>}
         </Link>
       </div>
 
