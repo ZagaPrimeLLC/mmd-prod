@@ -57,7 +57,7 @@ export default async function CareersPage() {
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-bold uppercase tracking-widest text-gold-dark">We are hiring</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-gold-deep">We are hiring</p>
               <h2 className="mt-1 text-3xl font-bold text-navy md:text-4xl">Open positions</h2>
             </div>
             <a href="#interest" className="text-sm font-semibold text-steel hover:underline">

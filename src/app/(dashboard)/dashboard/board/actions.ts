@@ -151,9 +151,13 @@ export async function setBoardLink(
  * Stage lives on the task and position lives on the board link, so dragging a
  * shared card to Done moves it on every board it appears on, while reordering
  * it only affects the board you are looking at. That is deliberate.
+ *
+ * Only the card that was dragged can change column. The rest of the list comes
+ * from the browser and may be stale: a teammate may have finished one of those
+ * cards since this tab loaded, and a reorder must not drag it back to To Do.
  */
 export async function applyColumnOrder(
-  boardId: string, stage: string, orderedTaskIds: string[]
+  boardId: string, stage: string, orderedTaskIds: string[], movedTaskId: string
 ): Promise<ActionResult> {
   const { supabase, canWrite } = await ctx();
   if (!canWrite) return { ok: false, error: NO_WRITE };
@@ -163,13 +167,13 @@ export async function applyColumnOrder(
   const ids = orderedTaskIds.filter((id) => typeof id === 'string' && id.length > 0);
   if (ids.length === 0) return { ok: true };
 
-  // Only the cards whose column actually changed need a stage write.
   const { data: current } = await supabase
     .from('tasks')
     .select('id, stage')
     .in('id', ids);
 
-  const needsStage = (current ?? []).filter((t) => t.stage !== stage).map((t) => t.id);
+  const moved = (current ?? []).find((t) => t.id === movedTaskId);
+  const needsStage = moved && moved.stage !== stage ? [moved.id] : [];
 
   if (needsStage.length > 0) {
     const { error } = await supabase
@@ -184,7 +188,11 @@ export async function applyColumnOrder(
     if (error) return { ok: false, error: error.message };
   }
 
-  const rows = ids.map((taskId, i) => ({
+  // Positions only for cards that really are in this column now (plus the one
+  // just moved into it); anything else in the stale list keeps its place.
+  const inColumn = new Set((current ?? []).filter((t) => t.stage === stage).map((t) => t.id));
+  if (moved) inColumn.add(moved.id);
+  const rows = ids.filter((id) => inColumn.has(id)).map((taskId, i) => ({
     board_id: boardId,
     task_id: taskId,
     position: (i + 1) * 1000,

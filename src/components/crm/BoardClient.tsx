@@ -151,7 +151,7 @@ export default function BoardClient({
 
     const ids = ordered.map((c) => c.id);
     start(async () => {
-      const r = await applyColumnOrder(board.id, target, ids);
+      const r = await applyColumnOrder(board.id, target, ids, movedId);
       if (!r.ok) {
         setError(r.error);
         setCards(items); // put it back where it was

@@ -161,7 +161,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
 }
 
 function StatusButtons({ job }: { job: Job }) {
-  const ready = Boolean(job.description && job.location);
+  const ready = Boolean(job.description && job.location && (job.pay_min != null || job.pay_max != null));
   const btn = 'rounded-md px-2.5 py-1.5 text-xs font-semibold ring-1 ring-inset';
   const actions: { to: JobStatus; label: string; cls: string; disabled?: boolean; title?: string }[] = [];
 
@@ -171,7 +171,7 @@ function StatusButtons({ job }: { job: Job }) {
       label: job.status === 'draft' ? 'Publish' : 'Reopen',
       cls: 'bg-navy text-white ring-navy hover:bg-navy-dark',
       disabled: !ready,
-      title: ready ? undefined : 'Add a location and description first',
+      title: ready ? undefined : 'Add a location, description and pay first',
     });
   }
   if (job.status === 'open') actions.push({ to: 'paused', label: 'Pause', cls: 'bg-white text-amber-800 ring-amber-200 hover:bg-amber-50' });

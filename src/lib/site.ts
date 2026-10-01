@@ -11,7 +11,8 @@ export const site = {
   email: 'info@mmdcommunitycare.com',
   address: { street: '2950 Hamilton Blvd', city: 'South Plainfield', state: 'NJ', zip: '07080' },
   walkIn: 'Tuesdays and Thursdays, 11am to 4pm',
-  url: 'https://www.mmdcommunitycare.com',
+  // Set at build time in next.config.mjs (Vercel's production domain).
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mmd-prod.vercel.app',
   logo: '/brand/mmd-logo.png',
 } as const;
 

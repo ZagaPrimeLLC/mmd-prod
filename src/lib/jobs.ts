@@ -146,8 +146,8 @@ export function suggestionsFor(j: {
   const text = `${j.title}\n${j.summary}\n${j.description}`;
   const flagged = FLAGGED.filter((f) => f.re.test(text));
   return [
-    { ok: Boolean(j.pay_min || j.pay_max), text: 'Add a pay range or fixed rate', why: 'Posts with pay listed get noticeably more applicants.' },
-    { ok: j.benefits.length >= 3, text: 'Select at least three benefits' },
+    { ok: Boolean(j.pay_min || j.pay_max), text: 'Add a pay range or fixed rate', why: 'Required to publish: New Jersey requires pay on job postings.' },
+    { ok: j.benefits.length >= 1, text: 'List the benefits', why: 'New Jersey also requires a general description of benefits for employers with 10 or more staff.' },
     { ok: j.summary.trim().length >= 40, text: 'Write a one or two sentence summary', why: 'It is what people see in the job list before they click.' },
     { ok: j.description.trim().length >= 300, text: 'Describe the role in at least a few paragraphs' },
     { ok: j.description.length <= 4000, text: 'Keep the description under 4,000 characters', why: 'Long posts lose people on a phone.' },

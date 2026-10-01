@@ -8,3 +8,6 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 .wrangler/
+
+# local browser-automation logs (may contain links with tokens)
+.playwright-mcp/

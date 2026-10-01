@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 import { site, services } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
@@ -28,6 +30,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
       message: String(fd.get('message') ?? '').trim() || null,
       source_page: sourcePage,
       cta,
+      attribution: getAttribution(),
     };
 
     if (!payload.email && !payload.phone) {
@@ -39,7 +42,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
     const { error } = await createClient().from('inquiries').insert(payload);
     setBusy(false);
     if (error) setError(`We could not send that. Please call us on ${site.phone}.`);
-    else setDone(true);
+    else { setDone(true); track('lead_submitted', { form: 'contact' }); }
   }
 
   if (done) {

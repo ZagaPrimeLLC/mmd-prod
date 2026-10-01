@@ -24,6 +24,7 @@ type Inquiry = {
   id: string; name: string; email: string | null; phone: string | null;
   service_interested: string | null; message: string | null; source_page: string | null;
   cta: string | null; status: string; owner_id: string | null; created_at: string;
+  source: string | null;
   linked_task: boolean;
 };
 
@@ -140,6 +141,7 @@ export default function InboxClient({
                             </span>
                           )}
                           {i.source_page && <span className="text-slate-400">{i.source_page}</span>}
+                          {i.source && <span className="rounded bg-sky-50 px-1.5 py-0.5 text-sky-800 ring-1 ring-sky-200">via {i.source}</span>}
                         </div>
                       </div>
                       <span className="shrink-0 text-xs text-slate-400">{ago(i.created_at)}</span>

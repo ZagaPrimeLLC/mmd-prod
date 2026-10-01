@@ -51,8 +51,18 @@ const securityHeaders = [
   },
 ];
 
+// The public address used for canonical links, the sitemap and structured data.
+// NEXT_PUBLIC_SITE_URL wins if set; otherwise Vercel's production domain, which
+// becomes mmdcommunitycare.com on its own once that domain is added to the
+// project. Inlined at build time so server and browser always agree.
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://mmd-prod.vercel.app')
+).replace(/\/$/, '');
+
 const nextConfig = {
   reactStrictMode: true,
+  env: { NEXT_PUBLIC_SITE_URL: siteUrl },
   poweredByHeader: false,
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

@@ -3,6 +3,8 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { CalendarCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 import { availableDays, SLOT_MINUTES, timeLabel } from '@/lib/booking';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
@@ -42,11 +44,12 @@ export default function BookingFlow() {
       phone: String(fd.get('phone') ?? '').trim(),
       requested_slot: slotIso,
       notes: String(fd.get('notes') ?? '').trim() || null,
+      attribution: getAttribution(),
     });
 
     setBusy(false);
     if (error) setError(`We could not hold that time. Please call ${site.phone}.`);
-    else setDone(`${day.label} at ${timeLabel(slotIso)}`);
+    else { setDone(`${day.label} at ${timeLabel(slotIso)}`); track('lead_submitted', { form: 'booking' }); }
   }
 
   if (done) {

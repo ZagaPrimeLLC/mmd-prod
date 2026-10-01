@@ -15,8 +15,16 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'HomeAndConstructionBusiness',
+  // A home and community based service provider. LocalBusiness is the honest
+  // fit; MedicalBusiness would overstate it, HomeAndConstructionBusiness is for contractors.
+  '@type': 'LocalBusiness',
+  '@id': `${site.url}/#organization`,
   name: site.legalName,
+  alternateName: site.name,
+  url: site.url,
+  logo: `${site.url}${site.logo}`,
+  image: `${site.url}/images/home-hero.jpg`,
+  slogan: site.slogan,
   description: site.description,
   telephone: site.phone,
   email: site.email,
@@ -29,12 +37,13 @@ const jsonLd = {
     postalCode: site.address.zip,
     addressCountry: 'US',
   },
+  knowsAbout: ['Individual Support', 'Respite Care', 'Community Based Supports', 'NJ Division of Developmental Disabilities'],
 };
 
 export default function HomePage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <HeroSection />
       <TrustBadges />
       <ValuesSection />

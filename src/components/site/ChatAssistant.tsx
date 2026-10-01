@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, CheckCircle2, CalendarCheck } from 'lucide-react';
 import { CHAT } from '@/lib/chat-script';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 import { site } from '@/lib/site';
 
 type Line = { from: 'bot' | 'user'; text: string };
@@ -65,11 +67,12 @@ export default function ChatAssistant() {
         `Assistant conversation\nPath: ${trail.current.join(' > ') || 'direct'}\n` +
         (note ? `Their note: ${note}` : 'No extra note left.'),
       source_page: '/chat',
+      attribution: getAttribution(),
     });
 
     setBusy(false);
     if (error) setError(`Could not send that. Please call ${site.phone}.`);
-    else { setSent(true); setCapturing(false); }
+    else { setSent(true); setCapturing(false); track('lead_submitted', { form: 'chat' }); }
   }
 
   const current = CHAT[node];

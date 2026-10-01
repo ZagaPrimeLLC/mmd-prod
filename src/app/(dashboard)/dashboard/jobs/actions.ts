@@ -91,6 +91,11 @@ export async function saveJob(id: string | null, fd: FormData): Promise<JobResul
   if (intent === 'publish' && (!description || !location)) {
     return { ok: false, error: 'A job needs a location and a description before it can go on the website.' };
   }
+  // NJ pay transparency law (in force June 2025): public postings must state
+  // the pay rate or range.
+  if (intent === 'publish' && pay_min == null && pay_max == null) {
+    return { ok: false, error: 'Add the pay rate or range before publishing. New Jersey requires it on job postings.' };
+  }
 
   if (!id) {
     const slug = makeSlug(title);
@@ -127,12 +132,12 @@ export async function setJobStatus(id: string, status: JobStatus): Promise<void>
 
   const { data: job } = await supabase
     .from('job_posts')
-    .select('slug, posted_at, description, location')
+    .select('slug, posted_at, description, location, pay_min, pay_max')
     .eq('id', id)
     .single();
   if (!job) return;
   // Same rule as the form: nothing half-written goes on the website.
-  if (status === 'open' && (!job.description || !job.location)) return;
+  if (status === 'open' && (!job.description || !job.location || (job.pay_min == null && job.pay_max == null))) return;
 
   const patch =
     status === 'open'

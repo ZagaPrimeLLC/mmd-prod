@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, Upload } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics';
+import { getAttribution } from '@/lib/attribution';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
@@ -75,6 +77,7 @@ export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTi
           cpr_first_aid: Boolean(fd.get('cpr')),
           driver_with_vehicle: Boolean(fd.get('driver')),
           applied_via: 'website job page',
+          attribution: getAttribution(),
         },
       },
     });
@@ -86,7 +89,10 @@ export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTi
           ? 'This position has just closed. Please look at our other openings, or call us.'
           : `We could not send that. Please call us on ${site.phone}.`
       );
-    } else setDone(true);
+    } else {
+      setDone(true);
+      track('lead_submitted', { form: 'job_application' });
+    }
   }
 
   if (done) {
