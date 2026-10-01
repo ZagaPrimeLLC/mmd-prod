@@ -1,4 +1,5 @@
 import PageHeader from '@/components/crm/PageHeader';
+import Link from 'next/link';
 import { Card, CardHead, Empty, Pill, dateLabel } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
 import { typeMeta, priorityMeta, stageMeta, isOverdue, STAGES, type WorkItem } from '@/lib/crm/board';
@@ -52,7 +53,7 @@ export default async function MyWorkPage() {
                         <t.icon className="h-3.5 w-3.5" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-navy-deep">{item.title}</span>
+                        <Link href={`/dashboard/board/${item.id}?from=my-work`} className="block text-sm font-medium text-navy-deep hover:underline">{item.title}</Link>
                         {item.notes && <span className="mt-0.5 block line-clamp-2 text-xs text-slate-500">{item.notes}</span>}
                       </span>
                       <span className="flex shrink-0 flex-col items-end gap-1">
@@ -88,7 +89,7 @@ export default async function MyWorkPage() {
             <ul className="divide-y divide-slate-100">
               {items.filter((i) => i.stage === 'done').slice(0, 10).map((item) => (
                 <li key={item.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                  <span className="min-w-0 truncate text-slate-500 line-through">{item.title}</span>
+                  <Link href={`/dashboard/board/${item.id}?from=my-work`} className="min-w-0 truncate text-slate-500 line-through hover:text-navy">{item.title}</Link>
                   <Pill tone="bg-emerald-100 text-emerald-800 ring-emerald-200">done</Pill>
                 </li>
               ))}

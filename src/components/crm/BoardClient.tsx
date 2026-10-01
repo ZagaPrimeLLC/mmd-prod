@@ -14,6 +14,7 @@ import {
   STAGES, WORK_TYPES, PRIORITIES, type WorkItem, type Board,
 } from '@/lib/crm/board';
 import BoardCard, { CardBody } from '@/components/crm/BoardCard';
+import BoardSearch, { useBoardSearch } from '@/components/crm/BoardSearch';
 import {
   createItem, moveItem, claimItem, setBoardLink, applyColumnOrder,
 } from '@/app/(dashboard)/dashboard/board/actions';
@@ -21,9 +22,9 @@ import {
 const stageIndex = (k: string) => STAGES.findIndex((s) => s.key === k);
 
 function Column({
-  stage, children,
-}: { stage: string; children: React.ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `col:${stage}`, data: { stage } });
+  stage, children, disabled,
+}: { stage: string; children: React.ReactNode; disabled: boolean }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `col:${stage}`, data: { stage }, disabled });
   return (
     <div
       ref={setNodeRef}
@@ -47,6 +48,9 @@ export default function BoardClient({
   const [adding, setAdding] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const filterOn = !!query.trim();
+  const search = useBoardSearch(board.id, query, items);
 
   // Local copy so a drag lands instantly. The server refreshes it afterwards.
   const [cards, setCards] = useState<WorkItem[]>(items);
@@ -65,14 +69,16 @@ export default function BoardClient({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const visibleCards = useMemo(() => search.data ? cards.filter((card) => !!search.data?.matches[card.id]) : cards, [cards, search.data]);
+
   const byStage = useMemo(() => {
     const m: Record<string, WorkItem[]> = {};
     for (const s of STAGES) m[s.key] = [];
-    for (const c of [...cards].sort((a, b) => a.position - b.position)) {
+    for (const c of [...visibleCards].sort((a, b) => a.position - b.position)) {
       (m[c.stage] ??= []).push(c);
     }
     return m;
-  }, [cards]);
+  }, [visibleCards]);
 
   const active = activeId ? cards.find((c) => c.id === activeId) ?? null : null;
 
@@ -106,12 +112,14 @@ export default function BoardClient({
   }
 
   function onDragStart(e: DragStartEvent) {
+    if (filterOn) return;
     setActiveId(String(e.active.id));
     setError(null);
   }
 
   /** Moves the card between columns while the pointer is still down. */
   function onDragOver(e: DragOverEvent) {
+    if (filterOn) return;
     const { active: a, over } = e;
     if (!over) return;
     const from = columnOf(String(a.id));
@@ -126,6 +134,7 @@ export default function BoardClient({
   function onDragEnd(e: DragEndEvent) {
     const { active: a, over } = e;
     setActiveId(null);
+    if (filterOn) return;
     if (!over) return;
 
     const movedId = String(a.id);
@@ -193,6 +202,14 @@ export default function BoardClient({
 
   return (
     <div className="p-5 sm:p-8">
+      <BoardSearch query={query} onChange={setQuery} searching={search.searching}
+        count={visibleCards.length} total={cards.length} warning={search.data?.warning}
+        error={search.error} onRetry={search.retry} disabled={!!activeId} />
+      {search.data && visibleCards.length === 0 && (
+        <p className="mb-5 rounded-lg border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-600">
+          No matching items. Try fewer words or clear the search.
+        </p>
+      )}
       {error && (
         <p role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">
           {error}
@@ -200,8 +217,8 @@ export default function BoardClient({
       )}
       {canWrite && (
         <p className="mb-4 text-xs text-slate-500">
-          Drag a card by its handle to move it, or use the arrows on the card. On a phone, hold a
-          card for a moment first so the board can still scroll.
+          Open a card to view details, edit notes, or comment. {filterOn ? 'Use the arrows on a card to change its status.' :
+            'Drag its handle to move it, or use the arrows on the card. On a phone, hold the handle for a moment first.'}
         </p>
       )}
 
@@ -218,15 +235,25 @@ export default function BoardClient({
         onDragEnd={onDragEnd}
         onDragCancel={() => { setActiveId(null); setCards(items); }}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        {search.data ? <div aria-label="Search results" className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {visibleCards.map((item) => <div key={item.id} className="min-w-0">
+            <p className="mb-2 text-xs font-semibold text-steel">{STAGES.find((stage) => stage.key === item.stage)?.label ?? item.stage}</p>
+            <BoardCard item={item} canWrite={canWrite} canDrag={false} searchMatch={search.data?.matches[item.id]}
+              mine={!!userId && item.owner_id === userId} busy={busyId === item.id}
+              boards={boards} currentBoardId={board.id} onMove={(direction) => move(item, direction)}
+              onClaim={() => claim(item)} onShare={(id, on) => share(item, id, on)} />
+          </div>)}
+        </div> : <div className="flex gap-4 overflow-x-auto pb-4" aria-busy={search.searching}>
           {STAGES.map((stage) => {
             const col = byStage[stage.key] ?? [];
             return (
               <section key={stage.key} className="flex w-[86vw] shrink-0 flex-col sm:w-[300px]">
                 <div className="mb-3 flex items-center gap-2">
-                  <stage.icon className="h-4 w-4 text-steel" />
-                  <h2 className="text-sm font-bold text-navy-deep">{stage.label}</h2>
-                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-bold tabular-nums text-slate-600">
+                  <stage.icon className={`h-4 w-4 ${stage.key === 'blocked' ? 'text-red-600' : 'text-steel'}`} />
+                  <h2 className={`text-sm font-bold ${stage.key === 'blocked' ? 'text-red-700' : 'text-navy-deep'}`}>{stage.label}</h2>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
+                    stage.key === 'blocked' && col.length > 0 ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'
+                  }`}>
                     {col.length}
                   </span>
                   {canWrite && (
@@ -294,12 +321,14 @@ export default function BoardClient({
                 )}
 
                 <SortableContext items={col.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-                  <Column stage={stage.key}>
+                  <Column stage={stage.key} disabled={filterOn || !canWrite}>
                     {col.map((item) => (
                       <BoardCard
                         key={item.id}
                         item={item}
                         canWrite={canWrite}
+                        canDrag={canWrite && !filterOn}
+                        searchMatch={search.data?.matches[item.id]}
                         mine={!!userId && item.owner_id === userId}
                         busy={busyId === item.id}
                         boards={boards}
@@ -311,7 +340,7 @@ export default function BoardClient({
                     ))}
                     {col.length === 0 && adding !== stage.key && (
                       <p className="rounded-lg border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">
-                        {canWrite ? 'Drop a card here' : 'Nothing here'}
+                        {filterOn && search.data ? 'No matches in this column' : canWrite && !filterOn ? 'Drop a card here' : 'Nothing here'}
                       </p>
                     )}
                   </Column>
@@ -319,7 +348,7 @@ export default function BoardClient({
               </section>
             );
           })}
-        </div>
+        </div>}
 
         <DragOverlay>
           {active && (

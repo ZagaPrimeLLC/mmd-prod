@@ -20,10 +20,52 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 
 const NO_WRITE = 'Your role can see this board but cannot change it.';
 
-function touched() {
+function touched(id?: string) {
   revalidatePath('/dashboard/board');
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/my-work');
+  if (id) revalidatePath(`/dashboard/board/${id}`);
+}
+
+const TASK_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function saveItemDetails(
+  id: string, original: { title: string; notes: string | null }, form: FormData
+): Promise<ActionResult> {
+  const { supabase, user, canWrite } = await ctx();
+  if (!user || !canWrite) return { ok: false, error: NO_WRITE };
+  if (!TASK_ID.test(id)) return { ok: false, error: 'That item could not be found.' };
+  const title = String(form.get('title') ?? '').trim();
+  const notes = String(form.get('notes') ?? '').trim();
+  if (!title || title.length > 200) return { ok: false, error: 'Enter a summary of 1 to 200 characters.' };
+  if (notes.length > 4000) return { ok: false, error: 'Keep notes to 4,000 characters or fewer.' };
+  if (!original || typeof original.title !== 'string' || (original.notes !== null && typeof original.notes !== 'string')) {
+    return { ok: false, error: 'Reload this item before editing it.' };
+  }
+
+  // Compare the details the editor opened, so another person's changes cannot
+  // be silently overwritten. A separate stage or assignment change is preserved.
+  let query = supabase.from('tasks')
+    .update({ title, notes: notes || null, updated_at: new Date().toISOString() })
+    .eq('id', id).eq('title', original.title);
+  query = original.notes === null ? query.is('notes', null) : query.eq('notes', original.notes);
+  const { data, error } = await query.select('id').maybeSingle();
+  if (error) return { ok: false, error: error.message };
+  if (!data) return { ok: false, error: 'This item changed or is no longer available. Copy your edits, then reload to see the latest version.' };
+  touched(id);
+  return { ok: true };
+}
+
+export async function addItemComment(id: string, form: FormData): Promise<ActionResult> {
+  const { supabase, user, canWrite } = await ctx();
+  if (!user || !canWrite) return { ok: false, error: NO_WRITE };
+  if (!TASK_ID.test(id)) return { ok: false, error: 'That item could not be found.' };
+  const body = String(form.get('body') ?? '').trim();
+  if (!body || body.length > 4000) return { ok: false, error: 'Enter a comment of 1 to 4,000 characters.' };
+  const { error } = await supabase.from('task_comments').insert({ task_id: id, body });
+  if (error) return { ok: false, error: 'Could not add the comment. Reload the item and try again.' };
+  touched(id);
+  return { ok: true };
 }
 
 export async function createItem(form: FormData): Promise<ActionResult> {
