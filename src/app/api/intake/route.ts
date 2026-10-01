@@ -45,6 +45,14 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase().rpc('intake_applicant', { p_key: key, p_payload: body });
 
   if (error) {
+    if (error.code === 'PT429') {
+      const seconds = Number(/^retry_after=(\d+)$/.exec(error.hint ?? '')?.[1]);
+      const retryAfter = Number.isSafeInteger(seconds) && seconds > 0 ? seconds : 3600;
+      return NextResponse.json(
+        { error: error.message },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
     if (error.code === '28000' || /invalid intake key/i.test(error.message)) {
       return NextResponse.json({ error: 'Invalid or revoked key.' }, { status: 401 });
     }
