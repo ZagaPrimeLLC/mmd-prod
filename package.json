@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/intake-route.test.mjs",
-    "test:db": "node --test tests/rate-limits.test.mjs"
+    "test": "node --test tests/intake-route.test.mjs tests/work-item-actions.test.mjs",
+    "test:db": "node --test tests/rate-limits.test.mjs tests/work-item-comments-db.test.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

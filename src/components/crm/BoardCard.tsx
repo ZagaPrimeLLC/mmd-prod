@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -95,9 +96,13 @@ export default function BoardCard({
             <GripVertical className="h-4 w-4" />
           </button>
         )}
-        <div className="min-w-0 flex-1">
+        <Link
+          href={`/dashboard/board/${item.id}?b=${encodeURIComponent(boards.find((b) => b.id === currentBoardId)?.key ?? '')}`}
+          aria-label={`Open ${item.title}`}
+          className="min-w-0 flex-1 rounded text-left outline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-navy"
+        >
           <CardBody item={item} boards={boards} currentBoardId={currentBoardId} />
-        </div>
+        </Link>
       </div>
 
       {canWrite && (

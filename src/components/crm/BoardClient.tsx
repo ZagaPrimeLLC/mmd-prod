@@ -200,8 +200,8 @@ export default function BoardClient({
       )}
       {canWrite && (
         <p className="mb-4 text-xs text-slate-500">
-          Drag a card by its handle to move it, or use the arrows on the card. On a phone, hold a
-          card for a moment first so the board can still scroll.
+          Open a card to view details, edit notes, or comment. Drag its handle to move it, or use
+          the arrows on the card. On a phone, hold the handle for a moment first.
         </p>
       )}
 
