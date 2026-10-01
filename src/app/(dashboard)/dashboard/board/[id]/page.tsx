@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import PageHeader from '@/components/crm/PageHeader';
 import { Card, CardHead, Empty, Notice, Pill, dateLabel } from '@/components/crm/ui';
-import { WorkItemDetails, WorkItemCommentForm } from '@/components/crm/WorkItemDetails';
+import { WorkItemDetails, WorkItemCommentForm, ItemInfoForm, type TeamOption } from '@/components/crm/WorkItemDetails';
 import { getSession } from '@/lib/crm/session';
 import { canWrite } from '@/lib/crm/nav';
 import { typeMeta, priorityMeta, stageMeta, type WorkItem } from '@/lib/crm/board';
@@ -57,6 +57,15 @@ export default async function WorkItemPage({ params, searchParams }: {
   const type = typeMeta(item.work_type);
   const priority = priorityMeta(item.priority);
 
+  // People who can own work, for the "Assigned to" list (only writers need it).
+  const { data: teamRows } = writes ? await supabase.rpc('team_list') : { data: [] };
+  const team: TeamOption[] = ((teamRows ?? []) as { user_id: string; email: string; display_name: string | null }[])
+    .map((m) => ({ id: m.user_id, name: m.user_id === user?.id ? `${m.display_name || m.email} (you)` : m.display_name || m.email }));
+  // The date picker shows the due date as the office sees it, in New York.
+  const dueOn = item.due_at
+    ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(item.due_at))
+    : '';
+
   return (
     <>
       <div className="px-5 pt-5 sm:px-8">
@@ -69,18 +78,23 @@ export default async function WorkItemPage({ params, searchParams }: {
         {!writes && <Notice>You can view this item and its comments. The operations team can edit details and post updates.</Notice>}
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
           <Card><WorkItemDetails id={id} title={item.title} notes={item.notes} canWrite={writes} /></Card>
-          <Card className="p-5">
-            <h2 className="text-sm font-bold text-navy-deep">Item information</h2>
+          <Card>
+            <ItemInfoForm id={id} stage={item.stage} priority={item.priority} workType={item.work_type}
+              ownerId={item.owner_id} dueOn={dueOn} team={team} canWrite={writes}>
             <dl className="mt-4 grid grid-cols-2 gap-4 text-sm lg:block lg:space-y-4">
               <div><dt className="text-xs text-slate-500">Status</dt><dd className="mt-1"><Pill>{stageMeta(item.stage).label}</Pill></dd></div>
               <div><dt className="text-xs text-slate-500">Priority</dt><dd className="mt-1"><Pill tone={priority.tone}>{priority.label}</Pill></dd></div>
               <div><dt className="text-xs text-slate-500">Assigned to</dt><dd className="mt-1 text-navy-deep">{item.owner_id ? nameOf(item.owner_id) : 'Unassigned'}</dd></div>
-              <div><dt className="text-xs text-slate-500">Due date</dt><dd className="mt-1 text-navy-deep">{dateLabel(item.due_at) || 'No due date'}</dd></div>
+              <div><dt className="text-xs text-slate-500">Type</dt><dd className="mt-1 text-navy-deep">{type.label}</dd></div>
+              <div><dt className="text-xs text-slate-500">Due date</dt><dd className="mt-1 text-navy-deep">{item.due_at
+                ? new Date(item.due_at).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', year: 'numeric' })
+                : 'No due date'}</dd></div>
               <div><dt className="text-xs text-slate-500">Created</dt><dd className="mt-1 text-navy-deep">{dateLabel(item.created_at)}</dd></div>
               {boards.length > 0 && <div><dt className="text-xs text-slate-500">Boards</dt><dd className="mt-1 flex flex-wrap gap-2">{boards.map((board) =>
                 <Link key={board.id} href={`/dashboard/board?b=${encodeURIComponent(board.key)}`} className="font-semibold text-steel hover:underline">{board.name}</Link>
               )}</dd></div>}
             </dl>
+            </ItemInfoForm>
           </Card>
         </div>
         <Card>
