@@ -2,6 +2,8 @@
 // own browser and attached to whatever form they eventually send. No cookie, no
 // third party, nothing about the person, only the campaign tags and referrer.
 
+import { ctaFromSearch } from '@/lib/cta';
+
 const KEY = 'mmd_first_touch';
 const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const;
 
@@ -11,6 +13,8 @@ export type Attribution = Partial<Record<(typeof UTM)[number], string>> & {
   first_seen?: string;
   gclid?: string;
   fbclid?: string;
+  cta?: string;
+  conversion_page?: string;
 };
 
 const clip = (v: string | null | undefined, n = 200) => (v ? v.slice(0, n) : undefined);
@@ -46,6 +50,16 @@ export function getAttribution(): Attribution | null {
   } catch {
     return null;
   }
+}
+
+/** Adds the current booking context without changing stored first-touch data. */
+export function getBookingAttribution(loc: { search: string; pathname: string }): Attribution & { conversion_page: string } {
+  const cta = ctaFromSearch(loc.search);
+  // Do not reuse conversion fields that might be present in old browser storage.
+  const firstTouch = { ...getAttribution() };
+  delete firstTouch.cta;
+  delete firstTouch.conversion_page;
+  return { ...firstTouch, conversion_page: clip(loc.pathname, 300) ?? '/contact', ...(cta ? { cta } : {}) };
 }
 
 /** "google / cpc", "facebook.com", "direct": for showing in the inbox. */

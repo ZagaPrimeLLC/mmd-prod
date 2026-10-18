@@ -1,95 +1,55 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { PHOTOS } from '@/lib/photos';
 import { Check } from 'lucide-react';
 import PageHero from '@/components/site/PageHero';
+import ServiceRows from '@/components/site/ServiceRows';
+import StepsSection from '@/components/site/StepsSection';
 import CTABanner from '@/components/site/CTABanner';
-import { serviceDetail, onboardingChecks } from '@/lib/site';
+import JsonLd from '@/components/site/JsonLd';
+import { onboardingChecks } from '@/lib/site';
+import { DDD_SERVICES } from '@/lib/seo-content';
+import { serviceLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
-  title: 'Our services',
+  title: 'DDD Services for Adults in New Jersey',
   description:
-    'Individual Support, Respite Care and Community Support for adults with developmental disabilities across New Jersey. NJ DDD approved provider.',
+    'Community-Based Supports, Individual Supports and Respite for adults with intellectual and developmental disabilities across New Jersey, from a NJ DDD approved provider.',
   alternates: { canonical: '/services' },
 };
 
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd data={DDD_SERVICES.map((s) => serviceLd(s))} />
       <PageHero
-        eyebrow="Services"
-        title="Support that fits the person"
-        lead="The State of New Jersey Division of Developmental Disabilities has approved our agency to provide community-based support, respite and individual support to adults with disabilities."
-        image="/images/games.jpg"
-        imageAlt="An MMD support worker accompanying a client in the community"
+        crumbs={[{ name: 'Services', href: '/services' }]}
+        title="DDD services for adults, built around the person"
+        lead="The NJ Division of Developmental Disabilities has approved MMD Community Care to provide Community-Based Supports, Individual Supports and Respite to adults across New Jersey."
+        photo={PHOTOS.boardgame}
       />
 
-      <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl space-y-16 px-5 sm:px-8 lg:px-12">
-          {serviceDetail.map((s, i) => (
-            <article key={s.slug} id={s.slug} className="grid gap-8 md:grid-cols-3">
-              <div>
-                <p className="text-5xl font-bold text-gold">{String(i + 1).padStart(2, '0')}</p>
-                <h2 className="mt-3 text-2xl font-bold text-navy">{s.name}</h2>
-                <p className="mt-3 leading-relaxed text-gray-600">{s.lead}</p>
-              </div>
-              <div className="md:col-span-2">
-                <div className="space-y-4 leading-relaxed text-gray-700">
-                  {s.body.map((para) => <p key={para}>{para}</p>)}
-                </div>
-                <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                  {s.includes.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5">
-                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-steel" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ServiceRows />
 
-      <section className="bg-cream py-16 md:py-20">
-        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
-          <h2 className="text-2xl font-bold text-navy md:text-3xl">What to expect from MMD</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              ['Personal care', 'Help with daily living: bathing, dressing, grooming and toileting.'],
-              ['Companionship', 'Activities that support social and emotional wellbeing.'],
-              ['Respite care', 'Temporary relief for primary caregivers.'],
-              ['Medical coordination', 'Appointments coordinated and medication reminders given.'],
-            ].map(([title, body]) => (
-              <div key={title} className="rounded-xl bg-white p-6 shadow-sm">
-                <h3 className="font-bold text-navy">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">{body}</p>
-              </div>
-            ))}
+      <section className="mx-3 mt-3 rounded-[20px] bg-cream py-20 md:py-24">
+        <div className="mx-auto grid w-full max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:px-12">
+          <div>
+            <h2 className="text-4xl text-navy-deep md:text-5xl">How our staff are vetted</h2>
+            <p className="mt-5 text-lg leading-relaxed text-navy-deep">
+              Every Direct Support Professional completes our full onboarding before working with anyone we support.
+            </p>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-16 md:py-20">
-        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
-          <h2 className="text-2xl font-bold text-navy md:text-3xl">How our staff are vetted</h2>
-          <p className="mt-4 max-w-3xl leading-relaxed text-gray-700">
-            Every Direct Support Professional completes our full onboarding process before they
-            work with a client.
-          </p>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
             {onboardingChecks.map((c) => (
-              <li key={c} className="flex items-start gap-2.5 rounded-lg bg-cream p-4">
-                <Check className="mt-0.5 h-5 w-5 shrink-0 text-steel" />
-                <span className="text-sm text-gray-700">{c}</span>
+              <li key={c} className="flex items-start gap-3 pb-2">
+                <Check aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-gold-deep" />
+                <span className="text-navy-deep">{c}</span>
               </li>
             ))}
           </ul>
-          <Link href="/contact?cta=services-page" className="mt-10 inline-block rounded-lg bg-navy px-8 py-4 font-bold text-white hover:bg-navy-dark">
-            Book a free consultation
-          </Link>
         </div>
       </section>
 
+      <StepsSection compact />
       <CTABanner />
     </>
   );

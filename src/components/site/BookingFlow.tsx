@@ -3,9 +3,9 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { CalendarCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
-import { getAttribution } from '@/lib/attribution';
-import { availableDays, SLOT_MINUTES, timeLabel } from '@/lib/booking';
+import { getBookingAttribution } from '@/lib/attribution';
+import { getSessionId } from '@/lib/analytics/session';
+import { availableDays, SLOT_MINUTES, timeLabel, officeHoursLabel, type Schedule } from '@/lib/booking';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
@@ -17,9 +17,10 @@ const field =
 const noop = () => () => {};
 const useInBrowser = () => useSyncExternalStore(noop, () => true, () => false);
 
-export default function BookingFlow() {
+export default function BookingFlow({ schedule }: { schedule: Schedule }) {
+  const hours = officeHoursLabel(schedule);
   const inBrowser = useInBrowser();
-  const days = useMemo(() => (inBrowser ? availableDays() : []), [inBrowser]);
+  const days = useMemo(() => (inBrowser ? availableDays(new Date(), schedule) : []), [inBrowser, schedule]);
   const [dayKey, setDayKey] = useState('');
   const [slotIso, setSlotIso] = useState('');
   const [busy, setBusy] = useState(false);
@@ -38,18 +39,30 @@ export default function BookingFlow() {
     setError(null);
 
     const fd = new FormData(e.currentTarget);
+    const attribution = getBookingAttribution(window.location);
     const { error } = await createClient().from('bookings').insert({
       name: String(fd.get('name') ?? '').trim(),
       email: String(fd.get('email') ?? '').trim(),
       phone: String(fd.get('phone') ?? '').trim(),
       requested_slot: slotIso,
       notes: String(fd.get('notes') ?? '').trim() || null,
-      attribution: getAttribution(),
+      cta: attribution.cta ?? null,
+      attribution,
+      session_id: getSessionId(),
     });
 
     setBusy(false);
-    if (error) setError(`We could not hold that time. Please call ${site.phone}.`);
-    else { setDone(`${day.label} at ${timeLabel(slotIso)}`); track('lead_submitted', { form: 'booking' }); }
+    if (error) {
+      // MB001: the slot is not bookable; MB002: the office schedule could not be read.
+      setError(error.code === 'MB001'
+        ? `That time is no longer available. Refresh this page for the current schedule, or call ${site.phone}.`
+        : error.code === 'MB002'
+          ? `We could not confirm the office schedule. Please call ${site.phone} to arrange a time.`
+          : `We could not request that time. Please call ${site.phone}.`);
+      window.dispatchEvent(new CustomEvent('mmd:form_error', { detail: { form: 'booking', category: 'save_failed' } }));
+    } else {
+      setDone(`${day.label} at ${timeLabel(slotIso)}`);
+    }
   }
 
   if (done) {
@@ -68,20 +81,22 @@ export default function BookingFlow() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form data-form="booking" onSubmit={submit} className="space-y-5">
       <div>
         <p className="flex items-center gap-2 font-semibold text-navy">
           <CalendarCheck className="h-5 w-5 text-steel" />
           Pick a time that suits you
         </p>
-        <p className="mt-2 text-sm text-gray-600">
-          Tuesdays and Thursdays, 11am to 4pm. Each consultation is about {SLOT_MINUTES} minutes.
-        </p>
+        {!schedule.unavailable && (
+          <p className="mt-2 text-sm text-gray-600">
+            {hours}. Each consultation is about {SLOT_MINUTES} minutes.
+          </p>
+        )}
       </div>
 
       {inBrowser && days.length === 0 ? (
         <p className="rounded-lg bg-cream p-4 text-sm text-gray-700">
-          No times are open in the next few weeks. Please call{' '}
+          {schedule.unavailable ? 'We could not confirm the office schedule. Please call' : 'No times are open in the next few weeks. Please call'}{' '}
           <a href={site.phoneHref} className="font-semibold text-navy underline">{site.phone}</a>.
         </p>
       ) : (

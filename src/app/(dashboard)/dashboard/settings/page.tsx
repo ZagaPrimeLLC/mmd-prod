@@ -6,6 +6,8 @@ import { Card, CardHead } from '@/components/crm/ui';
 import { getSession } from '@/lib/crm/session';
 import { canWrite } from '@/lib/crm/nav';
 import { site } from '@/lib/site';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
 import type { Board } from '@/lib/crm/board';
 import { Building2, ShieldCheck, Database } from 'lucide-react';
 
@@ -36,6 +38,7 @@ export default async function SettingsPage() {
   }
 
   const isAdmin = role === 'admin';
+  const hours = officeHoursLabel(await getSchedule());
   const [boardsRes, teamRes, keysRes, invitesRes] = await Promise.all([
     supabase.from('boards').select('*').eq('archived', false).order('position'),
     supabase.rpc('team_list'),
@@ -81,7 +84,7 @@ export default async function SettingsPage() {
               ['Phone', site.phone],
               ['Email', site.email],
               ['Office', `${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`],
-              ['Walk-in hours', site.walkIn],
+              ['Walk-in hours', hours],
             ].map(([k, v]) => (
               <div key={k} className="flex flex-wrap justify-between gap-3 px-5 py-3">
                 <dt className="text-slate-600">{k}</dt>
@@ -90,8 +93,8 @@ export default async function SettingsPage() {
             ))}
           </dl>
           <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">
-            These live in the site content file and change with a deploy, so the website and the
-            CRM can never disagree about them.
+            Walk-in hours use the published office schedule in Content. Other agency details
+            are maintained with the website.
           </p>
         </Card>
 

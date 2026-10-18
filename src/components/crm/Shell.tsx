@@ -8,6 +8,7 @@ import { Menu, X, LogOut, ShieldCheck, Eye } from 'lucide-react';
 import { navFor, canWrite, ROLE_LABELS, type Role } from '@/lib/crm/nav';
 import { site } from '@/lib/site';
 import Avatar from '@/components/crm/Avatar';
+import NotificationBell from '@/components/crm/NotificationBell';
 import type { Profile } from '@/lib/crm/session';
 
 export default function Shell({
@@ -63,12 +64,13 @@ export default function Shell({
       <span className="grid shrink-0 place-items-center rounded-lg bg-white p-1">
         <Image src={site.logo} alt="" width={616} height={484} className="h-8 w-auto" />
       </span>
-      <span className="min-w-0 leading-tight">
+      <span className="min-w-0 flex-1 leading-tight">
         <span className="block text-[13px] font-bold leading-snug text-white">MMD Community Care</span>
         <span className="block text-[10px] font-semibold uppercase tracking-wider text-gold">
           Operations
         </span>
       </span>
+      <span className="hidden lg:block"><NotificationBell side="sidebar" /></span>
     </div>
   );
 
@@ -146,7 +148,8 @@ export default function Shell({
             <Menu className="h-5 w-5" />
           </button>
           <Image src={site.logo} alt="" width={616} height={484} className="h-7 w-auto" />
-          <span className="text-sm font-bold text-navy">MMD Operations</span>
+          <span className="flex-1 text-sm font-bold text-navy">MMD Operations</span>
+          <NotificationBell side="topbar" />
         </div>
 
         {children}

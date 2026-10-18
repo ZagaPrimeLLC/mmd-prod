@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
 import { getAttribution } from '@/lib/attribution';
+import { ctaFromSearch } from '@/lib/cta';
+import { getSessionId } from '@/lib/analytics/session';
 import { site, services } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
@@ -17,9 +18,8 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
     e.preventDefault();
     setBusy(true);
     setError(null);
-    // Which button on the site sent them here. Read from the link, nothing
-    // tracked about the person and no cookie set.
-    const cta = new URLSearchParams(window.location.search).get('cta')?.replace(/[^a-z0-9-]/gi, '').slice(0, 40) || null;
+    // Which button on the site sent them here (site CTAs only, see lib/cta).
+    const cta = ctaFromSearch(window.location.search);
 
     const fd = new FormData(e.currentTarget);
     const payload = {
@@ -31,6 +31,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
       source_page: sourcePage,
       cta,
       attribution: getAttribution(),
+      session_id: getSessionId(),
     };
 
     if (!payload.email && !payload.phone) {
@@ -41,8 +42,11 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
 
     const { error } = await createClient().from('inquiries').insert(payload);
     setBusy(false);
-    if (error) setError(`We could not send that. Please call us on ${site.phone}.`);
-    else { setDone(true); track('lead_submitted', { form: 'contact' }); }
+    if (error) {
+      setError(`We could not send that. Please call us on ${site.phone}.`);
+      window.dispatchEvent(new CustomEvent('mmd:form_error', { detail: { form: 'contact', category: 'save_failed' } }));
+    }
+    else setDone(true);
   }
 
   if (done) {
@@ -59,7 +63,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form data-form="contact" onSubmit={submit} className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-gray-800">Your name</label>

@@ -1,91 +1,70 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { Phone, Mail, MapPin } from 'lucide-react';
 import { site } from '@/lib/site';
 import NewsletterSignup from '@/components/site/NewsletterSignup';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
 
-export default function SiteFooter() {
+const LINKS = [
+  { href: '/services/community-based-supports', label: 'Community-Based Supports' },
+  { href: '/services/individual-supports', label: 'Individual Supports' },
+  { href: '/services/respite', label: 'Respite' },
+  { href: '/getting-started', label: 'Getting started with DDD' },
+  { href: '/areas', label: 'Areas we serve' },
+  { href: '/about', label: 'About us' },
+  { href: '/mission', label: 'Mission and values' },
+  { href: '/careers', label: 'DSP jobs' },
+  { href: '/contact?cta=footer', label: 'Book a consultation' },
+];
+
+const LEGAL = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/notice-of-privacy-practices', label: 'Notice of Privacy Practices' },
+  { href: '/nondiscrimination', label: 'Nondiscrimination and Language Assistance' },
+  { href: '/accessibility', label: 'Accessibility' },
+  { href: '/terms', label: 'Terms of Use' },
+];
+
+export default async function SiteFooter() {
+  const schedule = await getSchedule();
   return (
-    <footer className="bg-navy text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:px-12 py-14 md:grid-cols-3">
+    <footer className="bg-navy-deep text-paper">
+      <div className="grid gap-12 px-6 pb-10 pt-16 sm:px-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <div>
-          <Image
-            src={site.logo}
-            alt={`${site.legalName} logo`}
-            width={616}
-            height={484}
-            className="mb-4 h-16 w-auto"
-          />
-          <p className="text-lg font-bold">{site.legalName}</p>
-          <p className="text-sm font-medium text-gold">{site.slogan}</p>
-          <p className="mt-3 text-sm leading-relaxed text-gray-200">
-            A New Jersey DDD approved statewide provider of community support, respite and
-            individual support for adults with disabilities.
+          <p className="max-w-[34ch] text-2xl font-light leading-[1.25] tracking-[-0.03em]">
+            {site.legalName}, a New Jersey DDD approved provider.
+          </p>
+          <p className="mt-6 text-lg leading-relaxed text-paper/85">
+            <Link href={site.officeHref} className="underline decoration-gold decoration-2 underline-offset-4 hover:decoration-paper">
+              {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
+            </Link>
+            <br />
+            <a href={site.phoneHref} className="hover:underline hover:underline-offset-4">{site.phone}</a>
+            <br />
+            <a href={`mailto:${site.email}`} className="hover:underline hover:underline-offset-4">{site.email}</a>
+            <br />
+            Walk-in hours: {officeHoursLabel(schedule)}
           </p>
         </div>
-
-        <div>
-          <p className="font-semibold text-gold">Contact</p>
-          <ul className="mt-4 space-y-3 text-sm text-gray-200">
-            <li className="flex items-start gap-2">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-              <span>{site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <Phone className="h-4 w-4 shrink-0 text-gold" />
-              <a href={site.phoneHref} className="hover:text-white">{site.phone}</a>
-            </li>
-            <li className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0 text-gold" />
-              <a href={`mailto:${site.email}`} className="hover:text-white">{site.email}</a>
-            </li>
+        <div className="space-y-10">
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-[16px] text-paper/85">
+            {LINKS.map((l) => (
+              <li key={l.href}><Link href={l.href} className="hover:text-paper hover:underline hover:underline-offset-4">{l.label}</Link></li>
+            ))}
           </ul>
-        </div>
-
-        <div>
-          <p className="font-semibold text-gold">Quick links</p>
-          <ul className="mt-4 space-y-2 text-sm text-gray-200">
-            <li><Link href="/services" className="hover:text-white">Our services</Link></li>
-            <li><Link href="/mission" className="hover:text-white">Mission and vision</Link></li>
-            <li><Link href="/contact/testimonials" className="hover:text-white">Testimonials</Link></li>
-            <li><Link href="/about" className="hover:text-white">About us</Link></li>
-            <li><Link href="/careers" className="hover:text-white">Caregiver jobs</Link></li>
-            <li><Link href="/contact?cta=footer" className="hover:text-white">Book a consultation</Link></li>
-          </ul>
-          <p className="mt-6 text-sm text-gray-300">
-            Walk-in paperwork: {site.walkIn}
-          </p>
-
-          <div className="mt-6 border-t border-white/15 pt-5">
-            <NewsletterSignup />
-          </div>
+          <NewsletterSignup />
         </div>
       </div>
 
-      <div className="border-t border-white/15">
-        <div className="mx-auto w-full max-w-7xl px-5 py-6 sm:px-8 lg:px-12">
-          {/* Section 1557 requires this to sit somewhere conspicuous on the site. */}
-          <p className="text-sm font-semibold text-gold">
-            Language assistance services and aids for effective communication are available free of
-            charge.{' '}
-            <a href={site.phoneHref} className="underline hover:text-white">
-              Call {site.phone}
-            </a>
-            .
-          </p>
-
-          <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-300">
-            <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-            <li><Link href="/notice-of-privacy-practices" className="hover:text-white">Notice of Privacy Practices</Link></li>
-            <li><Link href="/nondiscrimination" className="hover:text-white">Nondiscrimination and Language Assistance</Link></li>
-            <li><Link href="/accessibility" className="hover:text-white">Accessibility</Link></li>
-            <li><Link href="/terms" className="hover:text-white">Terms of Use</Link></li>
-          </ul>
-
-          <p className="mt-5 text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
-          </p>
-        </div>
+      <div className="px-6 pb-10 sm:px-12">
+        <p className="text-[15px] leading-relaxed text-paper/85">
+          Images and videos on this website are illustrations.
+        </p>
+        <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[15px] text-paper/70">
+          {LEGAL.map((l) => (
+            <li key={l.href}><Link href={l.href} className="hover:text-paper">{l.label}</Link></li>
+          ))}
+          <li>&copy; {new Date().getFullYear()} {site.legalName}</li>
+        </ul>
       </div>
     </footer>
   );

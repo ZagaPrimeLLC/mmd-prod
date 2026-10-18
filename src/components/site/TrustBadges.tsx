@@ -1,27 +1,29 @@
-import { Shield, Award, Heart, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { site } from '@/lib/site';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
 
-const badges = [
-  { icon: Shield, text: 'NJ DDD Approved' },
-  { icon: Award, text: 'Certified Provider' },
-  { icon: Heart, text: 'Compassionate Care' },
-  { icon: CheckCircle, text: 'Background Checked' },
+/** Four facts a family or support coordinator checks first, in plain words. */
+const facts = [
+  { title: 'NJ DDD approved', body: 'A statewide provider approved by the Division of Developmental Disabilities.' },
+  { title: 'Screened and trained', body: 'Fingerprinted, background checked, Boggs Center trained, CPR and First Aid certified.' },
+  { title: 'Built around the person', body: 'Support follows the person’s routine, goals and Individualized Service Plan.' },
 ];
 
-export default function TrustBadges() {
+export default async function TrustBadges() {
+  const hours = officeHoursLabel(await getSchedule());
   return (
-    <div className="border-y border-gray-200 bg-white py-12">
-      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          {badges.map(({ icon: Icon, text }) => (
-            <div key={text} className="flex flex-col items-center text-center">
-              <div className="mb-3 grid h-16 w-16 place-items-center rounded-full bg-steel/10">
-                <Icon className="h-8 w-8 text-steel" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">{text}</p>
-            </div>
-          ))}
+    <section aria-label="Why families choose MMD" className="grid gap-3 px-3 pt-3 sm:grid-cols-2 lg:grid-cols-4">
+      {facts.map(({ title, body }) => (
+        <div key={title} className="rounded-[20px] bg-paper px-6 py-8">
+          <p className="text-xl font-medium text-navy-deep">{title}</p>
+          <p className="mt-2 text-[16px] leading-[1.55] text-navy-deep">{body}</p>
         </div>
-      </div>
-    </div>
+      ))}
+      <Link href={site.officeHref} className="group rounded-[20px] bg-gold px-6 py-8 text-navy-deep transition hover:bg-gold-dark">
+        <p className="text-xl font-medium group-hover:underline group-hover:underline-offset-4">An office you can visit</p>
+        <p className="mt-2 text-[16px] leading-[1.55]">{site.address.street}, {site.address.city}. Walk-in hours: {hours}.</p>
+      </Link>
+    </section>
   );
 }

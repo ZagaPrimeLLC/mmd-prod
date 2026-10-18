@@ -1,16 +1,33 @@
 import type { Config } from 'tailwindcss';
 
+// MMD palette, drawn from the agency's shield logo. Token names are kept from the
+// first build so every page picks up the refined values.
 export default {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // palette carried over from the community-navigator build
-        navy:  { DEFAULT: '#1e3a8a', dark: '#1e40af', deep: '#172554' },
-        // deep: gold that passes WCAG AA (5.0:1) as text on white; DEFAULT/dark are for fills
-        gold:  { DEFAULT: '#fbbf24', dark: '#f59e0b', deep: '#b45309' },
-        steel: '#336699',
-        cream: '#F8F8F6',
+        // shield blue / hover / ink (headings, dark sections)
+        navy:  { DEFAULT: '#2B4190', dark: '#22357A', deep: '#16224A' },
+        // crest gold: DEFAULT/dark for fills, deep for text on light backgrounds (5.9:1)
+        gold:  { DEFAULT: '#D4A53A', dark: '#B8892A', deep: '#8A5A12', soft: '#F6EBCF', crest: '#F0C018' },
+        steel: '#3E5C9A',
+        // paper is the page ground; cream and haze are one and two tone steps from it
+        paper: '#F2F4F8',
+        cream: '#E9EDF4',
+        haze: '#DCE3EE',
+        // soft ink for secondary text (7.4:1 on paper)
+        soft: '#4A5675',
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+      },
+      keyframes: {
+        'mmd-rise': { '0%': { opacity: '0', transform: 'translateY(18px)' }, '100%': { opacity: '1', transform: 'none' } },
+      },
+      animation: {
+        'mmd-rise': 'mmd-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
     },
   },

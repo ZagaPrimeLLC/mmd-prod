@@ -42,13 +42,13 @@ input, select, textarea { font-size: 16px; }
 /* !important because utility classes set focus:outline-none on the inputs, and a
    keyboard user losing the focus ring is not a tradeoff worth making. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 3px solid #0c1a3a !important;
+  outline: 3px solid #16224a !important;
   outline-offset: 2px !important;
   border-radius: 4px;
 }
 /* On dark panels the navy ring disappears, so invert it there. */
-:where(.bg-navy, footer) :where(a, button, [tabindex]):focus-visible {
-  outline-color: #fbbf24 !important;
+:where(.bg-navy, .bg-navy-deep, .bg-navy-dark, footer) :where(a, button, [tabindex]):focus-visible {
+  outline-color: #d4a53a !important;
 }
 /* The skip link sits off screen until it is focused. */
 .mmd-skip {
@@ -71,3 +71,96 @@ input, select, textarea { font-size: 16px; }
 /* main takes focus programmatically after a skip, but should not show a ring
    just from being targeted. */
 main:focus { outline: none; }
+
+/* ─── Public site typography ──────────────────────────────────────────────
+   Work Sans throughout the public site: light and tightly tracked at display
+   sizes, regular for reading. The CRM keeps Public Sans. */
+.mmd-site {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  color: #16224a;
+  background: #dce3ee;
+}
+/* :where() keeps these at zero specificity, so a utility class on one heading can override them. */
+:where(.mmd-site h1, .mmd-site h2, .mmd-site h3) {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+:where(.mmd-site h3) { font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; }
+.mmd-site :where(p, li) { text-wrap: pretty; }
+.mmd-site { font-variant-numeric: tabular-nums; }
+
+/* Content stays visible before, during and after the entrance. A late observer
+   callback must not make text the visitor can already see disappear. */
+.mmd-reveal { opacity: 1; transform: none; }
+@keyframes mmd-reveal-in {
+  from { transform: translateY(22px); }
+  to { transform: none; }
+}
+.mmd-reveal.is-in {
+  animation: mmd-reveal-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--mmd-delay, 0ms);
+}
+
+/* County map: each county fills in turn when the map is revealed. */
+.mmd-county {
+  fill: #e7ecf6;
+  stroke: #ffffff;
+  stroke-width: 1.2;
+  transition: fill 0.6s ease, transform 0.25s ease;
+  transition-delay: var(--mmd-delay, 0ms);
+}
+.mmd-map.is-in .mmd-county { fill: #2b4190; }
+.mmd-map.is-in .mmd-county.is-home { fill: #d4a53a; }
+.mmd-map .mmd-county-link:hover .mmd-county,
+.mmd-map .mmd-county-link:focus-visible .mmd-county { fill: #16224a; transition-delay: 0ms; }
+.mmd-map.is-in .mmd-county-link:hover .mmd-county.is-home { fill: #b8892a; }
+
+/* Without JavaScript nothing should stay hidden. */
+@media (scripting: none) {
+  .mmd-reveal { opacity: 1; transform: none; }
+  .mmd-map .mmd-county { fill: #2b4190; }
+}
+
+/* Anyone who has asked their system to reduce motion sees the finished page. */
+@media (prefers-reduced-motion: reduce) {
+  .mmd-reveal, .mmd-reveal.is-in { opacity: 1; transform: none; animation: none; }
+  .mmd-county { transition: none; }
+  .motion-safe-only { animation: none !important; }
+}
+
+/* ─── Split stage (home) ─────────────────────────────────────────────────
+   Printed things from the agency's world: the services set as a menu sheet
+   with a scalloped edge, the DDD route as a torn slip. The edges are masks,
+   not decoration painted on top. */
+.mmd-menu-sheet {
+  --s: 9px;
+  -webkit-mask:
+    radial-gradient(var(--s) at 50% 0, #0000 98%, #000) 50% 0 / calc(2 * var(--s)) 51% repeat-x,
+    radial-gradient(var(--s) at 50% 100%, #0000 98%, #000) 50% 100% / calc(2 * var(--s)) 51% repeat-x;
+  mask:
+    radial-gradient(var(--s) at 50% 0, #0000 98%, #000) 50% 0 / calc(2 * var(--s)) 51% repeat-x,
+    radial-gradient(var(--s) at 50% 100%, #0000 98%, #000) 50% 100% / calc(2 * var(--s)) 51% repeat-x;
+}
+.mmd-slip {
+  --z: 10px;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--z)) 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--z)) 100%;
+}
+
+/* The photo strip runs on its own; it holds still on hover and for anyone
+   who has asked for less motion. */
+.mmd-marquee { animation: mmd-marquee 70s linear infinite; }
+.mmd-marquee:hover { animation-play-state: paused; }
+@keyframes mmd-marquee { to { transform: translateX(-50%); } }
+
+/* A slow push on still photographs so the page never sits dead. */
+.mmd-drift { animation: mmd-drift 24s ease-in-out infinite alternate; transform-origin: 50% 0; }
+@keyframes mmd-drift { from { transform: scale(1.02); } to { transform: scale(1.09) translateX(-1%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mmd-marquee, .mmd-drift { animation: none; }
+  .animate-mmd-rise { animation: none; }
+}

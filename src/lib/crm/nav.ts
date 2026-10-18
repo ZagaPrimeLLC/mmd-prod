@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, KanbanSquare, UserCheck, Inbox, Users,
   GraduationCap, Route, History, CircleUser, Settings, Contact2, Briefcase, FileUp, UserCog,
+  BarChart3, Globe2, MousePointerClick, Activity, FileText,
 } from 'lucide-react';
 
 /**
@@ -26,6 +27,7 @@ export type NavSection = { title: string; items: NavItem[] };
 
 const ALL: Role[] = ['admin', 'ops', 'leadership', 'viewer'];
 const OPS: Role[] = ['admin', 'ops'];
+const REPORTS: Role[] = ['admin', 'ops', 'leadership'];
 
 export const NAV: NavSection[] = [
   {
@@ -46,6 +48,18 @@ export const NAV: NavSection[] = [
       { href: '/dashboard/inbox',       label: 'Inbox',      icon: Inbox,     roles: ALL,
         hint: 'from the website' },
       { href: '/dashboard/contacts',    label: 'Contacts',   icon: Contact2,  roles: ALL },
+    ],
+  },
+  {
+    title: 'Website',
+    items: [
+      { href: '/dashboard/analytics',          label: 'Highlights', icon: BarChart3,         roles: REPORTS },
+      { href: '/dashboard/analytics/traffic',  label: 'Traffic',    icon: Globe2,            roles: REPORTS },
+      { href: '/dashboard/analytics/behavior', label: 'Behavior',   icon: MousePointerClick, roles: REPORTS },
+      { href: '/dashboard/analytics/realtime', label: 'Real-time',  icon: Activity,          roles: REPORTS,
+        hint: 'last 30 minutes' },
+      { href: '/dashboard/content',            label: 'Content',    icon: FileText,          roles: ALL,
+        hint: 'words on the site' },
     ],
   },
   {

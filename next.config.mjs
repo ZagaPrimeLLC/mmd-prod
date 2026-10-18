@@ -21,6 +21,8 @@ const csp = [
   // a form on this site can only post back to this site, so an injected form
   // cannot quietly ship what someone typed to another server
   "form-action 'self'",
+  // the office map on the contact page is a Google Maps embed; nothing else may be framed
+  "frame-src https://www.google.com https://maps.google.com",
   // profile photos are served from the project's public avatars bucket
   ["img-src", "'self'", 'data:', 'blob:', supabaseOrigin].filter(Boolean).join(' '),
   "font-src 'self' data:",
@@ -61,6 +63,8 @@ const siteUrl = (
 ).replace(/\/$/, '');
 
 const nextConfig = {
+  // next/image serves only these quality values; ArtImage uses 82, the header logo 100.
+  images: { qualities: [75, 82, 100] },
   reactStrictMode: true,
   env: { NEXT_PUBLIC_SITE_URL: siteUrl },
   poweredByHeader: false,

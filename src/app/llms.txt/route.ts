@@ -1,4 +1,7 @@
-import { site, serviceDetail } from '@/lib/site';
+import { site } from '@/lib/site';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
+import { DDD_SERVICES, AREAS } from '@/lib/seo-content';
 import { getOpenJobs } from '@/lib/public-jobs';
 import { EMPLOYMENT_LABEL, payLabel } from '@/lib/jobs';
 
@@ -17,14 +20,18 @@ export async function GET() {
     '',
     `${site.name} supports adults with intellectual and developmental disabilities across New Jersey, at home and in the community. Services are funded through the NJ Division of Developmental Disabilities (DDD); families usually arrange them with their DDD support coordinator.`,
     '',
-    '## Services',
-    ...serviceDetail.map((s) => `- [${s.name}](${u}/services): ${s.lead} Includes: ${s.includes.join(', ')}.`),
+    '## Services (NJ DDD)',
+    ...DDD_SERVICES.map((s) => `- [${s.name}](${u}/services/${s.slug}): ${s.lead} Includes: ${s.helpsWith.join(', ')}.`),
+    `- [How to start DDD services](${u}/getting-started): eligibility, support coordinators, assessment and choosing a provider.`,
+    '',
+    '## Areas served',
+    `Statewide: every county in New Jersey. County pages: ${AREAS.map((a) => `[${a.name}](${u}/areas/${a.slug})`).join(', ')}.`,
     '',
     '## Contact',
     `- Phone: ${site.phone}`,
     `- Email: ${site.email}`,
     `- Office: ${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`,
-    `- Walk-in hours (applications and paperwork): ${site.walkIn}`,
+    `- Walk-in hours (applications and paperwork): ${officeHoursLabel(await getSchedule())}`,
     `- [Book a free consultation](${u}/contact)`,
     '',
     '## Careers',

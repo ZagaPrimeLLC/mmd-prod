@@ -11,3 +11,9 @@ next-env.d.ts
 
 # local browser-automation logs (may contain links with tokens)
 .playwright-mcp/
+
+# design skill working files
+.taste-skill/
+
+.vercel
+.env*

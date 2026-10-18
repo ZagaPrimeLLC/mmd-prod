@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { Phone, MapPin, Building2, User, CalendarDays, ShieldCheck } from 'lucide-react';
 import DocumentLink from '@/components/portal/DocumentLink';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
 import { site } from '@/lib/site';
 
 // No account, so nothing here may be cached or indexed.
@@ -161,7 +163,7 @@ export default async function WelcomePage({ params }: { params: Promise<{ token:
           <h2 className="text-base font-bold text-navy-deep">Stuck on anything?</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
             Call the office and someone will walk you through it. You can also come in during
-            walk-in hours: {site.walkIn}.
+            walk-in hours: {officeHoursLabel(await getSchedule())}.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a

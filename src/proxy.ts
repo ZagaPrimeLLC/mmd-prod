@@ -23,6 +23,12 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Staff browsers carry a flag so their visits to the public site are not counted
+  // as traffic. Read only by /api/t; it grants nothing.
+  if (user) {
+    response.cookies.set('mmd_staff', '1', { path: '/', maxAge: 60 * 60 * 24 * 180, sameSite: 'lax', httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+  }
+
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';

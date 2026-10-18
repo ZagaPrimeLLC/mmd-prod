@@ -1,3 +1,7 @@
+import Link from 'next/link';
+import { PHOTOS } from '@/lib/photos';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import PageHero from '@/components/site/PageHero';
@@ -12,22 +16,21 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow="About MMD"
+        crumbs={[{ name: 'About', href: '/about' }]}
         title="Care built around the person, not the paperwork"
         lead="We are a New Jersey DDD approved statewide provider of community support, respite and individual support for adults with disabilities."
-        image="/images/kitchen.jpg"
-        imageAlt="An MMD support worker and a client preparing a meal together at home"
+        photo={PHOTOS.kitchen}
       />
 
-      <section className="bg-white py-16 md:py-20">
+      <section className="mx-3 mt-3 rounded-[20px] bg-paper py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:px-12 md:grid-cols-2">
           <div>
             <h2 className="text-2xl font-bold text-navy md:text-3xl">Who we are</h2>
-            <div className="mt-5 space-y-4 leading-relaxed text-gray-700">
+            <div className="mt-5 space-y-4 leading-relaxed text-navy-deep">
               <p>
                 MMD Community Care supports adults with developmental disabilities across New Jersey.
                 Our clients are our top priority, and we believe in treating every individual with
@@ -45,40 +48,42 @@ export default function AboutPage() {
             </div>
           </div>
           <Image
-            src="/images/kitchen.jpg"
-            alt="An MMD support worker and a client preparing a meal together"
-            width={1200}
-            height={900}
+            src={PHOTOS.library.src}
+            alt={PHOTOS.library.alt}
+            width={PHOTOS.library.width}
+            height={PHOTOS.library.height}
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="rounded-2xl shadow-lg"
+            className="w-full rounded-[20px]"
           />
         </div>
       </section>
 
       <TrustBadges />
 
-      <section className="bg-white py-16 md:py-20">
+      <section className="mx-3 mt-3 rounded-[20px] bg-paper py-16 md:py-20">
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <h2 className="text-2xl font-bold text-navy md:text-3xl">Our values</h2>
           <dl className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {values.map(([name, detail]) => (
-              <div key={name} className="border-l-4 border-gold pl-5">
-                <dt className="font-bold text-navy">{name}</dt>
-                <dd className="mt-2 leading-relaxed text-gray-600">{detail}</dd>
+              <div key={name} className="rounded-[20px] bg-cream px-6 py-6">
+                <dt className="font-normal text-navy-deep">{name}</dt>
+                <dd className="mt-2 leading-relaxed text-navy-deep">{detail}</dd>
               </div>
             ))}
           </dl>
         </div>
       </section>
 
-      <section className="bg-navy py-14 text-white">
+      <section className="mx-3 mt-3 rounded-[20px] bg-navy-deep py-14 text-paper">
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
           <h2 className="text-2xl font-bold">Where to find us</h2>
-          <p className="mt-4 text-gray-100">
-            {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
+          <p className="mt-4 text-paper">
+            <Link href={site.officeHref} className="underline decoration-gold decoration-2 underline-offset-4">
+              {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
+            </Link>
           </p>
-          <p className="mt-2 text-gray-100">
-            Walk-in hours for applications and paperwork: <strong className="text-gold">{site.walkIn}</strong>
+          <p className="mt-2 text-paper">
+            Walk-in hours for applications and paperwork: <strong className="text-gold">{officeHoursLabel(await getSchedule())}</strong>
           </p>
         </div>
       </section>

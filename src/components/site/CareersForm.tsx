@@ -1,16 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { CheckCircle2, AlertCircle, Upload } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
 import { getAttribution } from '@/lib/attribution';
+import { getSessionId } from '@/lib/analytics/session';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
-export default function CareersForm() {
+export default function CareersForm({ hours }: { hours: string }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function CareersForm() {
         `Experience: ${String(fd.get('experience') ?? '').trim()}` + resumeNote,
       source_page: '/careers',
       attribution: getAttribution(),
+      session_id: getSessionId(),
     };
 
     if (!payload.email && !payload.phone) {
@@ -75,7 +77,7 @@ export default function CareersForm() {
     const { error: insErr } = await supabase.from('inquiries').insert(payload);
     setBusy(false);
     if (insErr) setError(`We could not send that. Please call us on ${site.phone}.`);
-    else { setDone(true); track('lead_submitted', { form: 'careers_interest' }); }
+    else setDone(true);
   }
 
   if (done) {
@@ -85,8 +87,8 @@ export default function CareersForm() {
         <h3 className="text-lg font-bold text-green-900">Application received.</h3>
         <p className="mt-2 text-sm leading-relaxed text-green-900">
           Our hiring team will call you to go through the role and check availability. You can also
-          come to the office during walk-in hours: <strong>{site.walkIn}</strong>, at {site.address.street},{' '}
-          {site.address.city}, {site.address.state}.
+          come to the office during walk-in hours: <strong>{hours}</strong>, at{' '}
+          <Link href={site.officeHref} className="underline underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state}</Link>.
         </p>
         {resumeFailed && (
           <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-sm leading-relaxed text-gray-800 ring-1 ring-amber-300">
@@ -103,7 +105,7 @@ export default function CareersForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form data-form="careers-interest" onSubmit={submit} className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="c-name" className="block text-sm font-semibold text-gray-800">Full name</label>

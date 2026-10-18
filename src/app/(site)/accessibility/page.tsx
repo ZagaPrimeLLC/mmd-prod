@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LegalLayout, { Section } from '@/components/site/LegalLayout';
 import { site, legal } from '@/lib/site';
@@ -74,8 +75,8 @@ export default function AccessibilityPage() {
             {site.phone}
           </a>{' '}
           and a person will help you with anything the site does, including booking a consultation
-          and applying for a job. You can also visit us at {site.address.street},{' '}
-          {site.address.city}, {site.address.state} {site.address.zip}.
+          and applying for a job. You can also visit us at{' '}
+          <Link href={site.officeHref} className="underline underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}</Link>.
         </p>
         <p>
           We provide free aids and services for effective communication, including qualified sign

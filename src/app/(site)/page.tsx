@@ -1,55 +1,37 @@
 import type { Metadata } from 'next';
-import HeroSection from '@/components/site/HeroSection';
-import TrustBadges from '@/components/site/TrustBadges';
-import ValuesSection from '@/components/site/ValuesSection';
-import StatsBand from '@/components/site/StatsBand';
-import CareersBand from '@/components/site/CareersBand';
-import CTABanner from '@/components/site/CTABanner';
-import { site } from '@/lib/site';
+import JsonLd from '@/components/site/JsonLd';
+import StepsSection from '@/components/site/StepsSection';
+import { Intro, Figures } from '@/components/site/home/ReadingColumn';
+import { HeroFilm, WhatWeDo, ContactStrip, JobsSheet, FaqSplit, CtaFilm } from '@/components/site/home/Sections';
+import { organizationLd } from '@/lib/schema';
+import { getOpenJobs } from '@/lib/public-jobs';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: `${site.name} | ${site.tagline}`,
-  description: site.description,
+  // Written for the searches families and support coordinators make.
+  title: { absolute: 'NJ DDD Provider for Adults with Developmental Disabilities | MMD Community Care' },
+  description:
+    'NJ DDD approved statewide provider of Community-Based Supports, Individual Supports and Respite for adults with developmental disabilities. Free consultation.',
   alternates: { canonical: '/' },
 };
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  // A home and community based service provider. LocalBusiness is the honest
-  // fit; MedicalBusiness would overstate it, HomeAndConstructionBusiness is for contractors.
-  '@type': 'LocalBusiness',
-  '@id': `${site.url}/#organization`,
-  name: site.legalName,
-  alternateName: site.name,
-  url: site.url,
-  logo: `${site.url}${site.logo}`,
-  image: `${site.url}/images/home-hero.jpg`,
-  slogan: site.slogan,
-  description: site.description,
-  telephone: site.phone,
-  email: site.email,
-  areaServed: { '@type': 'State', name: 'New Jersey' },
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: site.address.street,
-    addressLocality: site.address.city,
-    addressRegion: site.address.state,
-    postalCode: site.address.zip,
-    addressCountry: 'US',
-  },
-  knowsAbout: ['Individual Support', 'Respite Care', 'Community Based Supports', 'NJ Division of Developmental Disabilities'],
-};
-
-export default function HomePage() {
+export default async function HomePage() {
+  const jobs = await getOpenJobs();
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <HeroSection />
-      <TrustBadges />
-      <ValuesSection />
-      <StatsBand />
-      <CareersBand />
-      <CTABanner />
+      <JsonLd data={organizationLd()} />
+      <HeroFilm />
+      <Intro />
+      <WhatWeDo />
+      <StepsSection compact />
+      <Figures />
+      <div className="mt-3 space-y-3">
+        <ContactStrip />
+        <JobsSheet jobs={jobs} />
+        <FaqSplit />
+        <CtaFilm />
+      </div>
     </>
   );
 }

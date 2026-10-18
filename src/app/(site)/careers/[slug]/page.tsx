@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { getSchedule } from '@/lib/cms/read';
+import { officeHoursLabel } from '@/lib/booking';
+import { pageMetadata } from '@/lib/seo-metadata';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -22,12 +25,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!job) return { title: 'Position closed', robots: { index: false } };
   const description =
     job.summary ?? `${job.title} with ${site.name}${job.location ? ` in ${job.location}` : ''}. Apply online in a couple of minutes.`;
-  return {
+  return pageMetadata({
     title: `${job.title}${job.location ? ` · ${job.location}` : ''}`,
     description,
-    alternates: { canonical: `/careers/${job.slug}` },
-    openGraph: { title: job.title, description, type: 'website', url: `/careers/${job.slug}` },
-  };
+    path: `/careers/${job.slug}`,
+  });
 }
 
 const EMPLOYMENT_SCHEMA: Record<Job['employment_type'], string> = {
@@ -173,7 +175,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
               <h2 className="text-xl font-bold text-navy">Apply for this job</h2>
               <p className="mt-1 text-sm text-gray-600">Takes about two minutes. We will call you back.</p>
               <div className="mt-5">
-                <JobApplyForm jobId={job.id} jobTitle={job.title} />
+                <JobApplyForm jobId={job.id} jobTitle={job.title} hours={officeHoursLabel(await getSchedule())} />
               </div>
               <div className="mt-6 space-y-2 border-t border-gray-100 pt-5 text-sm">
                 {job.apply_url && (

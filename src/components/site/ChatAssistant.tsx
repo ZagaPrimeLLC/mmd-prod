@@ -2,15 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, CheckCircle2, CalendarCheck } from 'lucide-react';
-import { CHAT } from '@/lib/chat-script';
+import { createChat } from '@/lib/chat-script';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
 import { getAttribution } from '@/lib/attribution';
+import { getSessionId } from '@/lib/analytics/session';
 import { site } from '@/lib/site';
 
 type Line = { from: 'bot' | 'user'; text: string };
 
-export default function ChatAssistant() {
+export default function ChatAssistant({ hours, unavailable }: { hours: string; unavailable: boolean }) {
+  const chat = createChat(hours, unavailable);
   const [open, setOpen] = useState(false);
   const [node, setNode] = useState('start');
   const [lines, setLines] = useState<Line[]>([]);
@@ -21,15 +22,10 @@ export default function ChatAssistant() {
   const endRef = useRef<HTMLDivElement>(null);
   const trail = useRef<string[]>([]);
 
-  useEffect(() => {
-    if (open && lines.length === 0) push('start');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [lines, capturing, sent]);
 
   function push(id: string) {
-    const n = CHAT[id];
+    const n = chat[id];
     if (!n) return;
     setNode(id);
     if (n.capture === 'lead') { setCapturing(true); return; }
@@ -68,14 +64,15 @@ export default function ChatAssistant() {
         (note ? `Their note: ${note}` : 'No extra note left.'),
       source_page: '/chat',
       attribution: getAttribution(),
+      session_id: getSessionId(),
     });
 
     setBusy(false);
     if (error) setError(`Could not send that. Please call ${site.phone}.`);
-    else { setSent(true); setCapturing(false); track('lead_submitted', { form: 'chat' }); }
+    else { setSent(true); setCapturing(false); }
   }
 
-  const current = CHAT[node];
+  const current = chat[node];
 
   return (
     <>
@@ -88,7 +85,7 @@ export default function ChatAssistant() {
         )}
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => { if (!open && lines.length === 0) push('start'); setOpen((v) => !v); }}
           aria-label={open ? 'Close the assistant' : 'Open the assistant'}
           className={`relative grid h-14 w-14 place-items-center rounded-full bg-gold text-navy transition hover:bg-gold-dark ${open ? 'shadow-xl' : 'mmd-chat-fab'}`}
         >
@@ -132,7 +129,7 @@ export default function ChatAssistant() {
             )}
 
             {capturing && (
-              <form onSubmit={submit} className="space-y-2.5 rounded-xl bg-cream p-3.5">
+              <form data-form="chat" onSubmit={submit} className="space-y-2.5 rounded-xl bg-cream p-3.5">
                 <input name="name" required placeholder="Your name"
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
                 <input name="phone" type="tel" placeholder="Phone"

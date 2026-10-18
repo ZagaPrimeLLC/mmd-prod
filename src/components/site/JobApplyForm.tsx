@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, Upload } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
 import { getAttribution } from '@/lib/attribution';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
@@ -17,7 +17,7 @@ const field =
  * the person straight onto the Applicants board under this job, through
  * proj_mmd.apply_to_job(), which refuses if the job has since closed.
  */
-export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTitle: string }) {
+export default function JobApplyForm({ jobId, jobTitle, hours }: { jobId: string; jobTitle: string; hours: string }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +91,6 @@ export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTi
       );
     } else {
       setDone(true);
-      track('lead_submitted', { form: 'job_application' });
     }
   }
 
@@ -102,8 +101,8 @@ export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTi
         <h3 className="text-lg font-bold text-green-900">Application received.</h3>
         <p className="mt-2 text-sm leading-relaxed text-green-900">
           Thank you for applying for <strong>{jobTitle}</strong>. Our hiring team will call you to go through the role
-          and check availability. You can also come in during walk-in hours: <strong>{site.walkIn}</strong>, at{' '}
-          {site.address.street}, {site.address.city}, {site.address.state}.
+          and check availability. You can also come in during walk-in hours: <strong>{hours}</strong>, at{' '}
+          <Link href={site.officeHref} className="underline underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state}</Link>.
         </p>
         {resumeFailed && (
           <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-sm leading-relaxed text-gray-800 ring-1 ring-amber-300">
@@ -116,7 +115,7 @@ export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTi
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form data-form="job-application" onSubmit={submit} className="space-y-4">
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label>Website <input name="website" tabIndex={-1} autoComplete="off" /></label>
       </div>

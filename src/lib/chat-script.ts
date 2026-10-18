@@ -1,6 +1,9 @@
+import { site } from '@/lib/site';
 // A guided assistant, not a language model. Every answer below is drawn from
 // what MMD actually states on the site, so it cannot invent a service, a price
 // or an eligibility rule. Anything it cannot answer goes to a human.
+import { SLOT_MINUTES } from '@/lib/booking';
+
 export type ChatOption = { id: string; label: string; next: string };
 
 export type ChatNode = {
@@ -11,7 +14,8 @@ export type ChatNode = {
   link?: { href: string; label: string };
 };
 
-export const CHAT: Record<string, ChatNode> = {
+export function createChat(hours: string, unavailable = false): Record<string, ChatNode> {
+  return {
   start: {
     id: 'start',
     say: [
@@ -31,10 +35,10 @@ export const CHAT: Record<string, ChatNode> = {
   booking: {
     id: 'booking',
     say: [
-      'Consultations run on Tuesdays and Thursdays between 11am and 4pm, and take about 45 minutes.',
-      'I will open the booking page so you can pick a time that suits you.',
+      unavailable ? `We cannot confirm consultation hours right now. Please call ${site.phone} to arrange a time.` : `Consultations run on ${hours}, and take about ${SLOT_MINUTES} minutes.`,
+      unavailable ? 'You can also leave your details on the contact page for a callback.' : 'I will open the booking page so you can pick a time that suits you.',
     ],
-    options: [{ id: 'go', label: 'Show me the times', next: 'book-link' }],
+    options: [{ id: 'go', label: unavailable ? 'Request a callback' : 'Show me the times', next: unavailable ? 'lead' : 'book-link' }],
   },
   'book-link': {
     id: 'book-link',
@@ -105,7 +109,7 @@ export const CHAT: Record<string, ChatNode> = {
     id: 'job',
     say: [
       'We hire Direct Support Professionals across New Jersey, with flexible schedules.',
-      'You can apply on the Careers page, or come to the office on Tuesdays and Thursdays, 11am to 4pm, at 2950 Hamilton Blvd, South Plainfield.',
+      unavailable ? `You can apply on the Careers page. Please call ${site.phone} to confirm office hours before visiting.` : `You can apply on the Careers page, or come to the office on ${hours}, at 2950 Hamilton Blvd, South Plainfield.`,
       'Shall I take your details so the hiring team can call you?',
     ],
     options: [
@@ -116,7 +120,7 @@ export const CHAT: Record<string, ChatNode> = {
   coordinator: {
     id: 'coordinator',
     say: [
-      'Thanks for considering us. We take referrals statewide for Individual Support, Respite and Community Support.',
+      'Thanks for considering us. We take referrals statewide for Community-Based Supports, Individual Supports and Respite.',
       'Leave your details and the office will get back to you about availability for your individual.',
     ],
     options: [{ id: 'yes', label: 'Take my details', next: 'lead' }],
@@ -133,7 +137,8 @@ export const CHAT: Record<string, ChatNode> = {
   end: {
     id: 'end',
     say: [
-      'No problem. If you change your mind, you can call the office on (732) 801-7683 any time.',
+      `No problem. If you change your mind, you can call the office on ${site.phone} any time.`,
     ],
   },
 };
+}

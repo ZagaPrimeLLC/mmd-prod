@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { track } from '@vercel/analytics';
 import { getAttribution } from '@/lib/attribution';
+import { getSessionId } from '@/lib/analytics/session';
 
 export default function NewsletterSignup() {
   const [busy, setBusy] = useState(false);
@@ -23,7 +23,7 @@ export default function NewsletterSignup() {
 
     const { error: err } = await createClient()
       .from('newsletter_subscribers')
-      .insert({ email, attribution: getAttribution() });
+      .insert({ email, attribution: getAttribution(), session_id: getSessionId() });
 
     setBusy(false);
     if (err) {
@@ -32,7 +32,6 @@ export default function NewsletterSignup() {
       else setError('That did not go through. Please try again later.');
     } else {
       setDone(true);
-      track('newsletter_signup');
     }
   }
 
@@ -46,7 +45,7 @@ export default function NewsletterSignup() {
   }
 
   return (
-    <form onSubmit={submit}>
+    <form data-form="newsletter" onSubmit={submit}>
       <label htmlFor="nl-email" className="block text-sm font-medium text-gray-200">
         Occasional updates on services and job openings
       </label>
@@ -63,18 +62,18 @@ export default function NewsletterSignup() {
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-gold px-4 py-2.5 text-sm font-bold text-navy hover:bg-gold-dark disabled:opacity-60"
+          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-[15px] font-medium text-navy-deep hover:bg-gold-dark disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
           Join
         </button>
       </div>
       {error && (
-        <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs text-red-300">
+        <p role="alert" className="mt-2 flex items-start gap-1.5 text-sm text-red-300">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />{error}
         </p>
       )}
-      <p className="mt-2 text-xs text-gray-400">
+      <p className="mt-2 text-sm text-paper/70">
         No health information, ever. Unsubscribe any time.{' '}
         <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>.
       </p>
