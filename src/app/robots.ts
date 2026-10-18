@@ -10,6 +10,10 @@ const PRIVATE = ['/dashboard', '/login', '/design-preview', '/auth', '/welcome',
 const AI_CRAWLERS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended'];
 
 export default function robots(): MetadataRoute.Robots {
+  // Staging, previews and local builds: nothing may be crawled (see next.config.mjs).
+  if (process.env.NEXT_PUBLIC_INDEXABLE !== '1') {
+    return { rules: [{ userAgent: '*', disallow: '/' }] };
+  }
   return {
     rules: [
       { userAgent: '*', allow: '/', disallow: PRIVATE },

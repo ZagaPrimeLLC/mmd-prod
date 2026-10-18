@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: `${site.name} | ${site.tagline}`, template: `%s | ${site.name}` },
   description: site.description,
-  robots: { index: true, follow: true },
+  // Production only; staging and previews are kept out of search results.
+  robots: process.env.NEXT_PUBLIC_INDEXABLE === '1' ? { index: true, follow: true } : { index: false, follow: false },
   keywords: [
     'NJ DDD approved provider', 'developmental disabilities New Jersey',
     'respite care NJ', 'individual support NJ', 'community support NJ',

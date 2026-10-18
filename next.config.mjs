@@ -62,14 +62,20 @@ const siteUrl = (
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://mmd-prod.vercel.app')
 ).replace(/\/$/, '');
 
+// Only the production deployment may appear in search results. Staging
+// (staging.mmdcommunitycare.com), previews and local builds tell every crawler
+// to stay out, so they never compete with the real site.
+const indexable = process.env.VERCEL_ENV === 'production';
+
 const nextConfig = {
   // next/image serves only these quality values; ArtImage uses 82, the header logo 100.
   images: { qualities: [75, 82, 100] },
   reactStrictMode: true,
-  env: { NEXT_PUBLIC_SITE_URL: siteUrl },
+  env: { NEXT_PUBLIC_SITE_URL: siteUrl, NEXT_PUBLIC_INDEXABLE: indexable ? '1' : '0' },
   poweredByHeader: false,
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    const headers = indexable ? securityHeaders : [...securityHeaders, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }];
+    return [{ source: '/:path*', headers }];
   },
 };
 
