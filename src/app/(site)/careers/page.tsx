@@ -1,11 +1,9 @@
 import Link from 'next/link';
 import { PHOTOS } from '@/lib/photos';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import {
-  Check, Clock, GraduationCap, HeartHandshake, CalendarClock, TrendingUp, PhoneCall, ClipboardCheck, UserCheck, Rocket,
+  Check, GraduationCap, HeartHandshake, CalendarClock, TrendingUp, PhoneCall, ClipboardCheck, UserCheck, Rocket,
 } from 'lucide-react';
 import PageHero from '@/components/site/PageHero';
 import CareersForm from '@/components/site/CareersForm';
@@ -34,12 +32,11 @@ const perks = [
 const steps = [
   { icon: ClipboardCheck, title: 'Apply online', body: 'Pick a position below and send a short application. It takes a couple of minutes.' },
   { icon: PhoneCall, title: 'Quick phone call', body: 'Our hiring team calls you to talk through the role and your availability.' },
-  { icon: UserCheck, title: 'Meet us in person', body: 'Come to the office for your appointment during walk-in hours.' },
+  { icon: UserCheck, title: 'Meet us in person', body: 'Our hiring team arranges a time to meet and talk through the role.' },
   { icon: Rocket, title: 'Screening and training', body: 'We guide you through background checks, training and certification, then match you with a client.' },
 ];
 
 export default async function CareersPage() {
-  const hours = officeHoursLabel(await getSchedule());
   const jobs = await getOpenJobs();
   const listed: PublicJob[] = jobs.map((j) => ({
     id: j.id, slug: j.slug, title: j.title, location: j.location, summary: j.summary,
@@ -155,11 +152,11 @@ export default async function CareersPage() {
             </p>
             <div className="mt-8 rounded-[20px] bg-paper p-6">
               <p className="flex items-center gap-2 font-semibold text-navy">
-                <Clock className="h-5 w-5 text-steel" /> Prefer to come in?
+                <PhoneCall className="h-5 w-5 text-steel" /> Questions about applying?
               </p>
               <p className="mt-2 text-sm leading-relaxed text-navy-deep">
-                Walk-in hours for applications and paperwork: <strong>{hours}</strong>, at{' '}
-                <Link href={site.officeHref} className="underline decoration-gold decoration-2 underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}</Link>.
+                Our hiring team can help you find the right role and explain what happens next.{' '}
+                <Link href="/contact" className="underline decoration-gold decoration-2 underline-offset-4">Contact us</Link>.
               </p>
               <a href={site.phoneHref} className="mt-4 inline-block font-semibold text-steel hover:underline">
                 Or call {site.phone}
@@ -170,7 +167,7 @@ export default async function CareersPage() {
             <h3 className="text-xl font-normal text-navy-deep">Register your interest</h3>
             <p className="mt-2 text-sm text-navy-deep">It takes a couple of minutes. We will call you to talk it through.</p>
             <div className="mt-6">
-              <CareersForm hours={hours} />
+              <CareersForm />
             </div>
           </div>
         </div>

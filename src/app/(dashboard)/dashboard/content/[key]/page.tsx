@@ -19,7 +19,7 @@ const btn = 'inline-flex items-center justify-center rounded-lg px-3.5 py-2 text
 const toTime = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
 /** The edit fields for one block type, pre-filled with the current content. */
-function Fields({ type, c }: { type: BlockType; c: Content[BlockType] }) {
+function Fields({ type, c, itemLabel = 'Highlight' }: { type: BlockType; c: Content[BlockType]; itemLabel?: string }) {
   switch (type) {
     case 'text': return <label className={label}>Text<input name="text" defaultValue={(c as Content['text']).text} maxLength={400} className={field} required /></label>;
     case 'heroTitle': { const v = c as Content['heroTitle']; return (<div className="grid gap-3 sm:grid-cols-2">
@@ -30,6 +30,13 @@ function Fields({ type, c }: { type: BlockType; c: Content[BlockType] }) {
       <label className={label}>Opens<input name="href" defaultValue={v.href} maxLength={200} className={field} placeholder="/contact#book" required /></label></div>); }
     case 'paragraphs': return <label className={label}>Paragraphs (separate with a blank line)<textarea name="paragraphs" rows={8} defaultValue={(c as Content['paragraphs']).paragraphs.join('\n\n')} className={field} required /></label>;
     case 'list': return <label className={label}>Items, one per line<textarea name="items" rows={4} defaultValue={(c as Content['list']).items.join('\n')} className={field} required /></label>;
+    case 'highlights': return <div className="space-y-5">{(c as Content['highlights']).items.map((item, i) => (
+      <fieldset key={i} className="space-y-2 rounded-lg border border-slate-200 p-4">
+        <legend className={label}>{itemLabel} {i + 1}</legend>
+        <label className={label}>Heading<input name="highlight_title" defaultValue={item.title} maxLength={60} className={field} required /></label>
+        <label className={label}>Description<textarea name="highlight_body" defaultValue={item.body} maxLength={180} rows={2} className={field} required /></label>
+      </fieldset>
+    ))}</div>;
     case 'faq': return <label className={label}>Questions and answers (Q: … / A: …, blank line between)<textarea name="items" rows={14} defaultValue={(c as Content['faq']).items.map((x) => `Q: ${x.q}\nA: ${x.a}`).join('\n\n')} className={field} required /></label>;
     case 'announcement': { const v = c as Content['announcement']; return (<div className="grid gap-3 sm:grid-cols-[2fr_1fr]">
       <label className={label}>Notice (leave empty to hide the bar)<input name="text" defaultValue={v.text} maxLength={160} className={field} /></label>
@@ -55,6 +62,7 @@ function Summary({ type, c }: { type: BlockType; c: unknown }) {
     case 'cta': return <>{String(x.label)} <span className="text-slate-500">→ {String(x.href)}</span></>;
     case 'paragraphs': return <>{(x.paragraphs as string[]).length} paragraphs: “{(x.paragraphs as string[])[0].slice(0, 90)}…”</>;
     case 'list': return <>{(x.items as string[]).join(' · ')}</>;
+    case 'highlights': return <>{(x.items as Content['highlights']['items']).map((item) => item.title).join(' · ')}</>;
     case 'faq': return <>{(x.items as { q: string }[]).length} questions: “{(x.items as { q: string }[])[0].q}”</>;
     case 'schedule': { const s = v.content as Content['schedule']; return <>{s.days.map((d) => WEEKDAY[d].slice(0, 3)).join(', ')} {clockLabel(s.start)}–{clockLabel(s.end)}{s.closed.length ? `, closed ${s.closed.join(', ')}` : ''}</>; }
   }
@@ -119,7 +127,7 @@ export default async function SlotPage({ params, searchParams }: { params: Promi
             <CardHead title="New draft" sub="Starts from what is live. Saving never changes the website until an administrator publishes." />
             <form action={saveDraft} className="space-y-4 px-5 py-4">
               <input type="hidden" name="key" value={key} />
-              <Fields type={def.type} c={current} />
+              <Fields type={def.type} c={current} itemLabel={key === 'homecare.steps' ? 'Step' : key === 'homecare.schedules' ? 'Care arrangement' : key === 'homecare.support' ? 'Support area' : 'Highlight'} />
               <label className={label}>Note for the reviewer (optional)<input name="note" maxLength={200} className={field} placeholder="What changed and why" /></label>
               <div className="flex flex-wrap gap-2">
                 <button name="intent" value="draft" className={`${btn} bg-navy-deep text-white hover:bg-navy`}>Save draft</button>

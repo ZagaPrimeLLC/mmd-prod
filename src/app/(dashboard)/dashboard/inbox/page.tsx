@@ -5,6 +5,7 @@ import { getSession } from '@/lib/crm/session';
 import { canWrite } from '@/lib/crm/nav';
 import type { Board } from '@/lib/crm/board';
 import { sourceLabel, type Attribution } from '@/lib/attribution';
+import { serviceLabel } from '@/lib/services';
 import { storedLeadCta } from '@/lib/cta';
 import { readAll } from '@/lib/supabase/read-all';
 
@@ -34,7 +35,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
       name: (i.name as string) || 'Unnamed', email: i.email, phone: i.phone,
       created_at: i.created_at, status: i.status, owner_id: i.owner_id,
       starred: Boolean(i.starred), archived: Boolean(i.archived_at),
-      preview: (i.service_interested as string | null) || ((i.message as string | null) ?? '').slice(0, 80),
+      preview: serviceLabel(i.service_interested) || (i.service_interested as string | null) || ((i.message as string | null) ?? '').slice(0, 80),
       source: sourceLabel(i.attribution as Attribution | null), cta: i.cta, source_page: i.source_page,
       service_interested: i.service_interested, message: i.message, linked_task: linkedRes.error ? undefined : linked.has(i.id),
     })),
@@ -46,6 +47,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
       preview: slotText(b.requested_slot),
       source: sourceLabel(b.attribution as Attribution | null), cta: storedLeadCta(b.cta, b.attribution), source_page: '/contact',
       requested_slot: b.requested_slot, notes: b.notes,
+      service_interested: b.service_interested,
     })),
   ].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 

@@ -5,10 +5,11 @@ import { site } from '@/lib/site';
 import Reveal from '@/components/site/Reveal';
 import Faqs from '@/components/site/Faqs';
 import LoopVideo from '@/components/site/LoopVideo';
-import WalkInStatus from '@/components/site/WalkInStatus';
+import ServiceRibbon from '@/components/site/ServiceRibbon';
 import ArtImage from '@/components/site/ArtImage';
+import HomeCareFeature from '@/components/site/HomeCareFeature';
 import { DDD_SERVICES } from '@/lib/seo-content';
-import { getSlotSafe, getSchedule } from '@/lib/cms/read';
+import { getSlotSafe } from '@/lib/cms/read';
 import { PHOTOS, type Photo } from '@/lib/photos';
 import type { Job } from '@/lib/jobs';
 
@@ -35,11 +36,12 @@ const SERVICE_PHOTO: Record<string, Photo> = {
  * 16:9 cut, so nobody's head is cropped away.
  */
 export async function HeroFilm() {
-  const [badge, title, lead, primary, secondary, trust, schedule] = await Promise.all([
+  const [badge, title, lead, primary, secondary, trust, ribbon] = await Promise.all([
     getSlotSafe('home.hero.badge'), getSlotSafe('home.hero.title'), getSlotSafe('home.hero.lead'),
-    getSlotSafe('home.hero.cta_primary'), getSlotSafe('home.hero.cta_secondary'), getSlotSafe('home.hero.trust'), getSchedule(),
+    getSlotSafe('home.hero.cta_primary'), getSlotSafe('home.hero.cta_secondary'), getSlotSafe('home.hero.trust'), getSlotSafe('home.ribbon.messages'),
   ]);
   return (
+    <>
     <section data-track-slot="home.hero" className="mx-3 mt-3 overflow-hidden rounded-[20px] bg-navy-deep text-paper">
       <div className="relative flex min-h-[min(calc(100svh-84px),56rem)] flex-col justify-end">
         <LoopVideo
@@ -87,23 +89,21 @@ export async function HeroFilm() {
           </ul>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 bg-paper px-6 py-4 text-[15px] text-navy-deep sm:px-12">
-        <WalkInStatus schedule={schedule} />
-        <Link href={site.officeHref} className="mr-14 font-medium underline-offset-4 hover:underline">
-          {site.address.street}, {site.address.city}
-        </Link>
-      </div>
     </section>
+    <ServiceRibbon items={ribbon.items} />
+    </>
   );
 }
 
 /** The three services: a photograph each, what it is, and what it includes. */
 export function WhatWeDo() {
   return (
+    <>
+    <HomeCareFeature />
     <section data-track-slot="home.what-we-do" className="mx-3 mt-3 rounded-[20px] bg-paper px-6 py-16 sm:px-12 md:py-24">
       <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
         <Reveal>
-          <h2 className="text-[2.6rem] text-navy-deep md:text-[3.6rem]">What we do</h2>
+          <h2 className="text-[2.6rem] text-navy-deep md:text-[3.6rem]">Developmental Disability Services</h2>
         </Reveal>
         <Reveal delay={80}>
           <p className="max-w-[48ch] text-lg leading-[1.55] text-navy-deep">
@@ -140,14 +140,14 @@ export function WhatWeDo() {
         })}
       </div>
     </section>
+    </>
   );
 }
 
 const STRIP: Photo[] = [PHOTOS.grocery, PHOTOS.garden, PHOTOS.art, PHOTOS.bus];
 
-/** Where the office is, whether it is open now, and the number to call. */
-export async function ContactStrip() {
-  const schedule = await getSchedule();
+/** Everyday community activities, followed by ways to explore support. */
+export function ContactStrip() {
   return (
     <section data-track-slot="home.community" className="mx-3 overflow-hidden rounded-[20px] bg-gold py-16 text-navy-deep md:py-24">
       <div className="px-6 sm:px-12">
@@ -173,24 +173,14 @@ export async function ContactStrip() {
         {STRIP.map((p) => <li key={p.src}>{p.alt}</li>)}
       </ul>
 
-      <div className="mt-12 grid gap-3 px-3 md:grid-cols-3">
-        <Link href={site.officeHref} data-cta="office-map" data-placement="home-contact-strip" className="group rounded-[20px] bg-paper px-6 py-6 transition hover:bg-white">
-          <span className="block text-base text-soft">Our office</span>
-          <span className="mt-1 block text-xl font-medium group-hover:underline group-hover:underline-offset-4">
-            {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
-          </span>
-          <span className="mt-3 block text-base text-navy-deep">See it on the map</span>
-        </Link>
-        <div className="rounded-[20px] bg-paper px-6 py-6">
-          <span className="block text-base text-soft">Walk in, no appointment</span>
-          <WalkInStatus className="mt-1 text-xl font-medium" schedule={schedule} />
-          <span className="mt-3 block text-base text-navy-deep">Bring paperwork or just come and meet us.</span>
+      <div className="mx-6 mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-navy-deep/25 pt-8 sm:mx-12">
+        <div>
+          <p className="text-2xl text-navy-deep">What would a good day look like?</p>
+          <p className="mt-2 text-base text-navy-deep">Start with what matters to you. We can work out the next steps together.</p>
         </div>
-        <a href={site.phoneHref} data-cta="call-office" data-placement="home-contact-strip" className="group rounded-[20px] bg-navy-deep px-6 py-6 text-paper transition hover:bg-navy">
-          <span className="block text-base text-paper/75">Call the office</span>
-          <span className="mt-1 block text-xl font-medium">{site.phone}</span>
-          <span className="mt-3 block text-base text-paper/75">A person answers, not a menu.</span>
-        </a>
+        <Link href="/contact?cta=home-community#book" data-cta="book-consultation" data-placement="home-community" className={`${BUTTON} gap-3 bg-navy-deep text-paper hover:bg-navy`}>
+          Let’s talk <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
@@ -274,8 +264,7 @@ export function CtaFilm({ title = 'Talk to us about your family' }: { title?: st
             </Reveal>
             <Reveal delay={80}>
               <p className="mt-5 max-w-[40ch] text-lg leading-[1.55] text-paper/90">
-                A free consultation, by phone or at our office in South Plainfield. We explain how DDD services work and what we
-                can offer, with no obligation.
+                A free consultation to talk through your needs. We talk through home care or DDD services and the next steps for your family, with no obligation.
               </p>
             </Reveal>
             <Reveal delay={160} className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">

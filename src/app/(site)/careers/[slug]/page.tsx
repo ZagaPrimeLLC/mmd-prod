@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import { pageMetadata } from '@/lib/seo-metadata';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -175,7 +173,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
               <h2 className="text-xl font-bold text-navy">Apply for this job</h2>
               <p className="mt-1 text-sm text-gray-600">Takes about two minutes. We will call you back.</p>
               <div className="mt-5">
-                <JobApplyForm jobId={job.id} jobTitle={job.title} hours={officeHoursLabel(await getSchedule())} />
+                <JobApplyForm jobId={job.id} jobTitle={job.title} />
               </div>
               <div className="mt-6 space-y-2 border-t border-gray-100 pt-5 text-sm">
                 {job.apply_url && (

@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { PHOTOS } from '@/lib/photos';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import Link from 'next/link';
 import PageHero from '@/components/site/PageHero';
 import StepsSection from '@/components/site/StepsSection';
@@ -36,6 +34,10 @@ export default async function GettingStartedPage() {
         lead="The Division of Developmental Disabilities process can feel like a maze the first time. Here is the path in plain words, and where MMD fits in."
         photo={PHOTOS.hands}
       />
+
+      <aside className="mx-3 mt-3 rounded-[20px] bg-cream px-6 py-8 text-navy-deep sm:px-12">
+        <p className="text-lg">For Home Health Aide Services, you can contact our team directly. <Link href="/services/home-health-aide#getting-started" className="font-medium underline decoration-gold decoration-2 underline-offset-4">See how to start home care</Link>.</p>
+      </aside>
 
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-16 md:py-20">
         <div className="mx-auto w-full max-w-4xl px-5 sm:px-8">
@@ -129,8 +131,8 @@ export default async function GettingStartedPage() {
               staffing, the introduction and a start date. A consultation is a chance to discuss those next steps.
             </p>
             <p className="mt-6 leading-relaxed text-navy-deep">
-              Would rather talk it through? Call <a href={site.phoneHref} className="font-semibold text-navy underline underline-offset-4">{site.phone}</a> or
-              visit during walk-in hours: {officeHoursLabel(await getSchedule())}.
+              Would rather talk it through? Call <a href={site.phoneHref} className="font-semibold text-navy underline underline-offset-4">{site.phone}</a> or{' '}
+              <Link href="/contact#book" className="font-semibold text-navy underline underline-offset-4">book a free consultation</Link>.
             </p>
           </div>
         </div>

@@ -11,7 +11,7 @@ import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
-export default function CareersForm({ hours }: { hours: string }) {
+export default function CareersForm() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,9 +86,8 @@ export default function CareersForm({ hours }: { hours: string }) {
         <CheckCircle2 className="mb-3 h-7 w-7 text-green-700" />
         <h3 className="text-lg font-bold text-green-900">Application received.</h3>
         <p className="mt-2 text-sm leading-relaxed text-green-900">
-          Our hiring team will call you to go through the role and check availability. You can also
-          come to the office during walk-in hours: <strong>{hours}</strong>, at{' '}
-          <Link href={site.officeHref} className="underline underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state}</Link>.
+          Our hiring team will call you to go through the role and check availability. For any questions,{' '}
+          <Link href="/contact" className="underline underline-offset-4">contact our team</Link>.
         </p>
         {resumeFailed && (
           <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-sm leading-relaxed text-gray-800 ring-1 ring-amber-300">

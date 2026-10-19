@@ -20,10 +20,15 @@ export default function AreasPage() {
     <>
       <PageHero
         crumbs={[{ name: 'Areas we serve', href: '/areas' }]}
-        title="Serving adults in every county in New Jersey"
+        title="DDD support across New Jersey"
         lead="Our office is in South Plainfield, Middlesex County, and our Direct Support Professionals work with adults and families statewide."
         photo={PHOTOS.walk}
       />
+      <aside className="mx-3 mt-3 rounded-[20px] bg-cream px-6 py-8 text-navy-deep sm:px-12">
+        <h2 className="text-2xl">Looking for Home Health Aide Services?</h2>
+        <p className="mt-3 max-w-3xl text-lg">The county map below describes our DDD services. For home care, share your town or ZIP code and preferred schedule so our team can confirm availability.</p>
+        <Link href="/services/home-health-aide" className="mt-4 inline-block font-medium underline decoration-gold decoration-2 underline-offset-4">Explore Home Health Aide Services</Link>
+      </aside>
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-20 md:py-24">
         <div className="mx-auto grid w-full max-w-7xl items-start gap-14 px-5 sm:px-8 md:grid-cols-[auto_minmax(0,1fr)] lg:gap-24 lg:px-12">
           <div className="flex justify-center">

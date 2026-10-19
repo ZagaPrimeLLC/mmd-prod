@@ -2,103 +2,164 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, ChevronDown, Phone } from 'lucide-react';
 import { site } from '@/lib/site';
 
-const nav = [
+type NavItem = {
+  href: string;
+  label: string;
+  introduction?: string;
+  children?: { href: string; label: string; description: string }[];
+};
+
+const nav: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/services', label: 'Services', children: [
-    { href: '/services/community-based-supports', label: 'Community-Based Supports' },
-    { href: '/services/individual-supports', label: 'Individual Supports' },
-    { href: '/services/respite', label: 'Respite' },
-    { href: '/getting-started', label: 'Getting started with DDD' },
+  { href: '/services', label: 'Services', introduction: 'Support for your kind of everyday.', children: [
+    { href: '/services/home-health-aide', label: 'Home Health Aide Services', description: 'Personal care and companionship at home.' },
+    { href: '/services/community-based-supports', label: 'Community-Based Supports', description: 'More connection, out in the community.' },
+    { href: '/services/individual-supports', label: 'Individual Supports', description: 'A helping hand with everyday routines.' },
+    { href: '/services/respite', label: 'Respite', description: 'Time to recharge for family caregivers.' },
+    { href: '/getting-started', label: 'Getting started with DDD', description: 'Understand the next steps, together.' },
   ] },
   { href: '/areas', label: 'Areas we serve' },
-  { href: '/about', label: 'About', children: [{ href: '/mission', label: 'Mission and values' }] },
-  { href: '/careers', label: 'Careers' },
-  { href: '/contact', label: 'Contact', children: [
-    { href: site.officeHref, label: 'Visit the office' },
-    { href: '/contact/testimonials', label: 'Share your experience' },
+  { href: '/about', label: 'About', introduction: 'People first. Always.', children: [
+    { href: '/mission', label: 'Mission and values', description: 'What guides the way we care.' },
   ] },
-] satisfies { href: string; label: string; children?: { href: string; label: string }[] }[];
+  { href: '/careers', label: 'Careers' },
+  { href: '/contact', label: 'Contact', introduction: 'A conversation is a good place to start.', children: [
+    { href: site.officeHref, label: 'Visit the office', description: 'Find visiting information on our Contact page.' },
+    { href: '/contact/testimonials', label: 'Share your experience', description: 'Tell us about your experience with MMD.' },
+  ] },
+];
+
+function RollingLabel({ children }: { children: string }) {
+  return (
+    <span className="mmd-nav-label">
+      <span>{children}</span>
+      <span aria-hidden="true">{children}</span>
+    </span>
+  );
+}
 
 export default function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null);
+  const header = useRef<HTMLElement>(null);
+  const mobileToggle = useRef<HTMLButtonElement>(null);
+  const menuToggles = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const close = () => { setOpen(false); setMenu(null); };
+  const active = (item: NavItem) => pathname === item.href ||
+    (item.href !== '/' && pathname.startsWith(item.href + '/')) ||
+    Boolean(item.children?.some((child) => pathname === child.href.split('#')[0]));
+
+  useEffect(() => {
+    if (!open && !menu) return;
+    const dismiss = (event: PointerEvent) => {
+      if (event.target instanceof Node && !header.current?.contains(event.target)) {
+        setOpen(false); setMenu(null);
+      }
+    };
+    document.addEventListener('pointerdown', dismiss);
+    return () => document.removeEventListener('pointerdown', dismiss);
+  }, [open, menu]);
 
   return (
-    <header className="sticky top-0 z-50 bg-haze">
-      <div className="flex h-[72px] w-full items-center justify-between gap-4 px-5 sm:px-8">
-        <Link href="/" className="flex min-w-0 items-center gap-3">
-          <Image src={site.logo} alt="" width={616} height={484} priority quality={100} className="h-11 w-auto" />
-          <span className="text-lg font-medium tracking-[-0.02em] text-navy-deep sm:text-xl">MMD Community Care</span>
-        </Link>
+    <header ref={header} className="mmd-header" onKeyDown={(event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      if (open) { setOpen(false); mobileToggle.current?.focus(); }
+      else if (menu) { menuToggles.current[menu]?.focus(); setMenu(null); }
+    }}>
+      <div className="mmd-header-shell bg-navy-deep text-paper">
+        <div className="mmd-header-row">
+          <Link href="/" aria-label="MMD Community Care home" onClick={close} className="mmd-header-brand">
+            <span className="mmd-header-crest">
+              <Image src={site.logo} alt="" width={616} height={484} priority quality={100} className="h-auto w-[58px]" />
+            </span>
+            <span className="mmd-header-wordmark"><strong>MMD</strong><span>Community Care</span></span>
+          </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-8 xl:flex">
-          {nav.map((n) => (
-            <div key={n.href} className="group relative">
-              <Link href={n.href} className="py-6 text-[16px] text-navy-deep underline-offset-[6px] hover:underline">
-                {n.label}
-              </Link>
-              {n.children && (
-                <div className="invisible absolute left-[-1.25rem] top-full z-50 translate-y-1 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
-                  <div className="min-w-[15rem] rounded-[20px] bg-paper py-3">
-                    {n.children.map((c) => (
-                      <Link key={c.href} href={c.href} className="block px-5 py-2 text-[16px] text-navy-deep hover:bg-cream">
-                        {c.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-
-        <Link
-          href="/contact?cta=header#book"
-          data-cta="book-consultation"
-          data-placement="header"
-          className="hidden shrink-0 rounded-full bg-navy-deep px-6 py-3 text-[16px] font-medium text-paper transition hover:-translate-y-0.5 hover:bg-navy active:translate-y-0 xl:inline-flex"
-        >
-          Book a free consultation
-        </Link>
-
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          className="shrink-0 rounded-full p-2 text-navy-deep xl:hidden"
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-      </div>
-
-      {open && (
-        <nav aria-label="Main" className="max-h-[calc(100svh-72px)] overflow-y-auto bg-haze px-3 pb-3 xl:hidden">
-          <div className="rounded-[20px] bg-paper px-5 py-4">
-            {nav.map((n) => (
-              <div key={n.href} className="py-1">
-                <Link href={n.href} onClick={() => setOpen(false)} className="block py-2.5 text-xl text-navy-deep">
-                  {n.label}
-                </Link>
-                {n.children?.map((c) => (
-                  <Link key={c.href} href={c.href} onClick={() => setOpen(false)} className="block py-2 pl-4 text-[16px] text-soft">
-                    {c.label}
+          <nav aria-label="Main" className="mmd-desktop-nav">
+            {nav.map((item) => (
+              <div key={item.href} className="mmd-nav-item" data-active={active(item)} data-open={menu === item.href}
+                onPointerEnter={(event) => { if (event.pointerType === 'mouse') setMenu(item.children ? item.href : null); }}
+                onPointerLeave={(event) => { if (!event.currentTarget.contains(document.activeElement)) setMenu(null); }}
+                onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMenu(null); }}>
+                <div className="mmd-nav-trigger">
+                  <Link href={item.href} aria-current={pathname === item.href ? 'page' : undefined} onClick={close}
+                    onFocus={() => setMenu(item.children ? item.href : null)} className="mmd-nav-link">
+                    <RollingLabel>{item.label}</RollingLabel>
                   </Link>
-                ))}
+                  {item.children && <button type="button" ref={(node) => { menuToggles.current[item.href] = node; }}
+                    aria-label={item.label + ' submenu'} aria-expanded={menu === item.href} aria-controls={'nav-' + item.label.toLowerCase()}
+                    onClick={() => setMenu((current) => current === item.href ? null : item.href)} className="mmd-nav-toggle">
+                    <ChevronDown aria-hidden="true" size={13} />
+                  </button>}
+                </div>
+                {item.children && (
+                  <div id={'nav-' + item.label.toLowerCase()} hidden={menu !== item.href}
+                    className={'mmd-nav-panel' + (item.href === '/services' ? ' mmd-nav-panel-wide' : '')}>
+                    <div className="mmd-nav-panel-inner">
+                      <p className="mmd-nav-introduction">{item.introduction}</p>
+                      <div className="mmd-nav-destinations">
+                        {item.children.map((child) => (
+                          <Link key={child.href} href={child.href} onClick={close} className="mmd-nav-destination">
+                            <span><strong>{child.label}</strong><span>{child.description}</span></span>
+                            <ArrowUpRight aria-hidden="true" size={19} />
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
-            <Link href="/contact?cta=mobile-header#book" data-cta="book-consultation" data-placement="mobile-header" onClick={() => setOpen(false)} className="mt-4 block rounded-full bg-navy-deep px-5 py-3.5 text-center font-medium text-paper">
-              Book a free consultation
-            </Link>
-            <a href={site.phoneHref} className="mt-3 block py-2 text-center text-navy-deep underline underline-offset-4">
-              Call {site.phone}
-            </a>
-          </div>
-        </nav>
-      )}
+          </nav>
+
+          <Link
+            href="/contact?cta=header#book"
+            data-cta="book-consultation"
+            data-placement="header"
+            className="mmd-header-cta"
+          >
+            <span><span>Let’s talk.</span><span>Book a free consultation</span></span>
+            <span className="mmd-header-cta-arrow"><ArrowUpRight aria-hidden="true" size={24} /></span>
+          </Link>
+
+          <button ref={mobileToggle} type="button" onClick={() => { setOpen((value) => !value); setMenu(null); }}
+            aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation"
+            className="mmd-mobile-toggle" data-open={open}>
+            <span>{open ? 'Close' : 'Menu'}</span><span className="mmd-menu-lines" aria-hidden="true"><span /><span /></span>
+          </button>
+        </div>
+
+        {open && (
+          <nav id="mobile-navigation" aria-label="Main" className="mmd-mobile-nav">
+            <div className="mmd-mobile-links">
+              {nav.map((item) => (
+                <div key={item.href}>
+                  <Link href={item.href} onClick={close} aria-current={pathname === item.href ? 'page' : undefined} className="mmd-mobile-link" data-active={active(item)}>
+                    {item.label}<ArrowUpRight aria-hidden="true" size={23} />
+                  </Link>
+                  {item.children && <div className="mmd-mobile-children">{item.children.map((child) => (
+                    <Link key={child.href} href={child.href} onClick={close}>{child.label}</Link>
+                  ))}</div>}
+                </div>
+              ))}
+            </div>
+            <div className="mmd-mobile-actions">
+              <Link href="/contact?cta=mobile-header#book" data-cta="book-consultation" data-placement="mobile-header" onClick={close} className="mmd-mobile-booking">
+                Book a free consultation<ArrowUpRight aria-hidden="true" size={21} />
+              </Link>
+              <a href={site.phoneHref} className="mmd-mobile-phone"><Phone aria-hidden="true" size={16} />Call {site.phone}</a>
+            </div>
+          </nav>
+        )}
+      </div>
     </header>
   );
 }

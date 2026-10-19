@@ -1,18 +1,16 @@
 import Link from 'next/link';
 import { PHOTOS } from '@/lib/photos';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import PageHero from '@/components/site/PageHero';
 import TrustBadges from '@/components/site/TrustBadges';
 import CTABanner from '@/components/site/CTABanner';
-import { site, values } from '@/lib/site';
+import { values } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'About us',
   description:
-    'MMD Community Care is a New Jersey DDD approved statewide provider serving adults with special needs across New Jersey from our South Plainfield office.',
+    'Get to know MMD Community Care: Home Health Aide Services for adults and seniors, and NJ DDD support for adults with developmental disabilities.',
   alternates: { canonical: '/about' },
 };
 
@@ -22,7 +20,7 @@ export default async function AboutPage() {
       <PageHero
         crumbs={[{ name: 'About', href: '/about' }]}
         title="Care built around the person, not the paperwork"
-        lead="We are a New Jersey DDD approved statewide provider of community support, respite and individual support for adults with disabilities."
+        lead="We provide Home Health Aide Services for adults and seniors, alongside statewide NJ DDD Community-Based Supports, Individual Supports and Respite."
         photo={PHOTOS.kitchen}
       />
 
@@ -32,7 +30,7 @@ export default async function AboutPage() {
             <h2 className="text-2xl font-bold text-navy md:text-3xl">Who we are</h2>
             <div className="mt-5 space-y-4 leading-relaxed text-navy-deep">
               <p>
-                MMD Community Care supports adults with developmental disabilities across New Jersey.
+                MMD Community Care brings together home care for adults and seniors and support for adults with developmental disabilities in New Jersey.
                 Our clients are our top priority, and we believe in treating every individual with
                 respect, dignity and kindness.
               </p>
@@ -76,14 +74,13 @@ export default async function AboutPage() {
 
       <section className="mx-3 mt-3 rounded-[20px] bg-navy-deep py-14 text-paper">
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12">
-          <h2 className="text-2xl font-bold">Where to find us</h2>
+          <h2 className="text-2xl font-bold">People you can feel confident in</h2>
           <p className="mt-4 text-paper">
-            <Link href={site.officeHref} className="underline decoration-gold decoration-2 underline-offset-4">
-              {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
-            </Link>
+            Every Direct Support Professional is fingerprinted, background checked and screened against the Central Registry.
+            Our team completes training with the Rutgers University Boggs Center and holds CPR and First Aid certification before the first visit.
           </p>
           <p className="mt-2 text-paper">
-            Walk-in hours for applications and paperwork: <strong className="text-gold">{officeHoursLabel(await getSchedule())}</strong>
+            <Link href="/contact#book" className="underline decoration-gold decoration-2 underline-offset-4">Talk to us about your support needs</Link>.
           </p>
         </div>
       </section>

@@ -8,6 +8,7 @@ import { Card, CardHead, Stat, Pill, Empty, ago, dateLabel } from '@/components/
 import { getSession } from '@/lib/crm/session';
 import { canWrite } from '@/lib/crm/nav';
 import { typeMeta, priorityMeta, stageMeta, isOverdue, type WorkItem } from '@/lib/crm/board';
+import { serviceLabel } from '@/lib/services';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,7 +54,7 @@ export default async function OverviewPage() {
     supabase.from('tasks').select('*').order('position'),
     supabase.from('applications').select('id, stage, created_at, last_contact_at'),
     supabase.from('inquiries').select('id, created_at, name, service_interested').order('created_at', { ascending: false }).limit(5),
-    supabase.from('bookings').select('id, requested_slot, status').order('requested_slot'),
+    supabase.from('bookings').select('id, requested_slot, status, service_interested').order('requested_slot'),
     supabase.from('trainings').select('id, name, status, expires_on, employees(full_name)').order('expires_on'),
     supabase.from('assignments').select('id, status, due_on, employees(full_name), workflows(name)').order('created_at', { ascending: false }).limit(5),
   ]);
@@ -191,7 +192,7 @@ export default async function OverviewPage() {
                   <li key={i.id} className="flex items-center justify-between gap-3 px-5 py-3">
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium text-navy-deep">{i.name}</span>
-                      <span className="text-xs text-slate-500">{i.service_interested ?? 'general'}</span>
+                      <span className="text-xs text-slate-500">{serviceLabel(i.service_interested) ?? 'General enquiry'}</span>
                     </span>
                     <span className="shrink-0 text-xs text-slate-400">{ago(i.created_at)}</span>
                   </li>
@@ -238,11 +239,15 @@ export default async function OverviewPage() {
             <ul className="divide-y divide-slate-100">
               {bookings.slice(0, 5).map((b) => (
                 <li key={b.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                  <span className="font-medium text-navy-deep">
+                  <span>
+                    <span className="block font-medium text-navy-deep">
                     {new Date(b.requested_slot).toLocaleString('en-US', {
+                      timeZone: 'America/New_York',
                       weekday: 'short', month: 'short', day: 'numeric',
                       hour: 'numeric', minute: '2-digit',
                     })}
+                    </span>
+                    <span className="mt-1 block text-xs text-slate-500">{serviceLabel(b.service_interested) ?? 'Consultation'}</span>
                   </span>
                   <Pill>{b.status}</Pill>
                 </li>

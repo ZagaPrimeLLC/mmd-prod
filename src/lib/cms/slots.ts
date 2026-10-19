@@ -1,3 +1,4 @@
+import { HOME_CARE } from '@/lib/home-care';
 import { HOME_FAQS, type Faq } from '@/lib/seo-content';
 import { DEFAULT_SCHEDULE, type Schedule } from '@/lib/booking';
 
@@ -16,9 +17,20 @@ export const SLOT_TYPES = {
   'home.hero.cta_primary': 'cta',
   'home.hero.cta_secondary': 'cta',
   'home.hero.trust': 'list',
-  'home.intro.statement': 'text',
-  'home.intro.paragraphs': 'paragraphs',
+  'home.approach.headline': 'text',
+  'home.approach.description': 'text',
+  'home.approach.highlights': 'highlights',
+  'home.approach.cta': 'cta',
+  'home.ribbon.messages': 'list',
   'home.faq': 'faq',
+  'homecare.feature.headline': 'text',
+  'homecare.feature.description': 'text',
+  'homecare.hero.headline': 'text',
+  'homecare.hero.lead': 'text',
+  'homecare.support': 'highlights',
+  'homecare.schedules': 'highlights',
+  'homecare.steps': 'highlights',
+  'homecare.faq': 'faq',
   'global.announcement': 'announcement',
   'settings.office_hours': 'schedule',
 } as const;
@@ -31,6 +43,7 @@ export type Content = {
   heroTitle: { lead: string; accent: string };
   cta: { label: string; href: string };
   list: { items: string[] };
+  highlights: { items: { title: string; body: string }[] };
   faq: { items: Faq[] };
   announcement: { text: string; href: string };
   schedule: Schedule;
@@ -40,7 +53,7 @@ export type BlockType = keyof Content;
 export type SlotDef<T extends BlockType = BlockType> = {
   key: SlotKey;
   label: string;
-  group: 'Homepage' | 'Site-wide' | 'Office';
+  group: 'Homepage' | 'Home Care' | 'Site-wide' | 'Office';
   type: T;
   help: string;
   default: Content[T];
@@ -52,18 +65,32 @@ const HOME = ['/'];
 const ALL_PUBLIC = ['/', '/services', '/about', '/mission', '/careers', '/contact', '/areas', '/getting-started'];
 
 export const SLOTS: SlotDef[] = [
+  { key: 'homecare.feature.headline', label: 'Home-care feature: headline', group: 'Home Care', type: 'text', help: 'Short headline beside the photo on Home and Services. Aim for two short phrases; keep the service name in the introduction.', default: {"text":"A helping hand. The comfort of home."}, paths: ["/","/services"] },
+  { key: 'homecare.feature.description', label: 'Home-care feature: introduction', group: 'Home Care', type: 'text', help: 'One or two sentences introducing Home Health Aide Services for adults and seniors. Shown on Home and Services; keep location and payment promises specific.', default: {"text":"Home Health Aide Services for adults and seniors. Personal care, companionship and help with everyday routines, in the comfort of home."}, paths: ["/","/services"] },
+  { key: 'homecare.hero.headline', label: 'Home-care page: headline', group: 'Home Care', type: 'text', help: 'Main heading on the Home Health Aide Services page. Keep it brief enough to read comfortably on a phone.', default: { text: HOME_CARE.headline }, paths: ["/services/home-health-aide"] },
+  { key: 'homecare.hero.lead', label: 'Home-care page: introduction', group: 'Home Care', type: 'text', help: 'Opening paragraph on the home-care page: who the service helps and the everyday support offered. Maximum 400 characters.', default: { text: HOME_CARE.introduction }, paths: ["/services/home-health-aide"] },
+  { key: 'homecare.support', label: 'Home-care page: three support areas', group: 'Home Care', type: 'highlights', help: 'Three support areas, each with a heading (60 characters) and description (180 characters). Describe personal care, household help and companionship.', default: { items: HOME_CARE.support.map(x => ({ ...x })) }, paths: ["/services/home-health-aide"] },
+  { key: 'homecare.schedules', label: 'Home-care page: care arrangements', group: 'Home Care', type: 'highlights', help: 'Three care arrangements, each with a heading (60 characters) and description (180 characters). State availability clearly and distinguish live-in rest periods from continuous awake coverage.', default: { items: HOME_CARE.schedules.map(x => ({ ...x })) }, paths: ["/services/home-health-aide"] },
+  { key: 'homecare.steps', label: 'Home-care page: getting started', group: 'Home Care', type: 'highlights', help: 'Three steps in order, from the first conversation through planning to arranging support. Each needs a heading (60 characters) and description (180 characters).', default: { items: HOME_CARE.steps.map(x => ({ ...x })) }, paths: ["/services/home-health-aide"] },
+  { key: 'homecare.faq', label: 'Home-care page: questions', group: 'Home Care', type: 'faq', help: 'Questions and answers about home-care eligibility, medication reminders, schedules, coverage and payment. Separate DDD requirements and avoid promising unconfirmed clinical services.', default: { items: HOME_CARE.faqs.map(x => ({ ...x })) }, paths: ["/services/home-health-aide"] },
   { key: 'home.hero.badge', label: 'Hero badge', group: 'Homepage', type: 'text', help: 'The small line above the headline.', default: { text: 'NJ DDD Approved Provider' }, paths: HOME },
   { key: 'home.hero.title', label: 'Hero headline', group: 'Homepage', type: 'heroTitle', help: 'Two parts: the white words and the gold words.', default: { lead: 'Serving Adults With', accent: 'Special Needs' }, paths: HOME },
-  { key: 'home.hero.lead', label: 'Hero sentence', group: 'Homepage', type: 'text', help: 'One or two sentences under the headline.', default: { text: 'Providing exceptional community support, respite care, and individual support to adults with disabilities across the State of New Jersey.' }, paths: HOME },
+  { key: 'home.hero.lead', label: 'Hero sentence', group: 'Homepage', type: 'text', help: 'One or two sentences under the headline.', default: { text: 'Home Health Aide Services for adults and seniors, alongside Community-Based Supports, Individual Supports and Respite for adults with developmental disabilities in New Jersey.' }, paths: HOME },
   { key: 'home.hero.cta_primary', label: 'Hero button (gold)', group: 'Homepage', type: 'cta', help: 'Label and the page it opens. Links stay inside this site.', default: { label: 'Book a Consultation', href: '/contact?cta=home-hero#book' }, paths: HOME },
   { key: 'home.hero.cta_secondary', label: 'Hero button (outlined)', group: 'Homepage', type: 'cta', help: 'Label and the page it opens.', default: { label: 'Our Services', href: '/services' }, paths: HOME },
-  { key: 'home.hero.trust', label: 'Hero trust line', group: 'Homepage', type: 'list', help: 'Three short phrases shown with icons under the buttons.', default: { items: ['Compassionate Care', 'DDD Certified', 'Statewide Service'] }, paths: HOME },
-  { key: 'home.intro.statement', label: 'Intro statement', group: 'Homepage', type: 'text', help: 'The large sentence that opens the introduction.', default: { text: 'Trained, checked support professionals for adults with developmental disabilities, at home and out in the community.' }, paths: HOME },
-  { key: 'home.intro.paragraphs', label: 'Intro paragraphs', group: 'Homepage', type: 'paragraphs', help: 'The paragraphs that follow. The office address line is added automatically.', default: { paragraphs: [
-    'MMD Community Care is approved by the New Jersey Division of Developmental Disabilities to support adults at home and in the community, in every county in New Jersey.',
-    'Every Direct Support Professional is fingerprinted, background checked and screened against the Central Registry, trained with the Rutgers University Boggs Center, and certified in CPR and First Aid before their first visit.',
+  { key: 'home.hero.trust', label: 'Hero trust line', group: 'Homepage', type: 'list', help: 'Three short phrases shown with icons under the buttons.', default: { items: ['Personalized care', 'Home Health Aide Services', 'NJ DDD approved provider'] }, paths: HOME },
+  // The redesigned approach has its own slots. Revisions of the former
+  // home.intro.* slots stay in the database without overriding this layout.
+  { key: 'home.approach.headline', label: 'Our approach: headline', group: 'Homepage', type: 'text', help: 'A short headline beside the community illustration. Keep visiting information on Contact.', default: { text: 'More independence. More everyday possibilities.' }, paths: HOME },
+  { key: 'home.approach.description', label: 'Our approach: introduction', group: 'Homepage', type: 'text', help: 'One short paragraph about the support we provide. No office address or visiting hours.', default: { text: 'Support for adults with developmental disabilities, shaped around their routines, interests and goals—at home and throughout New Jersey communities.' }, paths: HOME },
+  { key: 'home.approach.highlights', label: 'Our approach: three highlights', group: 'Homepage', type: 'highlights', help: 'Three brief benefits, each with a heading and a sentence.', default: { items: [
+    { title: 'Everyday confidence', body: 'Support with familiar routines and new skills.' },
+    { title: 'Community connections', body: 'Help taking part in activities that matter.' },
+    { title: 'Support that fits', body: 'Built around the person, their preferences and the care they need.' },
   ] }, paths: HOME },
-  { key: 'home.faq', label: 'Homepage questions', group: 'Homepage', type: 'faq', help: 'Questions and answers shown near the end of the homepage. Also published to Google as FAQ data.', default: { items: HOME_FAQS }, paths: HOME },
+  { key: 'home.approach.cta', label: 'Our approach: link', group: 'Homepage', type: 'cta', help: 'The link beneath the three highlights.', default: { label: 'Explore our approach', href: '/about' }, paths: HOME },
+  { key: 'home.ribbon.messages', label: 'Scrolling information banner', group: 'Homepage', type: 'list', help: 'Up to six short messages beneath the hero. No addresses or walk-in information; those belong on Contact.', default: { items: ['Home Health Aide Services', 'Community-Based Supports', 'Individual Supports', 'Respite care', 'Serving New Jersey', 'Support built around you'] }, paths: HOME },
+  { key: 'home.faq', label: 'Home care and DDD questions', group: 'Homepage', type: 'faq', help: 'Questions and answers shown near the end of the homepage. Also published to Google as FAQ data.', default: { items: [HOME_CARE.faqs[0], HOME_CARE.faqs[1], HOME_CARE.faqs[5], ...HOME_FAQS] }, paths: HOME },
   { key: 'global.announcement', label: 'Announcement bar', group: 'Site-wide', type: 'announcement', help: 'A short notice at the top of every public page, for example a holiday closure. Leave the text empty to hide the bar.', default: { text: '', href: '' }, paths: ALL_PUBLIC },
   { key: 'settings.office_hours', label: 'Walk-in and consultation hours', group: 'Office', type: 'schedule', help: 'Days and hours the office takes walk-ins and consultations, plus one-off closed dates. Automatic federal holiday closures: New Year’s Day, Martin Luther King Jr. Day, Presidents’ Day, Memorial Day, Juneteenth, Independence Day, Labor Day, Columbus Day, Veterans Day, Thanksgiving and Christmas Day. Fixed-date holidays are also observed on Friday when they fall on Saturday, or Monday when they fall on Sunday. Company closures: Christmas Eve and New Year’s Eve. Administrators only.', default: DEFAULT_SCHEDULE, paths: ALL_PUBLIC },
 ];
@@ -112,6 +139,16 @@ export function validate(type: BlockType, raw: unknown): { ok: true; content: Co
     case 'list': {
       const items = Array.isArray(r.items) ? r.items.map((x) => clip(x, 60)).filter(Boolean).slice(0, 6) : lines(r.items, 6, 60);
       return items.length ? { ok: true, content: { items } } : { ok: false, error: 'Add at least one item, one per line.' };
+    }
+    case 'highlights': {
+      if (!Array.isArray(r.items) || r.items.length !== 3) return { ok: false, error: 'Add exactly three items, each with a heading and a short description.' };
+      const items = r.items.map((item: unknown) => {
+        const row = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+        return { title: clip(row.title, 60), body: clip(row.body, 180) };
+      });
+      return items.every((item) => item.title && item.body)
+        ? { ok: true, content: { items } }
+        : { ok: false, error: 'Each item needs a heading and a short description.' };
     }
     case 'faq': {
       let items: Faq[] = [];

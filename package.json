@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/intake-route.test.mjs tests/work-item-actions.test.mjs tests/board-search.test.mjs tests/booking-attribution.test.mjs tests/site-review-regressions.test.mjs tests/review-completion.test.mjs",
+    "test": "node --test tests/intake-route.test.mjs tests/work-item-actions.test.mjs tests/board-search.test.mjs tests/booking-attribution.test.mjs tests/site-review-regressions.test.mjs tests/review-completion.test.mjs tests/home-care.test.mjs",
     "test:db": "node --test --test-concurrency=1 tests/rate-limits.test.mjs tests/work-item-comments-db.test.mjs tests/board-search-db.test.mjs tests/review-completion-db.test.mjs tests/followup-review-db.test.mjs"
   },
   "dependencies": {

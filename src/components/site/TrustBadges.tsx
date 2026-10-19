@@ -1,7 +1,4 @@
 import Link from 'next/link';
-import { site } from '@/lib/site';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 
 /** Four facts a family or support coordinator checks first, in plain words. */
 const facts = [
@@ -10,8 +7,7 @@ const facts = [
   { title: 'Built around the person', body: 'Support follows the person’s routine, goals and Individualized Service Plan.' },
 ];
 
-export default async function TrustBadges() {
-  const hours = officeHoursLabel(await getSchedule());
+export default function TrustBadges() {
   return (
     <section aria-label="Why families choose MMD" className="grid gap-3 px-3 pt-3 sm:grid-cols-2 lg:grid-cols-4">
       {facts.map(({ title, body }) => (
@@ -20,9 +16,9 @@ export default async function TrustBadges() {
           <p className="mt-2 text-[16px] leading-[1.55] text-navy-deep">{body}</p>
         </div>
       ))}
-      <Link href={site.officeHref} className="group rounded-[20px] bg-gold px-6 py-8 text-navy-deep transition hover:bg-gold-dark">
-        <p className="text-xl font-medium group-hover:underline group-hover:underline-offset-4">An office you can visit</p>
-        <p className="mt-2 text-[16px] leading-[1.55]">{site.address.street}, {site.address.city}. Walk-in hours: {hours}.</p>
+      <Link href="/contact#book" className="group rounded-[20px] bg-gold px-6 py-8 text-navy-deep transition hover:bg-gold-dark">
+        <p className="text-xl font-medium group-hover:underline group-hover:underline-offset-4">Start with a conversation</p>
+        <p className="mt-2 text-[16px] leading-[1.55]">Tell us what matters to your family. We will help you understand the next steps.</p>
       </Link>
     </section>
   );

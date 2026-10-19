@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 
 export const socialImage = {
-  url: new URL('/brand/social-preview.png', site.url).href,
-  width: 1200,
-  height: 630,
-  alt: 'MMD Community Care — support for adults with developmental disabilities in New Jersey',
+  url: new URL('/brand/social-preview-home-care.png', site.url).href,
+  width: 1731,
+  height: 909,
+  alt: `${site.name} — ${site.tagline}`,
 };
 
 /** Page-level Open Graph objects replace inherited values, so keep them complete. */

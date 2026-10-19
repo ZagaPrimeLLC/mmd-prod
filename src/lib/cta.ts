@@ -1,7 +1,7 @@
 import { COUNTY_SLUGS, SERVICE_SLUGS } from '@/lib/slugs';
 
 /** Buttons and links that send people to the contact page, by their ?cta= value. */
-export const PAGE_CTAS = ['header', 'mobile-header', 'footer', 'home-hero', 'cta-film', 'share-experience'] as const;
+export const PAGE_CTAS = ['header', 'mobile-header', 'footer', 'home-hero', 'home-community', 'cta-film', 'share-experience'] as const;
 
 const ALLOWED = new Set<string>([
   ...PAGE_CTAS,

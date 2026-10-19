@@ -8,6 +8,8 @@ import { getSessionId } from '@/lib/analytics/session';
 import { availableDays, SLOT_MINUTES, timeLabel, officeHoursLabel, type Schedule } from '@/lib/booking';
 import { site } from '@/lib/site';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
+import ServiceSelect from '@/components/site/ServiceSelect';
+import { bookingServiceValue } from '@/lib/services';
 
 const field =
   'mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-3 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy disabled:bg-gray-50 disabled:text-gray-400';
@@ -39,12 +41,16 @@ export default function BookingFlow({ schedule }: { schedule: Schedule }) {
     setError(null);
 
     const fd = new FormData(e.currentTarget);
-    const attribution = getBookingAttribution(window.location);
+    const bookingContext = getBookingAttribution(window.location, fd.get('service'));
+    // The service belongs to the booking row, not campaign attribution.
+    const attribution = { ...bookingContext };
+    delete attribution.service;
     const { error } = await createClient().from('bookings').insert({
       name: String(fd.get('name') ?? '').trim(),
       email: String(fd.get('email') ?? '').trim(),
       phone: String(fd.get('phone') ?? '').trim(),
       requested_slot: slotIso,
+      service_interested: bookingServiceValue(fd.get('service')),
       notes: String(fd.get('notes') ?? '').trim() || null,
       cta: attribution.cta ?? null,
       attribution,
@@ -82,6 +88,7 @@ export default function BookingFlow({ schedule }: { schedule: Schedule }) {
 
   return (
     <form data-form="booking" onSubmit={submit} className="space-y-5">
+      <ServiceSelect id="booking-service" />
       <div>
         <p className="flex items-center gap-2 font-semibold text-navy">
           <CalendarCheck className="h-5 w-5 text-steel" />

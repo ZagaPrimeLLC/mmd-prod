@@ -11,8 +11,6 @@ import CTABanner from '@/components/site/CTABanner';
 import CountyMap from '@/components/site/CountyMap';
 import { AREAS, DDD_SERVICES, areaBySlug, areaFaqs, areaForLocation } from '@/lib/seo-content';
 import { serviceLd } from '@/lib/schema';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import { AREA_RESOURCES } from '@/lib/area-resources';
 import { getOpenJobs } from '@/lib/public-jobs';
 import { payLabel } from '@/lib/jobs';
@@ -56,15 +54,14 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
         <div className="rounded-[20px] bg-paper px-6 py-14 sm:px-12">
           <h2 className="text-3xl text-navy-deep md:text-4xl">{resource.planningTitle}</h2>
           <p className="mt-6 max-w-[60ch] text-lg leading-relaxed text-navy-deep">{resource.planning}</p>
-          {a.slug === 'middlesex' && <p className="mt-4 text-lg text-navy-deep">Walk-in hours: {officeHoursLabel(await getSchedule())}.</p>}
           <ul className="mt-6 list-disc space-y-3 pl-5 text-lg leading-relaxed text-navy-deep">
             {resource.questions.map((question) => <li key={question}>{question}</li>)}
           </ul>
           <p className="mt-6 text-base leading-relaxed text-navy-deep">
             Call <a href={site.phoneHref} className="font-medium underline underline-offset-4">{site.phone}</a> with
             your town, preferred schedule and the service you are considering. Confirm staffing and an agreed start
-            date with MMD before making arrangements. Our office is in{' '}
-            <Link href={site.officeHref} className="underline underline-offset-4">South Plainfield</Link>.
+            date with MMD before making arrangements. Find the best way to reach us on our{' '}
+            <Link href="/contact" className="underline underline-offset-4">Contact page</Link>.
           </p>
           <Link href={`/contact?cta=areas-${a.slug}#book`} className="mt-7 inline-flex rounded-full bg-navy-deep px-6 py-3 font-medium text-paper hover:bg-navy">
             Discuss support in {a.name} County

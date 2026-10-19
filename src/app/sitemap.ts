@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { SERVICE_CATALOG } from '@/lib/services';
 import { site } from '@/lib/site';
 import { getOpenJobs } from '@/lib/public-jobs';
-import { DDD_SERVICES, AREAS } from '@/lib/seo-content';
+import { AREAS } from '@/lib/seo-content';
 
 const marketing = [
-  '', '/services', ...DDD_SERVICES.map((s) => `/services/${s.slug}`), '/getting-started',
+  '', '/services', ...SERVICE_CATALOG.map((s) => `/services/${s.slug}`), '/getting-started',
   '/areas', ...AREAS.map((a) => `/areas/${a.slug}`),
   '/about', '/mission', '/careers', '/contact', '/contact/testimonials',
 ];

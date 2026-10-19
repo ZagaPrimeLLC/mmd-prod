@@ -1,6 +1,8 @@
+import { SERVICE_CATALOG } from '@/lib/services';
+import { HOME_CARE } from '@/lib/home-care';
 import { site } from '@/lib/site';
 import { NJ_COUNTIES } from '@/lib/nj-counties';
-import { DDD_SERVICES, type DddService } from '@/lib/seo-content';
+import { type DddService } from '@/lib/seo-content';
 
 /**
  * Structured data shared across the site. Every page points at the same
@@ -42,11 +44,11 @@ export function organizationLd() {
     areaServed: counties,
     sameAs: SAME_AS,
     hasMap: site.mapsUrl,
-    knowsAbout: ['NJ Division of Developmental Disabilities', 'Intellectual and developmental disabilities', ...DDD_SERVICES.map((s) => s.name)],
+    knowsAbout: ['NJ Division of Developmental Disabilities', 'Intellectual and developmental disabilities', ...SERVICE_CATALOG.map((s) => s.name)],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'DDD services for adults',
-      itemListElement: DDD_SERVICES.map((s) => ({
+      name: 'Home care and developmental disability services',
+      itemListElement: SERVICE_CATALOG.map((s) => ({
         '@type': 'Offer',
         itemOffered: { '@type': 'Service', name: s.name, url: `${site.url}/services/${s.slug}` },
       })),
@@ -66,5 +68,15 @@ export function serviceLd(s: DddService, area?: string) {
     provider: { '@id': ORG_ID, '@type': 'LocalBusiness', name: site.legalName },
     areaServed: area ? { '@type': 'AdministrativeArea', name: `${area} County, New Jersey` } : counties,
     audience: { '@type': 'PeopleAudience', audienceType: 'Adults (21+) with intellectual and developmental disabilities, and their families' },
+  };
+}
+
+export function homeCareServiceLd() {
+  return {
+    '@context': 'https://schema.org', '@type': 'Service', name: HOME_CARE.name, serviceType: 'Home Health Aide Services',
+    description: HOME_CARE.description, url: `${site.url}/services/home-health-aide`,
+    provider: { '@id': ORG_ID, '@type': 'LocalBusiness', name: site.legalName },
+    // Specific home-care coverage is confirmed by town; do not imply statewide availability.
+    audience: { '@type': 'PeopleAudience', audienceType: 'Adults and seniors seeking personal care and everyday support at home' },
   };
 }

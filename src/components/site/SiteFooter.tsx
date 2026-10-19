@@ -1,10 +1,9 @@
 import Link from 'next/link';
 import { site } from '@/lib/site';
 import NewsletterSignup from '@/components/site/NewsletterSignup';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 
 const LINKS = [
+  { href: '/services/home-health-aide', label: 'Home Health Aide Services' },
   { href: '/services/community-based-supports', label: 'Community-Based Supports' },
   { href: '/services/individual-supports', label: 'Individual Supports' },
   { href: '/services/respite', label: 'Respite' },
@@ -24,25 +23,20 @@ const LEGAL = [
   { href: '/terms', label: 'Terms of Use' },
 ];
 
-export default async function SiteFooter() {
-  const schedule = await getSchedule();
+export default function SiteFooter() {
   return (
     <footer className="bg-navy-deep text-paper">
       <div className="grid gap-12 px-6 pb-10 pt-16 sm:px-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <div>
           <p className="max-w-[34ch] text-2xl font-light leading-[1.25] tracking-[-0.03em]">
-            {site.legalName}, a New Jersey DDD approved provider.
+            {site.legalName}. Home care and developmental disability support in New Jersey.
           </p>
           <p className="mt-6 text-lg leading-relaxed text-paper/85">
-            <Link href={site.officeHref} className="underline decoration-gold decoration-2 underline-offset-4 hover:decoration-paper">
-              {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
-            </Link>
+            <Link href="/contact" className="underline decoration-gold decoration-2 underline-offset-4 hover:decoration-paper">Contact us</Link>
             <br />
             <a href={site.phoneHref} className="hover:underline hover:underline-offset-4">{site.phone}</a>
             <br />
             <a href={`mailto:${site.email}`} className="hover:underline hover:underline-offset-4">{site.email}</a>
-            <br />
-            Walk-in hours: {officeHoursLabel(schedule)}
           </p>
         </div>
         <div className="space-y-10">

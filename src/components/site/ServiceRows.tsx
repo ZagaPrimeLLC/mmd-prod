@@ -9,9 +9,9 @@ export default function ServiceRows() {
   return (
     <section className="space-y-3 px-3 pt-3">
       <div className="rounded-[20px] bg-paper px-6 py-14 sm:px-12">
-        <h2 className="max-w-[18ch] text-[2.6rem] text-navy-deep md:text-[3.4rem]">Three ways we support adults</h2>
+        <h2 className="max-w-[18ch] text-[2.6rem] text-navy-deep md:text-[3.4rem]">Developmental Disability Services</h2>
         <p className="mt-5 max-w-[56ch] text-lg leading-[1.55] text-navy-deep">
-          Every service is funded through the person’s DDD budget and built around the goals in their Individualized Service Plan.
+          These three services are funded through the person’s DDD budget and built around the goals in their Individualized Service Plan.
         </p>
       </div>
       {DDD_SERVICES.map((s, i) => {

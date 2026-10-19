@@ -6,6 +6,7 @@ import {
   Mail, Phone, Loader2, ArrowRightCircle, Star, Archive, ArchiveRestore, Search, ChevronLeft,
   CalendarCheck, Inbox as InboxIcon, Globe, MousePointerClick, Trash2, Send, Lock,
 } from 'lucide-react';
+import { serviceLabel } from '@/lib/services';
 import { ago, dateLabel } from '@/components/crm/ui';
 import type { Board } from '@/lib/crm/board';
 import {
@@ -312,7 +313,7 @@ export default function InboxClient({
                       <Field label="Name">{selected.name}</Field>
                       {selected.email && <Field label="Email"><a href={`mailto:${selected.email}`} className="text-navy underline-offset-2 hover:underline">{selected.email}</a></Field>}
                       {selected.phone && <Field label="Phone"><a href={`tel:${selected.phone}`} className="text-navy underline-offset-2 hover:underline">{selected.phone}</a></Field>}
-                      {selected.type === 'inquiry' && selected.service_interested && <Field label="Subject">{selected.service_interested}</Field>}
+                      {selected.service_interested && <Field label="Service">{serviceLabel(selected.service_interested) ?? selected.service_interested}</Field>}
                       {selected.type === 'inquiry' && selected.message && <Field label="Message"><span className="whitespace-pre-wrap">{selected.message}</span></Field>}
                       {selected.type === 'booking' && selected.requested_slot && <Field label="Requested time">{new Date(selected.requested_slot).toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</Field>}
                       {selected.type === 'booking' && selected.notes && <Field label="Notes"><span className="whitespace-pre-wrap">{selected.notes}</span></Field>}

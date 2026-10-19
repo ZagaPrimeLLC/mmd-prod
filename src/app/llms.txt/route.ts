@@ -1,6 +1,5 @@
+import { HOME_CARE } from '@/lib/home-care';
 import { site } from '@/lib/site';
-import { getSchedule } from '@/lib/cms/read';
-import { officeHoursLabel } from '@/lib/booking';
 import { DDD_SERVICES, AREAS } from '@/lib/seo-content';
 import { getOpenJobs } from '@/lib/public-jobs';
 import { EMPLOYMENT_LABEL, payLabel } from '@/lib/jobs';
@@ -18,21 +17,22 @@ export async function GET() {
     '',
     `> ${site.description}`,
     '',
-    `${site.name} supports adults with intellectual and developmental disabilities across New Jersey, at home and in the community. Services are funded through the NJ Division of Developmental Disabilities (DDD); families usually arrange them with their DDD support coordinator.`,
+    `${site.name} supports adults with intellectual and developmental disabilities across New Jersey, at home and in the community. These DDD services are funded through the NJ Division of Developmental Disabilities (DDD); families usually arrange them with their DDD support coordinator.`,
+    '',
+    '## Home Care Services',
+    `- [Home Health Aide Services](${u}/services/home-health-aide): ${HOME_CARE.description} Contact the team to confirm home-care coverage, scheduling and payment options.`,
     '',
     '## Services (NJ DDD)',
     ...DDD_SERVICES.map((s) => `- [${s.name}](${u}/services/${s.slug}): ${s.lead} Includes: ${s.helpsWith.join(', ')}.`),
     `- [How to start DDD services](${u}/getting-started): eligibility, support coordinators, assessment and choosing a provider.`,
     '',
     '## Areas served',
-    `Statewide: every county in New Jersey. County pages: ${AREAS.map((a) => `[${a.name}](${u}/areas/${a.slug})`).join(', ')}.`,
+    `DDD services: every county in New Jersey. Home-care availability is confirmed with the team. County pages: ${AREAS.map((a) => `[${a.name}](${u}/areas/${a.slug})`).join(', ')}.`,
     '',
     '## Contact',
     `- Phone: ${site.phone}`,
     `- Email: ${site.email}`,
-    `- Office: ${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`,
-    `- Walk-in hours (applications and paperwork): ${officeHoursLabel(await getSchedule())}`,
-    `- [Book a free consultation](${u}/contact)`,
+    `- [Contact details and free consultations](${u}/contact)`,
     '',
     '## Careers',
     `MMD hires Direct Support Professionals (DSPs) across New Jersey. Every DSP clears federal and NJ background screening, fingerprinting, drug screening and Central Registry checks, and holds CPR and First Aid certification. Apply at ${u}/careers.`,

@@ -33,7 +33,7 @@ before(async () => {
     create function hub.is_member(p text) returns boolean language sql stable security definer set search_path='' as $$select exists(select 1 from hub.memberships where user_id=auth.uid() and project_slug=p)$$;
     create function proj_mmd.has_role(p text,r text[]) returns boolean language sql stable security definer set search_path='' as $$select hub.is_member(p) and exists(select 1 from proj_mmd.team_roles where user_id=auth.uid() and role=any(r))$$;
     create table proj_mmd.inquiries(id uuid primary key default gen_random_uuid(),name text,phone text,email text,service_interested text,message text,source_page text,cta text,status text default 'new',handled_at timestamptz,created_at timestamptz default now());
-    create table proj_mmd.bookings(id uuid primary key default gen_random_uuid(),name text,requested_slot timestamptz,status text default 'requested',created_at timestamptz default now());
+    create table proj_mmd.bookings(id uuid primary key default gen_random_uuid(),name text,email text,phone text,attribution jsonb,requested_slot timestamptz,status text default 'requested',created_at timestamptz default now());
     create table proj_mmd.applications(id uuid default gen_random_uuid(),applicant_id uuid,job_post_id uuid,created_at timestamptz);
     create table proj_mmd.applicants(id uuid,name text); create table proj_mmd.job_posts(id uuid,title text);
     create table proj_mmd.contacts(id uuid,full_name text,email text,kind text,first_source text);
@@ -195,4 +195,9 @@ test('old applicant, contact and newsletter alerts follow the roles they are sen
   role('viewer');     assert.equal(kinds(), 'assignment');
   assert.equal(member("update proj_mmd.notifications set read_at=now() where kind='application' returning id;"),'');
   role('admin');
+});
+
+
+test('home-care booking column, legacy clients and notification labels work with real database rules', () => {
+  sql(readFileSync(new URL('./home-care-bookings-db.sql', import.meta.url), 'utf8'));
 });

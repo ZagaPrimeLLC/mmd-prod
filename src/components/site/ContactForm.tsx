@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { getAttribution } from '@/lib/attribution';
 import { ctaFromSearch } from '@/lib/cta';
 import { getSessionId } from '@/lib/analytics/session';
-import { site, services } from '@/lib/site';
+import { site } from '@/lib/site';
+import ServiceSelect from '@/components/site/ServiceSelect';
 import FormPrivacyNote from '@/components/site/FormPrivacyNote';
 
 export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: string }) {
@@ -84,15 +85,7 @@ export default function ContactForm({ sourcePage = '/contact' }: { sourcePage?: 
         <p className="mt-1.5 text-xs text-gray-500">Give us a phone number or an email, whichever you prefer we use.</p>
       </div>
 
-      <div>
-        <label htmlFor="service" className="block text-sm font-semibold text-gray-800">What are you looking for?</label>
-        <select id="service" name="service"
-          className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-3 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy">
-          <option value="">Not sure yet</option>
-          {services.map((s) => <option key={s.slug} value={s.slug}>{s.name}</option>)}
-          <option value="other">Something else</option>
-        </select>
-      </div>
+      <ServiceSelect id="contact-service" />
 
       <div>
         <label htmlFor="message" className="block text-sm font-semibold text-gray-800">How can we help?</label>

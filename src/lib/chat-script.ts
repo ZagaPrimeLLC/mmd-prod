@@ -1,3 +1,4 @@
+import { HOME_CARE_CONTACT } from '@/lib/services';
 import { site } from '@/lib/site';
 // A guided assistant, not a language model. Every answer below is drawn from
 // what MMD actually states on the site, so it cannot invent a service, a price
@@ -26,6 +27,7 @@ export function createChat(hours: string, unavailable = false): Record<string, C
     ],
     options: [
       { id: 'book', label: 'Book a free consultation', next: 'booking' },
+      { id: 'home-care', label: 'Home Health Aide Services', next: 'home-care' },
       { id: 'family', label: 'I need care for a family member', next: 'family' },
       { id: 'job', label: 'I want to work as a caregiver', next: 'job' },
       { id: 'coordinator', label: "I'm a support coordinator", next: 'coordinator' },
@@ -45,13 +47,19 @@ export function createChat(hours: string, unavailable = false): Record<string, C
     say: ['Choose a slot on the booking page and the office will call to confirm it.'],
     link: { href: '/contact#book', label: 'Open the booking page' },
   },
+  'home-care': {
+    id: 'home-care',
+    say: ['Our Home Health Aide Services support adults and seniors with personal care, companionship and everyday routines at home.', 'Tell our team your town and the support you are looking for. We will discuss availability, scheduling and payment options with you.'],
+    link: { href: `${HOME_CARE_CONTACT}#send-a-message`, label: 'Ask about home care' },
+  },
   family: {
     id: 'family',
     say: [
-      'We support adults with developmental disabilities across New Jersey, and we are a DDD approved statewide provider.',
+      'We offer Home Health Aide Services for adults and seniors, as well as statewide DDD support for adults with developmental disabilities.',
       'Which of these sounds closest?',
     ],
     options: [
+      { id: 'home-care', label: 'Home care for an adult or senior', next: 'home-care' },
       { id: 'individual', label: 'One-to-one daily support', next: 'individual' },
       { id: 'respite', label: 'A break for me as the caregiver', next: 'respite' },
       { id: 'community', label: 'Help getting out into the community', next: 'community' },
@@ -109,7 +117,7 @@ export function createChat(hours: string, unavailable = false): Record<string, C
     id: 'job',
     say: [
       'We hire Direct Support Professionals across New Jersey, with flexible schedules.',
-      unavailable ? `You can apply on the Careers page. Please call ${site.phone} to confirm office hours before visiting.` : `You can apply on the Careers page, or come to the office on ${hours}, at 2950 Hamilton Blvd, South Plainfield.`,
+      'You can apply on the Careers page. Our hiring team will follow up to discuss the role and next steps.',
       'Shall I take your details so the hiring team can call you?',
     ],
     options: [

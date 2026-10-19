@@ -17,7 +17,7 @@ const field =
  * the person straight onto the Applicants board under this job, through
  * proj_mmd.apply_to_job(), which refuses if the job has since closed.
  */
-export default function JobApplyForm({ jobId, jobTitle, hours }: { jobId: string; jobTitle: string; hours: string }) {
+export default function JobApplyForm({ jobId, jobTitle }: { jobId: string; jobTitle: string }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,8 +101,8 @@ export default function JobApplyForm({ jobId, jobTitle, hours }: { jobId: string
         <h3 className="text-lg font-bold text-green-900">Application received.</h3>
         <p className="mt-2 text-sm leading-relaxed text-green-900">
           Thank you for applying for <strong>{jobTitle}</strong>. Our hiring team will call you to go through the role
-          and check availability. You can also come in during walk-in hours: <strong>{hours}</strong>, at{' '}
-          <Link href={site.officeHref} className="underline underline-offset-4">{site.address.street}, {site.address.city}, {site.address.state}</Link>.
+          and check availability. For any questions,{' '}
+          <Link href="/contact" className="underline underline-offset-4">contact our team</Link>.
         </p>
         {resumeFailed && (
           <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-sm leading-relaxed text-gray-800 ring-1 ring-amber-300">

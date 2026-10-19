@@ -16,7 +16,7 @@ export const AREA_RESOURCES: Record<string, AreaResource> = {
     href: 'https://www.middlesexcountynj.gov/government/departments/department-of-community-services/office-of-aging-disabled-services',
     description: 'The county office provides information, referrals and assistance for residents with disabilities and their caregivers. Its Aging and Disability Resource Connection can help identify local services when a family is unsure where to turn. Contact the office about the specific help you need and the requirements of each program.',
     planningTitle: 'A conversation at our South Plainfield office',
-    planning: `Middlesex County is home to our office at 2950 Hamilton Blvd in South Plainfield. For a family in Edison, Piscataway or another town, the first conversation can focus on support at home, community activities or a break for a caregiver.`,
+    planning: `We support adults and families throughout Middlesex County. For a family in Edison, Piscataway or another town, the first conversation can focus on support at home, community activities or a break for a caregiver.`,
     questions: ['Which town and days would you like support in?', 'Would you prefer a phone consultation or a visit to the South Plainfield office?'],
   },
   union: {

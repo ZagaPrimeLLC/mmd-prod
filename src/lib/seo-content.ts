@@ -1,5 +1,5 @@
 import type { PhotoKey } from '@/lib/photos';
-import type { ServiceSlug } from '@/lib/slugs';
+import type { DddServiceSlug } from '@/lib/slugs';
 import { COUNTY_SLUGS } from '@/lib/slugs';
 /**
  * Content for the service, guide and county pages. Service names follow the NJ
@@ -13,7 +13,7 @@ import { COUNTY_SLUGS } from '@/lib/slugs';
 export type Faq = { q: string; a: string };
 
 export type DddService = {
-  slug: ServiceSlug;
+  slug: DddServiceSlug;
   /** The page the old /services anchors pointed at, kept for redirects. */
   legacySlug: string;
   name: string;
@@ -170,14 +170,14 @@ export const GETTING_STARTED_FAQS: Faq[] = [
   { q: 'Do we need a support coordinator before contacting MMD?', a: 'No. You are welcome to call us first. To start DDD-funded services, your support coordinator will need to send us a referral, and we can explain how that works.' },
   { q: 'What if the person is not yet registered with DDD?', a: 'Start with the NJ Division of Developmental Disabilities eligibility process. The Division’s website lists the steps and the documents needed.' },
   { q: 'Can we change provider later?', a: 'Families can choose and change providers with the help of their support coordinator.' },
-  { q: 'Is there a cost to talk to you?', a: 'No. Consultations are free, by phone or at our South Plainfield office.' },
+  { q: 'Is there a cost to talk to you?', a: 'No. Consultations are free. Contact us to arrange a conversation about the support you need.' },
 ];
 
 export const HOME_FAQS: Faq[] = [
   { q: 'Is MMD Community Care an approved DDD provider?', a: 'Yes. MMD Community Care is approved by the New Jersey Division of Developmental Disabilities as a statewide provider of Community-Based Supports, Individual Supports and Respite for adults.' },
-  { q: 'Which parts of New Jersey do you serve?', a: 'We serve adults across New Jersey from our office in South Plainfield, Middlesex County. Call us with the town and we will confirm how quickly we can staff support.' },
-  { q: 'How do we start services?', a: 'Tell your DDD support coordinator you would like MMD as your provider, or book a free consultation and we will walk you through it.' },
-  { q: 'Are your staff background checked and trained?', a: 'Every Direct Support Professional clears federal and New Jersey screening, fingerprinting, drug screening and Central Registry checks, trains with the Rutgers University Boggs Center, and holds CPR and First Aid certification.' },
+  { q: 'Where are your DDD services available?', a: 'We serve adults across New Jersey from our office in South Plainfield, Middlesex County. Call us with the town and we will confirm how quickly we can staff support.' },
+  { q: 'How do we start DDD services?', a: 'Tell your DDD support coordinator you would like MMD as your provider, or book a free consultation and we will walk you through it.' },
+  { q: 'How are your Direct Support Professionals trained?', a: 'Every Direct Support Professional clears federal and New Jersey screening, fingerprinting, drug screening and Central Registry checks, trains with the Rutgers University Boggs Center, and holds CPR and First Aid certification.' },
 ];
 
 // ─── County pages ──────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ export const AREAS: Area[] = [
     slug: 'middlesex',
     name: 'Middlesex',
     towns: ['South Plainfield', 'Edison', 'New Brunswick', 'Piscataway', 'Woodbridge', 'East Brunswick', 'Perth Amboy', 'Sayreville', 'Old Bridge'],
-    intro: 'Middlesex County is home: our office is on Hamilton Boulevard in South Plainfield, so families here can also meet us in person during walk-in hours.',
+    intro: 'We support adults across Middlesex County, from South Plainfield and Edison to New Brunswick, with services built around their routines, interests and goals.',
     jobMatch: ['middlesex', 'south plainfield', 'edison', 'new brunswick', 'piscataway', 'woodbridge', 'east brunswick', 'perth amboy', 'sayreville', 'old bridge'],
   },
   {

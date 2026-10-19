@@ -5,7 +5,7 @@ export const site = {
   // the slogan is set into the agency's own shield logo
   slogan: 'Serving Adults with Special Needs',
   description:
-    'MMD Community Care is a New Jersey DDD (Division of Developmental Disabilities) approved statewide provider of community support, Respite and Individual Support for adults with disabilities.',
+    'MMD Community Care provides Home Health Aide Services for adults and seniors in New Jersey, alongside statewide NJ DDD Community-Based Supports, Individual Supports and Respite.',
   phone: '(732) 801-7683',
   phoneHref: 'tel:+17328017683',
   email: 'info@mmdcommunitycare.com',
@@ -20,27 +20,6 @@ export const site = {
   /** Where every mention of the office links to: the map on the contact page. */
   officeHref: '/contact#visit',
 } as const;
-
-export const services = [
-  {
-    slug: 'individual-support',
-    name: 'Individual Support',
-    summary:
-      'For clients who need more intensive support, our Direct Support Professionals keep them safe, comfortable and well supported.',
-  },
-  {
-    slug: 'respite-care',
-    name: 'Respite Care',
-    summary:
-      'Temporary relief and specialised attention for your loved one, with an individualised care plan, so primary caregivers get a genuine break.',
-  },
-  {
-    slug: 'community-support',
-    name: 'Community Support',
-    summary:
-      'Personalised care tailored to each client, with a team available around the clock to provide the assistance you need.',
-  },
-] as const;
 
 // Verbatim in substance from the existing Services page. Compliance-relevant: do not trim.
 // Onboarding checks every DSP clears before working a case. Stated on the

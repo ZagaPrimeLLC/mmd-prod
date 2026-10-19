@@ -157,11 +157,12 @@ test('observed federal holidays and existing extra closure days exclude appointm
   assert.equal(isHoliday({ y: 2026, m: 7, d: 2 }), false);
 });
 
-test('chat answers use the published schedule text', () => {
+test('consultation chat uses the schedule while careers chat directs applicants online', () => {
   const { createChat } = loadTs('src/lib/chat-script.ts');
   const chat = createChat('Mondays, 9am to 2pm');
   assert.match(chat.booking.say.join(' '), /Mondays, 9am to 2pm/);
-  assert.match(chat.job.say.join(' '), /Mondays, 9am to 2pm/);
+  assert.match(chat.job.say.join(' '), /Careers page/);
+  assert.doesNotMatch(chat.job.say.join(' '), /Mondays|walk.in|Hamilton/);
   assert.doesNotMatch(chat.booking.say.join(' '), /Thursdays/);
   const unavailable = createChat('temporarily unavailable; please call to confirm', true);
   assert.match(unavailable.booking.say.join(' '), /cannot confirm consultation hours/);
@@ -388,4 +389,56 @@ test('mobile and desktop consultation buttons share a button id and keep separat
   assert.match(src, /href="\/contact\?cta=mobile-header#book" data-cta="book-consultation" data-placement="mobile-header"/);
   const { ctaFromSearch } = loadTs('src/lib/cta.ts');
   assert.equal(ctaFromSearch('?cta=mobile-header'), 'mobile-header');
+});
+
+test('CMS highlights reject incomplete or malformed rows and bound display text', () => {
+  const { validate } = loadTs('src/lib/cms/slots.ts');
+  const row = { title: '  Everyday confidence  ', body: '  Support with familiar routines.  ' };
+  for (const items of [null, [], [row], [row, null, row], [row, { title: 'Missing body' }, row], [row, row, row, row]]) {
+    assert.equal(validate('highlights', { items }).ok, false);
+  }
+  const valid = validate('highlights', { items: [row, row, { title: 'x'.repeat(100), body: 'y'.repeat(300) }] });
+  assert.equal(valid.ok, true);
+  assert.equal(valid.content.items[0].title, 'Everyday confidence');
+  assert.equal(valid.content.items[2].title.length, 60);
+  assert.equal(valid.content.items[2].body.length, 180);
+});
+
+test('staff can submit the new CMS highlights for review without publishing', async () => {
+  let inserted;
+  const { saveDraft } = loadTs('src/app/(dashboard)/dashboard/content/actions.ts', {
+    mocks: {
+      'next/cache': {},
+      'next/navigation': { redirect: url => { throw new Error(url); } },
+      '@/lib/cms/read': {},
+      '@/lib/crm/nav': { canWrite: role => role === 'ops' },
+      '@/lib/crm/session': { getSession: async () => ({ user: { id: 'staff-id' }, role: 'ops', supabase: {
+        from: table => { assert.equal(table, 'cms_revisions'); return { insert: async value => { inserted = value; return { error: null }; } }; },
+      } }) },
+    },
+  });
+  const fd = new FormData();
+  fd.set('key', 'home.approach.highlights');
+  fd.set('intent', 'review');
+  for (let i = 1; i <= 3; i++) { fd.append('highlight_title', `Benefit ${i}`); fd.append('highlight_body', `Description ${i}`); }
+  await assert.rejects(() => saveDraft(fd), /sent%20for%20review/);
+  assert.equal(inserted.status, 'in_review');
+  assert.equal(inserted.author_id, 'staff-id');
+  assert.equal(inserted.content.items[2].body, 'Description 3');
+});
+
+test('information ribbon toggles pause and hides its duplicated list from assistive technology', () => {
+  const h = hooks();
+  const { default: Ribbon } = loadTs('src/components/site/ServiceRibbon.tsx', { mocks: { react: h.react } });
+  const props = { items: ['Community-Based Supports', 'Respite care'] };
+  let rendered = h.render(Ribbon, props);
+  assert.equal(rendered.filter(n => n.type === 'ul' && n.props['aria-hidden'] !== true).length, 1);
+  assert.equal(rendered.filter(n => n.type === 'ul' && n.props['aria-hidden'] === true).length, 1);
+  assert.equal(rendered.find(n => n.type === 'section').props['data-paused'], false);
+  rendered.find(n => n.type === 'button').props.onClick();
+  rendered = h.render(Ribbon, props);
+  assert.equal(rendered.find(n => n.type === 'section').props['data-paused'], true);
+  assert.equal(rendered.find(n => n.type === 'button').props['aria-label'], 'Play information banner');
+  rendered.find(n => n.type === 'button').props.onClick();
+  assert.equal(h.render(Ribbon, props).find(n => n.type === 'section').props['data-paused'], false);
 });

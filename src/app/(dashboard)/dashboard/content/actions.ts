@@ -26,6 +26,10 @@ function fromForm(type: BlockType, fd: FormData): unknown {
     case 'cta': return { label: g('label'), href: g('href') };
     case 'paragraphs': return { paragraphs: g('paragraphs') };
     case 'list': return { items: g('items') };
+    case 'highlights': {
+      const titles = fd.getAll('highlight_title'), bodies = fd.getAll('highlight_body');
+      return { items: titles.map((title, i) => ({ title, body: bodies[i] })) };
+    }
     case 'faq': return { items: g('items') };
     case 'announcement': return { text: g('text'), href: g('href') };
     case 'schedule': return { days: fd.getAll('days'), start: g('start'), end: g('end'), closed: g('closed') };
@@ -86,7 +90,7 @@ export async function publish(fd: FormData) {
   // Refresh what shows it. Failures here are logged, not fatal: the database is already correct.
   try {
     for (const t of slotTags(key)) updateTag(t);
-    // Slots shown on every page (announcement bar, footer hours) live in the
+    // Slots shown on every page (such as the announcement bar) live in the
     // site layout, so the whole public tree is refreshed; it re-renders on demand.
     revalidatePath('/', 'layout');
     for (const p of def.paths) revalidatePath(p);

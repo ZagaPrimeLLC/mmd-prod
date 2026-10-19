@@ -66,5 +66,6 @@ test('the inbox reads current or legacy CTA values using the shared allowlist', 
     assert.equal(storedLeadCta(null, malformed), null);
   }
   assert.equal(ctaFromSearch('?cta=%20HEADER%20'), 'header');
+  assert.equal(ctaFromSearch('?cta=home-community'), 'home-community');
   assert.equal(ctaFromSearch('?cta=person%40example.com'), null);
 });
