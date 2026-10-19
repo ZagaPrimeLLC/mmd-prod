@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 
+const socialImageUrl = new URL('/brand/social-preview-ddd-home-care-v3.jpg', site.url).href;
+
+// A compact, fixed-size JPEG keeps link-preview downloads small. Version the
+// filename when replacing it so crawlers do not reuse an earlier image result.
 export const socialImage = {
-  url: new URL('/brand/social-preview-home-care.png', site.url).href,
-  width: 1731,
-  height: 909,
+  url: socialImageUrl,
+  secureUrl: socialImageUrl,
+  type: 'image/jpeg',
+  width: 1200,
+  height: 630,
   alt: `${site.name} — ${site.tagline}`,
 };
 

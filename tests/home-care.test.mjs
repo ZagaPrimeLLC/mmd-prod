@@ -1,9 +1,29 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { stat } from 'node:fs/promises';
+import path from 'node:path';
 import { loadTs } from './helpers/load-ts.mjs';
 
 const nodes = e => !e || typeof e !== 'object' ? [] : Array.isArray(e) ? e.flatMap(nodes) : [e, ...nodes(e.props?.children)];
+
+test('sharing metadata points to a compact landscape asset with matching encoded dimensions', async () => {
+  const { default: sharp } = await import('sharp');
+  const { socialImage, pageMetadata } = loadTs('src/lib/seo-metadata.ts');
+  const imageUrl = new URL(socialImage.url);
+  const imagePath = path.join(process.cwd(), 'public', imageUrl.pathname);
+  const encoded = await sharp(imagePath).metadata();
+  assert.equal(imageUrl.protocol, 'https:');
+  assert.equal(socialImage.secureUrl, socialImage.url);
+  assert.equal(socialImage.type, `image/${encoded.format}`);
+  assert.equal(socialImage.width, encoded.width);
+  assert.equal(socialImage.height, encoded.height);
+  assert.equal(encoded.width, 1200);
+  assert.equal(encoded.height, 630);
+  assert.ok((await stat(imagePath)).size < 200_000, 'Sharing asset exceeded the project download budget');
+  const metadata = pageMetadata({ title: 'Home care', description: 'Everyday support', path: '/services/home-health-aide' });
+  assert.equal(metadata.openGraph.images[0].url, metadata.twitter.images[0].url);
+});
 
 test('home-care referrals preselect the service and preserve historic DDD inquiry values', () => {
   const { serviceFromSearch, serviceFromValue } = loadTs('src/lib/services.ts');
