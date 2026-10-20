@@ -3,6 +3,7 @@ import { HOME_CARE } from '@/lib/home-care';
 import { site } from '@/lib/site';
 import { NJ_COUNTIES } from '@/lib/nj-counties';
 import { type DddService } from '@/lib/seo-content';
+import { PHOTOS } from '@/lib/photos';
 
 /**
  * Structured data shared across the site. Every page points at the same
@@ -35,7 +36,7 @@ export function organizationLd() {
     alternateName: site.name,
     url: site.url,
     logo: `${site.url}${site.logo}`,
-    image: `${site.url}/img/kitchen.jpg`,
+    image: `${site.url}${PHOTOS.kitchen.wide}`,
     slogan: site.slogan,
     description: site.description,
     telephone: '+1-732-801-7683',

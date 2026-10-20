@@ -82,7 +82,7 @@ export const SLOTS: SlotDef[] = [
   // The redesigned approach has its own slots. Revisions of the former
   // home.intro.* slots stay in the database without overriding this layout.
   { key: 'home.approach.headline', label: 'Our approach: headline', group: 'Homepage', type: 'text', help: 'A short headline beside the community illustration. Keep visiting information on Contact.', default: { text: 'More independence. More everyday possibilities.' }, paths: HOME },
-  { key: 'home.approach.description', label: 'Our approach: introduction', group: 'Homepage', type: 'text', help: 'One short paragraph about the support we provide. No office address or visiting hours.', default: { text: 'Support for adults with developmental disabilities, shaped around their routines, interests and goals—at home and throughout New Jersey communities.' }, paths: HOME },
+  { key: 'home.approach.description', label: 'Our approach: introduction', group: 'Homepage', type: 'text', help: 'One short paragraph about the support we provide. No office address or visiting hours.', default: { text: 'Support for adults with developmental disabilities at home and throughout New Jersey communities, shaped around their routines, interests and goals.' }, paths: HOME },
   { key: 'home.approach.highlights', label: 'Our approach: three highlights', group: 'Homepage', type: 'highlights', help: 'Three brief benefits, each with a heading and a sentence.', default: { items: [
     { title: 'Everyday confidence', body: 'Support with familiar routines and new skills.' },
     { title: 'Community connections', body: 'Help taking part in activities that matter.' },

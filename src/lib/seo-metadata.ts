@@ -11,7 +11,7 @@ export const socialImage = {
   type: 'image/jpeg',
   width: 1200,
   height: 630,
-  alt: `${site.name} — ${site.tagline}`,
+  alt: `${site.name}: ${site.tagline}`,
 };
 
 /** Page-level Open Graph objects replace inherited values, so keep them complete. */

@@ -2,7 +2,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Reveal from '@/components/site/Reveal';
 import { DDD_SERVICES } from '@/lib/seo-content';
-import { PHOTOS } from '@/lib/photos';
+import { PHOTOS, type Photo } from '@/lib/photos';
+
+const ROW_PHOTOS: Record<string, Photo> = {
+  'community-based-supports': PHOTOS['community-cafe'],
+  'individual-supports': PHOTOS['individual-routine'],
+  respite: PHOTOS['mission-music'],
+};
 
 /** The three DDD services, each with its photograph beside the words. */
 export default function ServiceRows() {
@@ -15,11 +21,11 @@ export default function ServiceRows() {
         </p>
       </div>
       {DDD_SERVICES.map((s, i) => {
-        const p = PHOTOS[s.photo];
+        const p = ROW_PHOTOS[s.slug];
         return (
           <article key={s.slug} id={s.legacySlug} className="grid scroll-mt-24 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
             <div className={`relative overflow-hidden rounded-[20px] ${i % 2 ? 'lg:order-2' : ''}`} style={{ aspectRatio: `${p.width} / ${p.height}` }}>
-              <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+              <Image src={p.src} alt={p.alt} fill quality={82} sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
             </div>
             <div className="flex flex-col justify-center rounded-[20px] bg-paper px-6 py-12 sm:px-12">
               <Reveal><h3 className="text-[2.2rem] font-light text-navy-deep md:text-[2.8rem]">{s.name}</h3></Reveal>

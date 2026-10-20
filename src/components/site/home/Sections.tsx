@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, Award, Users, ArrowRight } from 'lucide-react';
-import { site } from '@/lib/site';
 import Reveal from '@/components/site/Reveal';
 import Faqs from '@/components/site/Faqs';
 import LoopVideo from '@/components/site/LoopVideo';
 import ServiceRibbon from '@/components/site/ServiceRibbon';
-import ArtImage from '@/components/site/ArtImage';
 import HomeCareFeature from '@/components/site/HomeCareFeature';
 import { DDD_SERVICES } from '@/lib/seo-content';
 import { getSlotSafe } from '@/lib/cms/read';
@@ -32,7 +30,7 @@ const SERVICE_PHOTO: Record<string, Photo> = {
 
 /**
  * The opening: one moment at home, across the full width, with the offer laid
- * over it. Phones get the portrait cut of the film, everything wider gets the
+ * over it. Phones get a close 4:3 view above the copy; desktops get the
  * 16:9 cut, so nobody's head is cropped away.
  */
 export async function HeroFilm() {
@@ -42,27 +40,19 @@ export async function HeroFilm() {
   ]);
   return (
     <>
-    <section data-track-slot="home.hero" className="mx-3 mt-3 overflow-hidden rounded-[20px] bg-navy-deep text-paper">
-      <div className="relative flex min-h-[min(calc(100svh-84px),56rem)] flex-col justify-end">
-        <LoopVideo
-          src="/video/kitchen-portrait.mp4"
-          poster="/video/kitchen-portrait.jpg"
-          label={PHOTOS.kitchen.alt}
-          className="absolute inset-0 h-full w-full object-cover sm:hidden"
-        />
-        <LoopVideo
-          src="/video/kitchen-wide.mp4"
-          poster="/video/kitchen-wide.jpg"
-          label={PHOTOS.kitchen.alt}
-          className="absolute inset-0 hidden h-full w-full object-cover object-[center_12%] sm:block"
-        />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />{/* taste-skill-ignore: scrim over the film so the text reads */}
-        <div className="relative px-6 pb-10 pt-40 sm:px-12 lg:pb-14">
-          <p className="inline-flex animate-mmd-rise items-center rounded-full bg-navy-deep/60 px-4 py-1.5 text-sm font-medium text-gold-crest ring-1 ring-gold-crest">
+    <section data-track-slot="home.hero" className="mx-3 mt-3 overflow-hidden rounded-[20px] bg-cream text-navy-deep">
+      <div className="relative flex flex-col lg:min-h-[min(calc(100svh-100px),54rem)] lg:justify-center">
+        <div className="relative aspect-[4/3] w-full overflow-hidden lg:absolute lg:inset-0 lg:aspect-auto">
+          <LoopVideo src="/video/hero-mobile-v2.mp4" poster="/video/hero-mobile-v2.jpg" label="An MMD support professional sharing a bright breakfast moment with an adult at home" className="absolute inset-0 h-full w-full object-cover object-top lg:hidden" />
+          <LoopVideo src="/video/hero-wide-v2.mp4" poster="/video/hero-wide-v2.jpg" label="An MMD support professional sharing a bright breakfast moment with an adult at home" className="absolute inset-0 hidden h-full w-full object-cover object-right-top lg:block" />
+        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(90deg,#f5f2e9_0%,rgba(245,242,233,.98)_22%,rgba(245,242,233,.88)_34%,rgba(245,242,233,0)_58%)] lg:block" />
+        <div className="relative px-6 py-10 sm:px-12 lg:max-w-[46%] lg:py-16">
+          <p className="inline-flex animate-mmd-rise items-center rounded-full bg-navy-deep px-4 py-1.5 text-sm font-medium text-gold-crest ring-1 ring-gold-crest">
             {badge.text}
           </p>
-          <h1 className="mt-5 animate-mmd-rise text-[2.2rem] font-normal sm:max-w-[20ch] sm:text-[4.25rem] xl:text-[5.25rem] [animation-delay:60ms]">
-            {title.lead} {title.accent && <span className="text-gold-crest">{title.accent}</span>}
+          <h1 className="mt-5 animate-mmd-rise text-[2.2rem] font-normal leading-[1.05] sm:text-[3.25rem] xl:text-[4.1rem] [animation-delay:60ms]">
+            {title.lead} {title.accent && <span className="text-gold-deep">{title.accent}</span>}
           </h1>
           <p className="mt-6 max-w-[52ch] animate-mmd-rise text-lg leading-[1.55] [animation-delay:120ms] md:text-xl">
             {lead.text}
@@ -72,7 +62,7 @@ export async function HeroFilm() {
               {primary.label}
               <ArrowRight aria-hidden className="h-4 w-4" />
             </Link>
-            <Link href={secondary.href} data-cta="our-services" data-placement="home-hero" className={`${BUTTON} bg-transparent text-paper ring-1 ring-paper hover:bg-paper hover:text-navy-deep`}>
+            <Link href={secondary.href} data-cta="our-services" data-placement="home-hero" className={`${BUTTON} bg-transparent text-navy-deep ring-1 ring-navy-deep/40 hover:bg-white`}>
               {secondary.label}
             </Link>
           </div>
@@ -81,7 +71,7 @@ export async function HeroFilm() {
               const Icon = TRUST_ICONS[i % TRUST_ICONS.length];
               return (
                 <li key={label} className="flex items-center gap-2">
-                  <Icon aria-hidden className="h-4 w-4 text-gold-crest" />
+                  <Icon aria-hidden className="h-4 w-4 text-gold-deep" />
                   {label}
                 </li>
               );
@@ -99,7 +89,7 @@ export async function HeroFilm() {
 export function WhatWeDo() {
   return (
     <>
-    <HomeCareFeature />
+    <HomeCareFeature photo={PHOTOS['home-care-porch']} />
     <section data-track-slot="home.what-we-do" className="mx-3 mt-3 rounded-[20px] bg-paper px-6 py-16 sm:px-12 md:py-24">
       <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
         <Reveal>
@@ -117,7 +107,7 @@ export function WhatWeDo() {
           return (
             <Reveal key={s.slug} delay={i * 90} as="article" className="flex flex-col">
               <Link href={`/services/${s.slug}`} className="group relative block aspect-[4/5] overflow-hidden rounded-[20px]">
-                <Image src={p.src} alt={p.alt} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]" />
+                <Image src={p.src} alt={p.alt} fill quality={82} sizes="(min-width: 768px) 33vw, 100vw" className="origin-top object-cover object-top transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03]" />
               </Link>
               <h3 className="mt-7 text-2xl font-normal text-navy-deep lg:text-[1.75rem]">
                 <Link href={`/services/${s.slug}`} className="hover:underline hover:underline-offset-[6px]">{s.name}</Link>
@@ -144,7 +134,7 @@ export function WhatWeDo() {
   );
 }
 
-const STRIP: Photo[] = [PHOTOS.grocery, PHOTOS.garden, PHOTOS.art, PHOTOS.bus];
+const STRIP: Photo[] = [PHOTOS.garden, PHOTOS.art];
 
 /** Everyday community activities, followed by ways to explore support. */
 export function ContactStrip() {
@@ -162,16 +152,13 @@ export function ContactStrip() {
       </div>
 
       {/* Each tile keeps its photograph's own shape, so nothing is cropped. */}
-      <div className="mmd-marquee mt-12 flex w-max gap-3" aria-hidden>
-        {[...STRIP, ...STRIP].map((p, i) => (
-          <div key={i} className="relative h-64 shrink-0 overflow-hidden rounded-[20px] md:h-80" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
-            <Image src={p.src} alt="" fill sizes="480px" className="object-cover" />
+      <div className="mt-12 grid items-center gap-3 px-6 sm:px-12 md:grid-cols-[1fr_1.78fr]">
+        {STRIP.map((p, i) => (
+          <div key={i} className="relative w-full overflow-hidden rounded-[20px]" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
+            <Image src={p.src} alt={p.alt} fill quality={82} sizes="(min-width: 768px) 64vw, 100vw" className="object-cover object-top" />
           </div>
         ))}
       </div>
-      <ul className="sr-only">
-        {STRIP.map((p) => <li key={p.src}>{p.alt}</li>)}
-      </ul>
 
       <div className="mx-6 mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-navy-deep/25 pt-8 sm:mx-12">
         <div>
@@ -190,15 +177,10 @@ export function ContactStrip() {
 export function JobsSheet({ jobs }: { jobs: Job[] }) {
   const shown = jobs.slice(0, 6);
   return (
-    <section data-track-slot="home.jobs" className="mx-3 overflow-hidden rounded-[20px] bg-navy-deep">
-      <div className="relative aspect-[3/2] md:hidden">
-        <Image src={PHOTOS.team.src} alt={PHOTOS.team.alt} fill sizes="100vw" className="object-cover" />
-      </div>
-      <div className="relative md:aspect-[21/9]">
-        <div className="absolute inset-0 hidden md:block">
-          <ArtImage photo={PHOTOS.team} className="mmd-drift" position="center 20%" sizes="100vw" />
-        </div>
-        <div className="relative px-3 py-3 md:flex md:min-h-full md:items-center md:justify-end md:px-10 md:py-14">
+    <section data-track-slot="home.jobs" className="mx-3 overflow-hidden rounded-[20px] bg-navy-deep lg:grid lg:grid-cols-[1.15fr_1fr] lg:items-center">
+      <Image src={PHOTOS.team.src} alt={PHOTOS.team.alt} width={PHOTOS.team.width} height={PHOTOS.team.height} quality={82} sizes="(min-width: 1024px) 54vw, 100vw" className="h-auto w-full" />
+      <div>
+        <div className="flex justify-center px-3 py-3 lg:px-8 lg:py-8">
           <Reveal className="w-full max-w-[34rem] rounded-[20px] bg-paper px-6 py-10 text-navy-deep sm:px-10">
             <h2 className="text-[2.4rem] md:text-[3rem]">DSP jobs in New Jersey</h2>
             <p className="mt-3 text-[17px] leading-[1.55] text-navy-deep">
@@ -240,43 +222,6 @@ export async function FaqSplit() {
     <section data-track-slot="home.faq" className="mx-3 rounded-[20px] bg-paper px-6 py-16 sm:px-12 md:py-24">
       <div className="mx-auto max-w-[52rem]">
         <Faqs faqs={faq.items} title="Questions families ask" />
-      </div>
-    </section>
-  );
-}
-
-/**
- * The closing film: a moment on a park bench. On wide screens the offer sits
- * over the empty half of the frame; on phones it follows underneath.
- */
-export function CtaFilm({ title = 'Talk to us about your family' }: { title?: string }) {
-  return (
-    <section data-track-slot="cta-film" className="mx-3 mb-3 overflow-hidden rounded-[20px] bg-navy-deep text-paper">
-      <div className="relative">
-        <div className="relative aspect-video max-h-[85svh] w-full">
-          <LoopVideo src="/video/park-bench.mp4" poster="/video/park-bench.jpg" label={PHOTOS.park.alt} className="absolute inset-0 h-full w-full object-cover object-[25%_30%]" />
-          <div aria-hidden className="absolute inset-0 hidden bg-gradient-to-l from-black/70 via-black/30 to-transparent lg:block" />{/* taste-skill-ignore: scrim over the film so the text reads */}
-        </div>
-        <div className="px-6 py-12 sm:px-12 lg:absolute lg:inset-y-0 lg:right-0 lg:flex lg:w-1/2 lg:items-center lg:py-0">
-          <div>
-            <Reveal>
-              <h2 className="max-w-[16ch] text-[2rem] sm:text-[2.6rem] lg:text-[3.6rem]">{title}</h2>
-            </Reveal>
-            <Reveal delay={80}>
-              <p className="mt-5 max-w-[40ch] text-lg leading-[1.55] text-paper/90">
-                A free consultation to talk through your needs. We talk through home care or DDD services and the next steps for your family, with no obligation.
-              </p>
-            </Reveal>
-            <Reveal delay={160} className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <Link href="/contact?cta=cta-film#book" data-cta="book-consultation" data-placement="cta-film" className={`${BUTTON} bg-paper text-navy-deep hover:bg-white`}>
-                Book a free consultation
-              </Link>
-              <a href={site.phoneHref} className="text-[17px] font-medium underline decoration-gold decoration-2 underline-offset-[6px] hover:decoration-paper">
-                Call {site.phone}
-              </a>
-            </Reveal>
-          </div>
-        </div>
       </div>
     </section>
   );

@@ -19,7 +19,7 @@ export default function MissionPage() {
         crumbs={[{ name: 'Mission and values', href: '/mission' }]}
         title="Why we do what we do"
         lead="We believe in treating our clients with compassion and respect."
-        photo={PHOTOS.garden}
+        photo={PHOTOS['home-care-companionship']}
       />
 
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-16 md:py-20">

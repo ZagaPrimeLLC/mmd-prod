@@ -16,7 +16,7 @@ export async function Intro() {
     <section id="our-approach" aria-labelledby="approach-title" data-track-slot="home.intro" className="mx-3 mt-3 overflow-hidden rounded-[20px] bg-paper p-3 sm:p-6 lg:p-10">
       <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
         <Reveal className="relative aspect-[4/5] overflow-hidden rounded-[14px] sm:max-lg:aspect-[5/4] lg:aspect-auto lg:min-h-[38rem]">
-          <Image src={PHOTOS.library.src} alt={PHOTOS.library.alt} fill sizes="(min-width: 1024px) 43vw, 100vw" className="object-cover object-center" />
+          <Image src={PHOTOS.library.src} alt={PHOTOS.library.alt} fill quality={82} sizes="(min-width: 1024px) 43vw, 100vw" className="object-cover object-top" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-deep/80 to-transparent px-7 pb-8 pt-24 text-paper">
             <p className="text-sm font-medium tracking-[0.08em]">EVERYDAY LIFE. YOUR WAY.</p>
           </div>

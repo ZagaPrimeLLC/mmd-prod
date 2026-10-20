@@ -125,13 +125,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
       <section className="grid gap-3 px-3 pt-3 md:grid-cols-2">
         {others.map((o) => (
-          <Link key={o.slug} href={`/services/${o.slug}`} className="group relative block aspect-[4/5] overflow-hidden rounded-[20px] text-paper lg:aspect-video">
-            <ArtImage photo={PHOTOS[o.photo]} noUltra sizes="(min-width: 768px) 50vw, 100vw" className="transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]" />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />{/* taste-skill-ignore: scrim over the photo so the text reads */}
-            <div className="absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10">
-              <p className="text-[2rem] font-light tracking-[-0.03em]">{o.name}</p>
-              <p className="mt-2 max-w-[44ch] text-[17px] text-paper/90">{o.lead}</p>
+          <Link key={o.slug} href={"/services/" + o.slug} className="group flex flex-col justify-between gap-8 rounded-[20px] bg-cream px-6 py-10 text-navy-deep transition hover:bg-gold/20 sm:px-10">
+            <div>
+              <h2 className="text-[2rem] font-normal tracking-[-0.03em]">{o.name}</h2>
+              <p className="mt-4 max-w-[44ch] text-[17px] leading-relaxed">{o.lead}</p>
             </div>
+            <span className="self-start border-b-2 border-gold pb-1 font-medium">View service <span aria-hidden>↗</span></span>
           </Link>
         ))}
       </section>

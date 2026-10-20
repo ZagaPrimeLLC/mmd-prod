@@ -21,7 +21,7 @@ export default async function AboutPage() {
         crumbs={[{ name: 'About', href: '/about' }]}
         title="Care built around the person, not the paperwork"
         lead="We provide Home Health Aide Services for adults and seniors, alongside statewide NJ DDD Community-Based Supports, Individual Supports and Respite."
-        photo={PHOTOS.kitchen}
+        photo={PHOTOS['about-listening']}
       />
 
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-16 md:py-20">
@@ -46,10 +46,10 @@ export default async function AboutPage() {
             </div>
           </div>
           <Image
-            src={PHOTOS.library.src}
-            alt={PHOTOS.library.alt}
-            width={PHOTOS.library.width}
-            height={PHOTOS.library.height}
+            src={PHOTOS['about-teamwork'].src}
+            alt={PHOTOS['about-teamwork'].alt}
+            width={PHOTOS['about-teamwork'].width}
+            height={PHOTOS['about-teamwork'].height}
             sizes="(min-width: 768px) 50vw, 100vw"
             className="w-full rounded-[20px]"
           />

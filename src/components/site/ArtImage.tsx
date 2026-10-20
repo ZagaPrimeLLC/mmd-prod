@@ -8,7 +8,7 @@ import type { Photo } from '@/lib/photos';
  * crop a portrait picture. Fills its (positioned) parent.
  */
 export default function ArtImage({
-  photo, className = '', priority = false, sizes = '100vw', position, noUltra = false,
+  photo, className = '', priority = false, sizes = '100vw', position = 'center top', noUltra = false,
 }: {
   photo: Photo;
   className?: string;

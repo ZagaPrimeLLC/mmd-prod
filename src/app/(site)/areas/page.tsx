@@ -1,39 +1,34 @@
 import type { Metadata } from 'next';
-import { PHOTOS } from '@/lib/photos';
 import Link from 'next/link';
-import PageHero from '@/components/site/PageHero';
-import CountyMap from '@/components/site/CountyMap';
+import AreaHero from '@/components/site/AreaHero';
 import CTABanner from '@/components/site/CTABanner';
 import { AREAS } from '@/lib/seo-content';
 import { NJ_COUNTIES } from '@/lib/nj-counties';
+import { pageMetadata } from '@/lib/seo-metadata';
 
-export const metadata: Metadata = {
-  title: 'Areas We Serve in New Jersey',
+export const metadata: Metadata = pageMetadata({
+  title: 'DDD and Home Care in New Jersey',
   description:
-    'MMD Community Care provides DDD services to adults in every county in New Jersey, from our office in South Plainfield, Middlesex County.',
-  alternates: { canonical: '/areas' },
-};
+    'Explore DDD support and Home Health Aide Services in New Jersey. MMD serves every county for DDD services; contact us to confirm home care availability in your town.',
+  path: '/areas',
+});
 
 export default function AreasPage() {
   const withPages = new Set(AREAS.map((a) => a.slug));
   return (
     <>
-      <PageHero
+      <AreaHero
         crumbs={[{ name: 'Areas we serve', href: '/areas' }]}
-        title="DDD support across New Jersey"
-        lead="Our office is in South Plainfield, Middlesex County, and our Direct Support Professionals work with adults and families statewide."
-        photo={PHOTOS.walk}
+        title="DDD support and Home Health Aide Services across New Jersey"
+        lead="DDD support for adults with special needs, and Home Health Aide Services for adults and seniors. Our DDD services reach every New Jersey county; home care availability is confirmed for your town and schedule."
       />
       <aside className="mx-3 mt-3 rounded-[20px] bg-cream px-6 py-8 text-navy-deep sm:px-12">
-        <h2 className="text-2xl">Looking for Home Health Aide Services?</h2>
-        <p className="mt-3 max-w-3xl text-lg">The county map below describes our DDD services. For home care, share your town or ZIP code and preferred schedule so our team can confirm availability.</p>
+        <h2 className="text-2xl">Home Health Aide Services</h2>
+        <p className="mt-3 max-w-3xl text-lg">Our Home Health Aide Services offer personal care, companionship and help with everyday routines. Share your town or ZIP code and preferred schedule so our team can confirm availability.</p>
         <Link href="/services/home-health-aide" className="mt-4 inline-block font-medium underline decoration-gold decoration-2 underline-offset-4">Explore Home Health Aide Services</Link>
       </aside>
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-20 md:py-24">
-        <div className="mx-auto grid w-full max-w-7xl items-start gap-14 px-5 sm:px-8 md:grid-cols-[auto_minmax(0,1fr)] lg:gap-24 lg:px-12">
-          <div className="flex justify-center">
-            <CountyMap pages={AREAS.map((a) => a.slug)} />
-          </div>
+        <div className="mx-auto grid w-full max-w-7xl items-start gap-14 px-5 sm:px-8  lg:px-12">
           <div>
             <h2 className="text-3xl text-navy-deep md:text-4xl">Choose your county</h2>
             <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3">
@@ -52,8 +47,8 @@ export default function AreasPage() {
               ))}
             </ul>
             <p className="mt-8 max-w-xl leading-relaxed text-navy-deep">
-              Don’t see a page for your county yet? We still serve it. Get in touch with the town and we will confirm
-              how quickly we can staff support.
+              Don’t see a page for your county yet? Our DDD services cover every county. For DDD or Home Health Aide Services,
+              get in touch with your town and the support you need so we can confirm staffing and availability.
             </p>
           </div>
         </div>

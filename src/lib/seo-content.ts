@@ -59,7 +59,7 @@ export const DDD_SERVICES: DddService[] = [
       'The family wants reliable support from trained, checked staff',
     ],
     photo: 'grocery',
-    image: '/img/grocery.jpg',
+    image: '/img/refresh/grocery-v2.webp',
     imageAlt: 'An MMD Direct Support Professional choosing fruit with a client at the grocery store',
     faqs: [
       { q: 'Who pays for Community-Based Supports?', a: 'For people eligible for NJ Division of Developmental Disabilities services, CBS is funded through the person’s DDD budget. Your support coordinator confirms what your budget and program include.' },
@@ -94,7 +94,7 @@ export const DDD_SERVICES: DddService[] = [
       'Building independence at home is a goal in the service plan',
     ],
     photo: 'kitchen',
-    image: '/img/kitchen.jpg',
+    image: '/img/refresh/kitchen-v2.webp',
     imageAlt: 'An MMD support professional cooking with a client in his kitchen',
     faqs: [
       { q: 'How are Individual Supports funded?', a: 'For people with NJ DDD services, Individual Supports are paid through the person’s DDD budget. Which services a budget covers depends on the person’s program and assessment, so your support coordinator is the one to confirm it.' },
@@ -127,9 +127,9 @@ export const DDD_SERVICES: DddService[] = [
       'The person does best with someone they already know',
       'Respite is part of the person’s DDD budget or plan',
     ],
-    photo: 'respite',
-    image: '/img/respite.jpg',
-    imageAlt: 'An MMD support professional looking through a photo album with a client at home',
+    photo: 'respite-jigsaw',
+    image: '/img/distinct/respite-jigsaw-v2.webp',
+    imageAlt: 'A client and an MMD support professional enjoying a jigsaw puzzle together',
     faqs: [
       { q: 'Who is respite for?', a: 'Respite is for the unpaid family caregivers of an adult with a developmental disability: a short break while trained staff support the person.' },
       { q: 'Is respite covered by DDD?', a: 'Respite is a DDD service, funded through the person’s budget. Your support coordinator confirms how much is available and how to schedule it.' },
@@ -283,7 +283,8 @@ export function areaForLocation(location: string | null | undefined): Area | und
 export function areaFaqs(a: Area): Faq[] {
   return [
     { q: `Do you provide DDD services in ${a.name} County?`, a: `Yes. MMD Community Care provides Community-Based Supports, Individual Supports and Respite to adults in ${a.name} County, including ${a.towns.slice(0, 4).join(', ')} and nearby towns.` },
-    { q: `How do we start services in ${a.name} County?`, a: 'Tell your DDD support coordinator you would like MMD Community Care as your provider, or call us first and we will explain the next steps. Consultations are free.' },
+    { q: `Are Home Health Aide Services available in ${a.name} County?`, a: 'Contact us directly with your town or ZIP code, the support needed and your preferred schedule. Our team will confirm Home Health Aide Services availability and discuss the next steps. Home care follows a separate process from DDD services.' },
+    { q: `How do we start DDD services in ${a.name} County?`, a: 'Tell your DDD support coordinator you would like MMD Community Care as your provider, or call us first and we will explain the next steps. Consultations are free.' },
     { q: `Are you hiring in ${a.name} County?`, a: `We hire Direct Support Professionals for cases across New Jersey, including ${a.name} County. Current openings are listed on this page and on our careers page.` },
   ];
 }

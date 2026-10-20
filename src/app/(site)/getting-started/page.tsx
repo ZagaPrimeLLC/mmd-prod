@@ -32,7 +32,7 @@ export default async function GettingStartedPage() {
         crumbs={[{ name: 'Getting started', href: '/getting-started' }]}
         title="Starting DDD services for an adult in New Jersey"
         lead="The Division of Developmental Disabilities process can feel like a maze the first time. Here is the path in plain words, and where MMD fits in."
-        photo={PHOTOS.hands}
+        photo={PHOTOS['getting-started-plan']}
       />
 
       <aside className="mx-3 mt-3 rounded-[20px] bg-cream px-6 py-8 text-navy-deep sm:px-12">

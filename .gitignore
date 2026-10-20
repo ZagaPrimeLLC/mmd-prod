@@ -6,6 +6,7 @@ out/
 .env.local
 .env*.local
 *.tsbuildinfo
+supabase/.temp/
 next-env.d.ts
 .wrangler/
 

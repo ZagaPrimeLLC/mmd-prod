@@ -1,20 +1,18 @@
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/seo-metadata';
-import { PHOTOS } from '@/lib/photos';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import ArtImage from '@/components/site/ArtImage';
-import PageHero from '@/components/site/PageHero';
+import AreaHero from '@/components/site/AreaHero';
 import Faqs from '@/components/site/Faqs';
 import JsonLd from '@/components/site/JsonLd';
 import CTABanner from '@/components/site/CTABanner';
-import CountyMap from '@/components/site/CountyMap';
 import { AREAS, DDD_SERVICES, areaBySlug, areaFaqs, areaForLocation } from '@/lib/seo-content';
 import { serviceLd } from '@/lib/schema';
 import { AREA_RESOURCES } from '@/lib/area-resources';
 import { getOpenJobs } from '@/lib/public-jobs';
 import { payLabel } from '@/lib/jobs';
 import { site } from '@/lib/site';
+import { HOME_CARE } from '@/lib/home-care';
 
 export const revalidate = 3600;
 
@@ -25,9 +23,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const a = areaBySlug((await params).slug);
   if (!a) return {};
-  const description = `DDD approved Community-Based Supports, Individual Supports and Respite for adults with developmental disabilities in ${a.name} County, NJ, including ${a.towns.slice(0, 4).join(', ')}.`;
+  const description = `DDD support in ${a.name} County, NJ, plus Home Health Aide Services for adults and seniors. Contact MMD to confirm home care availability in your town.`;
   return pageMetadata({
-    title: `DDD Services in ${a.name} County, NJ`,
+    title: `DDD and Home Care in ${a.name} County, NJ`,
     description,
     path: `/areas/${a.slug}`,
   });
@@ -43,11 +41,11 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
   return (
     <>
       <JsonLd data={DDD_SERVICES.map((s) => serviceLd(s, a.name))} />
-      <PageHero
+      <AreaHero
         crumbs={[{ name: 'Areas we serve', href: '/areas' }, { name: `${a.name} County`, href: `/areas/${a.slug}` }]}
-        title={`DDD services in ${a.name} County`}
-        lead={a.intro}
-        photo={PHOTOS.bus}
+        title={`DDD support and Home Health Aide Services in ${a.name} County`}
+        lead={`${a.intro} For Home Health Aide Services, contact us with your town and preferred schedule to confirm availability.`}
+        county={a.slug}
       />
 
       <section className="grid gap-3 px-3 pt-3 lg:grid-cols-2" aria-label={`Planning support in ${a.name} County`}>
@@ -83,10 +81,16 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
         </aside>
       </section>
 
-      <section className="grid gap-3 px-3 pt-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+      <section className="grid gap-3 px-3 pt-3 ">
         <div className="rounded-[20px] bg-paper px-6 py-14 sm:px-12 md:py-20">
           <h2 className="text-[2.4rem] text-navy-deep md:text-[3rem]">Services in {a.name} County</h2>
           <ul className="mt-10 space-y-10">
+            <li>
+              <h3 className="text-[1.6rem] font-normal text-navy-deep">
+                <Link href="/services/home-health-aide" className="underline decoration-gold decoration-2 underline-offset-[6px] hover:decoration-navy-deep">{HOME_CARE.name}</Link>
+              </h3>
+              <p className="mt-3 max-w-[60ch] text-[18px] leading-[1.6] text-navy-deep">Personal care, companionship and help with everyday routines for adults and seniors at home. Share your town or ZIP code and preferred schedule to confirm home care availability.</p>
+            </li>
             {DDD_SERVICES.map((s) => (
               <li key={s.slug}>
                 <h3 className="text-[1.6rem] font-normal text-navy-deep">
@@ -97,21 +101,17 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
             ))}
           </ul>
         </div>
-        <div className="flex items-center justify-center rounded-[20px] bg-cream p-8">
-          <CountyMap pages={AREAS.map((x) => x.slug)} highlight={a.slug} />
-        </div>
       </section>
 
       <section className="grid gap-3 px-3 pt-3 lg:grid-cols-2">
         <div className="rounded-[20px] bg-gold px-6 py-14 text-navy-deep sm:px-12">
-          <h2 className="text-[2.4rem] md:text-[3rem]">Towns we cover</h2>
-          <p className="mt-4 text-[18px]">Including, but not limited to:</p>
+          <h2 className="text-[2.4rem] md:text-[3rem]">Support in your town</h2>
+          <p className="mt-4 text-[18px]">Our DDD coverage includes these towns and nearby communities. For Home Health Aide Services, contact us to confirm availability in your town.</p>
           <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-3 text-[19px] sm:grid-cols-3">
             {a.towns.map((t) => <li key={t}>{t}</li>)}
           </ul>
         </div>
         <div className="relative overflow-hidden rounded-[20px] bg-navy-deep px-6 py-14 text-paper sm:px-12">
-          <ArtImage photo={PHOTOS.team} className="opacity-25" position="center 20%" sizes="50vw" />
           <div className="relative">
             <h2 className="text-[2.4rem] md:text-[3rem]">Jobs in {a.name} County</h2>
             {jobs.length > 0 ? (

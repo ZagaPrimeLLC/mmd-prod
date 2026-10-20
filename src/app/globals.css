@@ -281,6 +281,7 @@ main:focus { outline: none; }
   .mmd-ribbon-copy, .mmd-ribbon-control { display: none; }
 }
 
+
 /* A slow push on still photographs so the page never sits dead. */
 .mmd-drift { animation: mmd-drift 24s ease-in-out infinite alternate; transform-origin: 50% 0; }
 @keyframes mmd-drift { from { transform: scale(1.02); } to { transform: scale(1.09) translateX(-1%); } }

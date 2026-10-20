@@ -50,7 +50,7 @@ export default async function CareersPage() {
         crumbs={[{ name: 'Careers', href: '/careers' }]}
         title="Better care starts with you"
         lead="Join a team of dedicated Direct Support Professionals making a real difference in the lives of adults with special needs across New Jersey."
-        photo={PHOTOS.team}
+        photo={PHOTOS['careers-training']}
       />
 
       {/* ── Open positions ─────────────────────────────────────────── */}
@@ -131,10 +131,10 @@ export default async function CareersPage() {
             </ul>
           </div>
           <Image
-            src={PHOTOS.office.src}
-            alt={PHOTOS.office.alt}
-            width={PHOTOS.office.width}
-            height={PHOTOS.office.height}
+            src={PHOTOS['careers-mentor'].src}
+            alt={PHOTOS['careers-mentor'].alt}
+            width={PHOTOS['careers-mentor'].width}
+            height={PHOTOS['careers-mentor'].height}
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="w-full rounded-[20px]"
           />

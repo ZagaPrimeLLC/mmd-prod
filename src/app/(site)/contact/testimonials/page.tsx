@@ -24,7 +24,7 @@ export default function TestimonialsPage() {
         crumbs={[{ name: 'Contact', href: '/contact' }, { name: 'Share your experience', href: '/contact/testimonials' }]}
         title="Tell us how we are doing"
         lead="Families, support coordinators and our own team: your experience helps us improve, and helps other families choose with confidence."
-        photo={PHOTOS.respite}
+        photo={PHOTOS['feedback-conversation']}
       />
       <section className="mx-3 mt-3 rounded-[20px] bg-paper py-20 md:py-24">
         <div className="mx-auto grid w-full max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:px-12">

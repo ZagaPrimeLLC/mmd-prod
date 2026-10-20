@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import JsonLd from '@/components/site/JsonLd';
 import StepsSection from '@/components/site/StepsSection';
 import { Intro, Figures } from '@/components/site/home/ReadingColumn';
-import { HeroFilm, WhatWeDo, ContactStrip, JobsSheet, FaqSplit, CtaFilm } from '@/components/site/home/Sections';
+import { HeroFilm, WhatWeDo, ContactStrip, JobsSheet, FaqSplit } from '@/components/site/home/Sections';
+import CTABanner from '@/components/site/CTABanner';
 import { organizationLd } from '@/lib/schema';
 import { getOpenJobs } from '@/lib/public-jobs';
 import { site } from '@/lib/site';
@@ -50,7 +51,7 @@ export default async function HomePage() {
         <ContactStrip />
         <JobsSheet jobs={jobs} />
         <FaqSplit />
-        <CtaFilm />
+        <CTABanner />
       </div>
     </>
   );

@@ -26,10 +26,10 @@ export default function ServicesPage() {
         crumbs={[{ name: 'Services', href: '/services' }]}
         title="Care at home. Support in the community."
         lead="Explore Home Health Aide Services for adults and seniors, alongside our NJ DDD-approved Community-Based Supports, Individual Supports and Respite. We will help you find the right starting point."
-        photo={PHOTOS.boardgame}
+        photo={PHOTOS['services-welcome']}
       />
 
-      <HomeCareFeature />
+      <HomeCareFeature photo={PHOTOS['home-care-routine']} />
       <ServiceRows />
 
       <section className="mx-3 mt-3 rounded-[20px] bg-cream py-20 md:py-24">
